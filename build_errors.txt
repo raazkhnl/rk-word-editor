@@ -1,0 +1,4 @@
+﻿packages/core/src/ExportEngine.ts(75,21): error TS2540: Cannot assign to 'alignment' because it is a read-only property.
+packages/core/src/ExportEngine.ts(83,47): error TS2749: 'HeadingLevel' refers to a value, but is being used as a type here. Did you mean 'typeof HeadingLevel'?
+packages/core/src/ExportEngine.ts(103,21): error TS2540: Cannot assign to 'alignment' because it is a read-only property.
+packages/core/src/ExportEngine.ts(164,43): error TS2749: 'AlignmentType' refers to a value, but is being used as a type here. Did you mean 'typeof AlignmentType'?

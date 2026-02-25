@@ -46,6 +46,19 @@ export const TextTransform = Extension.create<TextTransformOptions>({
                             };
                         },
                     },
+                    fontVariant: {
+                        default: null,
+                        parseHTML: (element) => element.style.fontVariant,
+                        renderHTML: (attributes) => {
+                            if (!attributes.fontVariant) {
+                                return {};
+                            }
+
+                            return {
+                                style: `font-variant: ${attributes.fontVariant}`,
+                            };
+                        },
+                    },
                 },
             },
         ];
@@ -53,11 +66,17 @@ export const TextTransform = Extension.create<TextTransformOptions>({
 
     addCommands() {
         return {
-            setTextTransform: (textTransform) => ({ chain }) => {
-                return chain().setMark('textStyle', { textTransform }).run();
+            setTextTransform: (textTransform: string) => ({ chain }: { chain: any }) => {
+                return chain()
+                    .focus()
+                    .setMark('textStyle', { textTransform })
+                    .run();
             },
-            unsetTextTransform: () => ({ chain }) => {
-                return chain().setMark('textStyle', { textTransform: null }).removeEmptyTextStyle().run();
+            toggleSmallCaps: () => ({ chain }: { chain: any }) => {
+                return chain().focus().setMark('textStyle', { fontVariant: 'small-caps' }).run();
+            },
+            unsetTextTransform: () => ({ chain }: { chain: any }) => {
+                return chain().focus().setMark('textStyle', { textTransform: null }).removeEmptyTextStyle().run();
             },
         };
     },

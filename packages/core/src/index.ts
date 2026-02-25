@@ -16,7 +16,7 @@ import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { Image } from '@tiptap/extension-image';
 
-// Custom Extensions
+// Core Extensions (Phase 0-2)
 import { FontSize } from './extensions/FontSize';
 import { TextTransform } from './extensions/TextTransform';
 import { LineHeight } from './extensions/LineHeight';
@@ -24,118 +24,188 @@ import { ParagraphSpacing } from './extensions/ParagraphSpacing';
 import { Indent } from './extensions/Indent';
 import { PageBreak } from './extensions/PageBreak';
 import { Footnote } from './extensions/Footnote';
+import { PasteHandler } from './extensions/PasteHandler';
+import { AdvancedTypography } from './extensions/AdvancedTypography';
+import { ParagraphSystem } from './extensions/ParagraphSystem';
+import { StylesEngine } from './extensions/StylesEngine';
+// Phase 3
+import { PageLayout } from './extensions/PageLayout';
+import { Section } from './extensions/Section';
+import { Header, Footer, PageNumber } from './extensions/HeaderFooter';
+// Phase 5
+import { TableStyles } from './extensions/TableStyles';
+// Phase 6
+import { MultilevelList } from './extensions/MultilevelList';
+// Phase 7
+import { Caption } from './extensions/Caption';
+import { ImageResize } from './extensions/ImageResize';
+import { MathInline, MathBlock } from './extensions/Math';
+// Phase 8
+import { TableOfContents } from './extensions/TableOfContents';
+import { Citation, Bibliography } from './extensions/Citation';
+// Phase 10
+import { SlashCommands, SlashCommand } from './extensions/SlashCommands';
 
-// Export
+// Utilities
+import { DocumentValidator } from './DocumentValidator';
+import { CommandManager } from './CommandManager';
 import { ExportEngine, ExportFormat, ExportOptions } from './ExportEngine';
+import { StyleManager } from './StyleManager';
+
+// Re-export types for consumers
+export type { ExportFormat, ExportOptions, SlashCommand };
+export { StyleManager } from './StyleManager';
+export { ExportEngine } from './ExportEngine';
 
 export interface WordEditorOptions {
   element: HTMLElement;
-  content?: string;
-  onUpdate?: (props: { editor: Editor }) => void;
+  initialContent?: string;
+  onUpdate?: (json: any) => void;
+  slashCommands?: SlashCommand[];
 }
 
 export class WordEditor {
   private editor: Editor;
+  public commands: CommandManager;
+  private exporter: ExportEngine;
+  private _styleManager: StyleManager;
 
   constructor(options: WordEditorOptions) {
+    this._styleManager = new StyleManager();
+
     this.editor = new Editor({
       element: options.element,
       extensions: [
-        StarterKit.configure({
-          heading: { levels: [1, 2, 3, 4, 5, 6] },
-        }),
+        // ---- Foundation ----
+        StarterKit,
         Underline,
-        Subscript,
-        Superscript,
         TextStyle,
         FontFamily,
         Color,
         Highlight.configure({ multicolor: true }),
-        FontSize,
-        TextTransform,
+        Subscript,
+        Superscript,
         TextAlign.configure({ types: ['heading', 'paragraph'] }),
-        LineHeight,
-        ParagraphSpacing,
-        Indent,
-        TaskList,
-        TaskItem.configure({ nested: true }),
+        // ---- Tables (Phase 5) ----
         Table.configure({ resizable: true }),
         TableRow,
         TableHeader,
         TableCell,
+        TableStyles,
+        // ---- Lists (Phase 6) ----
+        TaskList,
+        TaskItem.configure({ nested: true }),
+        MultilevelList,
+        // ---- Media (Phase 7) ----
+        Image.configure({ HTMLAttributes: { class: 'rk-image' } }),
+        ImageResize,
+        Caption,
+        MathInline,
+        MathBlock,
+        // ---- Typography (Phase 1) ----
+        FontSize,
+        TextTransform,
+        LineHeight,
+        ParagraphSpacing,
+        Indent,
+        // ---- Layout (Phase 3) ----
         PageBreak,
         Footnote,
-        Image.configure({
-          HTMLAttributes: {
-            class: 'rk-image',
-          },
+        PasteHandler,
+        AdvancedTypography,
+        ParagraphSystem,
+        StylesEngine,
+        PageLayout,
+        Section,
+        Header,
+        Footer,
+        PageNumber,
+        // ---- References (Phase 8) ----
+        TableOfContents,
+        Citation,
+        Bibliography,
+        // ---- Commands (Phase 10) ----
+        SlashCommands.configure({
+          commands: options.slashCommands || undefined,
         }),
       ],
-      content: options.content || '',
+      content: options.initialContent || '',
       onUpdate: ({ editor }) => {
-        if (options.onUpdate) options.onUpdate({ editor });
+        if (options.onUpdate) {
+          options.onUpdate(editor.getJSON());
+        }
       },
     });
+
+    this.commands = new CommandManager(this.editor);
+    this.exporter = new ExportEngine(this._styleManager);
+
+    // Link editor to commands parent for easy access
+    (this.editor as any).options.parent = this;
   }
 
+  // ---- Core API ----
   public getHTML(): string { return this.editor.getHTML(); }
   public getJSON(): any { return this.editor.getJSON(); }
-  public setDocument(content: string | any): void { this.editor.commands.setContent(content); }
+
+  public setDocument(content: string | any): void {
+    const validatedContent = typeof content === 'object'
+      ? DocumentValidator.validate(content)
+      : content;
+    this.editor.commands.setContent(validatedContent);
+  }
+
   public focus(): void { this.editor.chain().focus().run(); }
   public destroy(): void { this.editor.destroy(); }
 
-  // Formatting Shortcuts
-  public format = {
-    bold: () => this.editor.chain().focus().toggleBold().run(),
-    italic: () => this.editor.chain().focus().toggleItalic().run(),
-    underline: () => this.editor.chain().focus().toggleUnderline().run(),
-    strike: () => this.editor.chain().focus().toggleStrike().run(),
-    subscript: () => this.editor.chain().focus().toggleSubscript().run(),
-    superscript: () => this.editor.chain().focus().toggleSuperscript().run(),
+  // ---- Format proxy (legacy compatibility) ----
+  public get format() { return this.commands; }
 
-    fontFamily: (font: string) => this.editor.chain().focus().setFontFamily(font).run(),
-    fontSize: (size: string) => this.editor.chain().focus().setFontSize(size).run(),
-    color: (color: string) => this.editor.chain().focus().setColor(color).run(),
-    highlight: (color: string) => this.editor.chain().focus().setHighlight({ color }).run(),
-    transform: (type: any) => this.editor.chain().focus().setTextTransform(type).run(),
-
-    align: (alignment: any) => this.editor.chain().focus().setTextAlign(alignment).run(),
-    lineHeight: (height: string) => this.editor.chain().focus().setLineHeight(height).run(),
-    spacing: (top: string, bottom: string) => this.editor.chain().focus().setParagraphSpacing({ top, bottom }).run(),
-    indent: () => this.editor.chain().focus().indent().run(),
-    outdent: () => this.editor.chain().focus().outdent().run(),
-
-    heading: (level: any) => this.editor.chain().focus().toggleHeading({ level }).run(),
-    paragraph: () => this.editor.chain().focus().setParagraph().run(),
-
-    bulletList: () => this.editor.chain().focus().toggleBulletList().run(),
-    orderedList: () => this.editor.chain().focus().toggleOrderedList().run(),
-    taskList: () => (this.editor.chain().focus() as any).toggleTaskList().run(),
-
-    insertTable: (options: any) => this.editor.chain().focus().insertTable(options).run(),
-    insertImage: (src: string) => this.editor.chain().focus().setImage({ src }).run(),
-
-    pageBreak: () => (this.editor.commands as any).setPageBreak(),
-    footnote: () => (this.editor.commands as any).setFootnote(),
-
-    clear: () => this.editor.chain().focus().unsetAllMarks().run(),
-    undo: () => this.editor.chain().focus().undo().run(),
-    redo: () => this.editor.chain().focus().redo().run(),
-  };
-
-  public async export(format: ExportFormat, options: ExportOptions = {}) {
-    return ExportEngine.export(this.getHTML(), format, options);
+  // ---- Export API ----
+  public async exportDocx() {
+    return this.exporter.exportToDocx(this.getJSON());
   }
 
+  public async export(format: ExportFormat, _options: ExportOptions = {}) {
+    if (format === 'docx') return this.exportDocx();
+    if (format === 'html') {
+      const blob = new Blob([this.getHTML()], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'document.html';
+      a.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
+    console.warn('Export format not yet implemented:', format);
+  }
+
+  // ---- Document Tools (Phase 8) ----
   public getTableOfContents() {
-    const headings: any[] = [];
+    const headings: { level: number; text: string; id: string }[] = [];
     this.editor.state.doc.descendants((node) => {
       if (node.type.name === 'heading') {
-        headings.push({ level: node.attrs.level, text: node.textContent });
+        const text = node.textContent;
+        const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        headings.push({ level: node.attrs.level, text, id });
       }
     });
     return headings;
   }
 
+  public getWordCount(): { words: number; characters: number; paragraphs: number } {
+    const text = this.editor.state.doc.textContent;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const characters = text.length;
+    let paragraphs = 0;
+    this.editor.state.doc.descendants(node => {
+      if (node.type.name === 'paragraph') paragraphs++;
+    });
+    return { words, characters, paragraphs };
+  }
+
+  // ---- Instance access ----
   public get instance(): Editor { return this.editor; }
+  public get styleManager(): StyleManager { return this._styleManager; }
 }
