@@ -23,13 +23,25 @@ export const TableOfContents = Extension.create({
 
     addCommands() {
         return {
-            insertTableOfContents: () => ({ commands }: { commands: any; state: any }) => {
+            insertTableOfContents: () => ({ commands }: { commands: any }) => {
                 const headings = this.storage.headings as any[];
                 if (!headings.length) return false;
 
                 const tocContent = headings.map((h: any) => ({
                     type: 'paragraph',
-                    content: [{ type: 'text', text: `${'  '.repeat(h.level - 1)}${h.text}` }],
+                    attrs: { textAlign: 'left' },
+                    content: [
+                        {
+                            type: 'text',
+                            text: `${' '.repeat((h.level - 1) * 4)}${h.text}`,
+                            marks: [
+                                {
+                                    type: 'textStyle',
+                                    attrs: { color: '#1a73e8' },
+                                },
+                            ],
+                        },
+                    ],
                 }));
 
                 return commands.insertContent(tocContent);

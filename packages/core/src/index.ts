@@ -45,33 +45,47 @@ import { TableOfContents } from './extensions/TableOfContents';
 import { Citation, Bibliography } from './extensions/Citation';
 // Phase 10
 import { SlashCommands, SlashCommand } from './extensions/SlashCommands';
+// Phase 2 Sprint - New Extensions
+import { ImageUpload } from './extensions/ImageUpload';
+import { FormatPainter } from './extensions/FormatPainter';
+import { DragHandle } from './extensions/DragHandle';
+import { TrackChanges } from './extensions/TrackChanges';
 
 // Utilities
 import { DocumentValidator } from './DocumentValidator';
 import { CommandManager } from './CommandManager';
 import { ExportEngine, ExportFormat, ExportOptions } from './ExportEngine';
+import { ImportEngine } from './ImportEngine';
 import { StyleManager } from './StyleManager';
 
-// Re-export types for consumers
+// Re-export types and utilities for consumers
 export type { ExportFormat, ExportOptions, SlashCommand };
 export { StyleManager } from './StyleManager';
 export { ExportEngine } from './ExportEngine';
+export { ImportEngine } from './ImportEngine';
+export type { ChangeRecord } from './extensions/TrackChanges';
 
 export interface WordEditorOptions {
   element: HTMLElement;
   initialContent?: string;
   onUpdate?: (json: any) => void;
+  onWordCount?: (stats: { words: number; characters: number; paragraphs: number }) => void;
   slashCommands?: SlashCommand[];
+  trackAuthor?: string;
+  imageUploadHandler?: (file: File) => Promise<string>;
+  dragHandles?: boolean;
 }
 
 export class WordEditor {
   private editor: Editor;
   public commands: CommandManager;
   private exporter: ExportEngine;
+  private importer: ImportEngine;
   private _styleManager: StyleManager;
 
   constructor(options: WordEditorOptions) {
     this._styleManager = new StyleManager();
+    this.importer = new ImportEngine();
 
     this.editor = new Editor({
       element: options.element,
@@ -99,6 +113,9 @@ export class WordEditor {
         // ---- Media (Phase 7) ----
         Image.configure({ HTMLAttributes: { class: 'rk-image' } }),
         ImageResize,
+        ImageUpload.configure({
+          onUpload: options.imageUploadHandler || null,
+        }),
         Caption,
         MathInline,
         MathBlock,
@@ -128,11 +145,20 @@ export class WordEditor {
         SlashCommands.configure({
           commands: options.slashCommands || undefined,
         }),
+        // ---- Phase 2 Sprint ----
+        FormatPainter,
+        TrackChanges.configure({
+          author: options.trackAuthor || 'Author',
+        }),
+        ...(options.dragHandles !== false ? [DragHandle] : []),
       ],
       content: options.initialContent || '',
       onUpdate: ({ editor }) => {
         if (options.onUpdate) {
           options.onUpdate(editor.getJSON());
+        }
+        if (options.onWordCount) {
+          options.onWordCount(this.getWordCount());
         }
       },
     });
@@ -166,8 +192,14 @@ export class WordEditor {
     return this.exporter.exportToDocx(this.getJSON());
   }
 
-  public async export(format: ExportFormat, _options: ExportOptions = {}) {
+  public async exportMarkdown(): Promise<void> {
+    const md = await this.importer.exportMarkdown(this.getHTML());
+    this.importer.downloadMarkdown(md);
+  }
+
+  public async export(format: ExportFormat | 'markdown', _options: ExportOptions = {}) {
     if (format === 'docx') return this.exportDocx();
+    if (format === 'markdown') return this.exportMarkdown();
     if (format === 'html') {
       const blob = new Blob([this.getHTML()], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
@@ -179,6 +211,31 @@ export class WordEditor {
       return;
     }
     console.warn('Export format not yet implemented:', format);
+  }
+
+  // ---- Import API ----
+  public async importDocx(file: File): Promise<void> {
+    const html = await this.importer.importDocx(file);
+    this.setDocument(html);
+  }
+
+  public async importMarkdown(text: string): Promise<void> {
+    const html = await this.importer.importMarkdown(text);
+    this.setDocument(html);
+  }
+
+  public async importFromFile(file: File): Promise<void> {
+    if (file.name.endsWith('.docx')) {
+      return this.importDocx(file);
+    } else if (file.name.endsWith('.md') || file.name.endsWith('.markdown')) {
+      const text = await file.text();
+      return this.importMarkdown(text);
+    } else if (file.name.endsWith('.html') || file.name.endsWith('.htm')) {
+      const html = await file.text();
+      this.setDocument(html);
+    } else {
+      throw new Error(`Unsupported file format: ${file.name}`);
+    }
   }
 
   // ---- Document Tools (Phase 8) ----
@@ -203,6 +260,15 @@ export class WordEditor {
       if (node.type.name === 'paragraph') paragraphs++;
     });
     return { words, characters, paragraphs };
+  }
+
+  // ---- Track Changes API ----
+  public toggleTrackChanges(): void {
+    (this.editor as any).chain().toggleTrackChanges().run();
+  }
+
+  public isTrackingChanges(): boolean {
+    return (this.editor.storage.trackChanges as any)?.enabled ?? false;
   }
 
   // ---- Instance access ----

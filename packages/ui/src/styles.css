@@ -1,12 +1,266 @@
-/* Editor Container */
+/* ==================================================
+   RK Word Editor - Comprehensive UI Styles
+   ================================================== */
+
+/* ---- CSS Variables ---- */
+:root {
+    --rk-bg: #f0f2f5;
+    --rk-surface: #ffffff;
+    --rk-border: #e1e4e8;
+    --rk-border-strong: #c8ccd0;
+    --rk-text: #24292e;
+    --rk-text-muted: #6a737d;
+    --rk-primary: #1a73e8;
+    --rk-primary-hover: #1557b0;
+    --rk-active-bg: #e8f0fe;
+    --rk-active-text: #1a73e8;
+    --rk-hover-bg: #f6f8fa;
+    --rk-menu-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --rk-radius: 6px;
+    --rk-radius-sm: 3px;
+    --rk-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ---- Shell Layout ---- */
 .rk-word-editor {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: #f0f2f5;
+    background-color: var(--rk-bg);
+    font-family: var(--rk-font-ui);
 }
 
-/* Page Visualization */
+.rk-editor-shell {
+    display: flex;
+    flex-direction: column;
+    background: var(--rk-surface);
+    border-bottom: 1px solid var(--rk-border);
+    user-select: none;
+}
+
+/* ---- Menu Bar ---- */
+.rk-menubar {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    height: 36px;
+    background: var(--rk-surface);
+    border-bottom: 1px solid var(--rk-border);
+    gap: 2px;
+    font-size: 13px;
+}
+
+.rk-menu {
+    position: relative;
+}
+
+.rk-menu-trigger {
+    background: none;
+    border: none;
+    padding: 4px 10px;
+    border-radius: var(--rk-radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--rk-text);
+    font-family: var(--rk-font-ui);
+    transition: background 0.12s;
+}
+
+.rk-menu-trigger:hover,
+.rk-menu-trigger[aria-expanded="true"] {
+    background: var(--rk-hover-bg);
+}
+
+.rk-menu-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    min-width: 220px;
+    background: var(--rk-surface);
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-menu-shadow);
+    padding: 4px;
+    z-index: 1000;
+}
+
+.rk-menu-trigger[aria-expanded="true"]+.rk-menu-dropdown {
+    display: block;
+}
+
+.rk-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 6px 10px;
+    background: none;
+    border: none;
+    border-radius: var(--rk-radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    color: var(--rk-text);
+    font-family: var(--rk-font-ui);
+    gap: 8px;
+    transition: background 0.1s;
+}
+
+.rk-menu-item:hover {
+    background: var(--rk-hover-bg);
+}
+
+.rk-menu-item-label {
+    flex: 1;
+}
+
+.rk-menu-item-shortcut {
+    font-size: 11px;
+    color: var(--rk-text-muted);
+    white-space: nowrap;
+}
+
+.rk-menu-sep {
+    height: 1px;
+    background: var(--rk-border);
+    margin: 4px 0;
+}
+
+.rk-menubar-spacer {
+    flex: 1;
+}
+
+.rk-wordcount-display {
+    font-size: 12px;
+    color: var(--rk-text-muted);
+    padding: 0 8px;
+    white-space: nowrap;
+}
+
+/* ---- Toolbar ---- */
+.rk-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 4px 8px;
+    gap: 2px;
+    background: var(--rk-surface);
+    border-bottom: 1px solid var(--rk-border);
+}
+
+.rk-tb-group {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-right: 4px;
+    padding-right: 6px;
+    border-right: 1px solid var(--rk-border);
+}
+
+.rk-tb-group:last-child {
+    border-right: none;
+}
+
+.rk-toolbar button {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--rk-radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--rk-text);
+    font-family: var(--rk-font-ui);
+    transition: background 0.1s, border-color 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.rk-toolbar button:hover {
+    background: var(--rk-hover-bg);
+    border-color: var(--rk-border);
+}
+
+.rk-toolbar button.is-active {
+    background: var(--rk-active-bg);
+    color: var(--rk-active-text);
+    border-color: #b3cef6;
+}
+
+.rk-toolbar button:focus-visible {
+    outline: 2px solid var(--rk-primary);
+    outline-offset: 1px;
+}
+
+.rk-toolbar select {
+    height: 28px;
+    padding: 0 4px;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    background: var(--rk-surface);
+    font-size: 12px;
+    color: var(--rk-text);
+    cursor: pointer;
+    font-family: var(--rk-font-ui);
+}
+
+.rk-toolbar select:focus-visible {
+    outline: 2px solid var(--rk-primary);
+    outline-offset: 1px;
+}
+
+.rk-select-wide {
+    min-width: 140px;
+}
+
+.rk-select-medium {
+    min-width: 100px;
+}
+
+.rk-select-narrow {
+    min-width: 60px;
+}
+
+/* ---- Color Picker Buttons ---- */
+.rk-color-btn {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: var(--rk-radius-sm);
+    font-size: 13px;
+    gap: 3px;
+    transition: background 0.1s;
+}
+
+.rk-color-btn:hover {
+    background: var(--rk-hover-bg);
+    border-color: var(--rk-border);
+}
+
+.rk-color-btn input[type="color"] {
+    width: 14px;
+    height: 14px;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.rk-highlight-btn span {
+    background: #ffff00;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+/* ---- Editor Area ---- */
 .rk-editor {
     flex: 1;
     overflow-y: auto;
@@ -14,269 +268,298 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: none;
-    background: transparent;
-    box-shadow: none;
+    background: var(--rk-bg);
 }
 
 .ProseMirror {
     background-color: white !important;
     width: 210mm;
-    /* A4 Width */
     min-height: 297mm;
-    /* A4 Height */
     padding: 1in !important;
-    /* Default Margin */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
-    margin-bottom: 40px;
-    outline: none;
-    box-sizing: border-box;
-    border-radius: 0 !important;
-}
-
-.rk-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    padding: 12px;
-    border-bottom: 1px solid #e1e4e8;
-    background-color: #fafbfc;
-}
-
-.rk-toolbar button,
-.rk-toolbar select {
-    border: 1px solid transparent;
-    background: transparent;
-    padding: 6px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #444;
-    transition: all 0.2s ease;
-}
-
-.rk-toolbar button:hover {
-    background-color: #f1f3f5;
-    border-color: #d1d5da;
-}
-
-.rk-toolbar button.is-active {
-    background-color: #e8f0fe;
-    color: #1a73e8;
-    border-color: #c2d7ff;
-}
-
-.rk-editor-content {
-    padding: 40px 60px;
-    min-height: 500px;
-    outline: none;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 2px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
     line-height: 1.6;
-    font-size: 16px;
-    color: #24292e;
+    color: #000;
+    outline: none !important;
+}
+
+.ProseMirror>*+* {
+    margin-top: 0.5em;
 }
 
 .ProseMirror p {
-    margin-bottom: 1em;
+    margin: 0 0 0.5em;
+    widows: 3;
+    orphans: 3;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+    font-family: var(--rk-font-ui);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 1.2em 0 0.4em;
+    break-after: avoid;
+    page-break-after: avoid;
 }
 
 .ProseMirror h1 {
     font-size: 2em;
-    margin: 1em 0;
 }
 
 .ProseMirror h2 {
-    font-size: 1.5em;
-    margin: 1em 0;
+    font-size: 1.6em;
 }
 
-.ProseMirror a {
-    color: #0366d6;
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
+.ProseMirror h3 {
+    font-size: 1.3em;
 }
 
-.ProseMirror a:hover {
-    border-bottom-color: #0366d6;
+.ProseMirror h4 {
+    font-size: 1.1em;
 }
 
-/* Toolbar Groups */
-.rk-toolbar-group {
-    display: flex;
-    gap: 4px;
-    padding-right: 8px;
-    border-right: 1px solid #e1e4e8;
-    margin-right: 4px;
-}
-
-.rk-toolbar-group:last-child {
-    border-right: none;
-}
-
-/* Tables */
+/* ---- Tables ---- */
 .ProseMirror table {
     border-collapse: collapse;
-    table-layout: fixed;
     width: 100%;
-    margin: 0;
-    overflow: hidden;
+    margin: 1em 0;
+    font-size: 10pt;
 }
 
 .ProseMirror td,
 .ProseMirror th {
-    min-width: 1em;
-    border: 1px solid #ced4da;
-    padding: 3px 5px;
+    border: 1px solid #c0c0c0;
+    padding: 6px 10px;
+    min-width: 60px;
     vertical-align: top;
-    box-sizing: border-box;
     position: relative;
 }
 
 .ProseMirror th {
-    font-weight: bold;
+    background: #f3f4f6;
+    font-weight: 700;
     text-align: left;
-    background-color: #f8f9fa;
 }
 
 .ProseMirror .selectedCell:after {
     z-index: 2;
     position: absolute;
-    content: "";
+    content: '';
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
-    background: rgba(200, 200, 255, 0.4);
+    background: rgba(26, 115, 232, 0.12);
     pointer-events: none;
 }
 
-.ProseMirror .column-resize-handle {
+.column-resize-handle {
     position: absolute;
     right: -2px;
     top: 0;
-    bottom: -2px;
+    bottom: 0;
     width: 4px;
-    background-color: #adf;
+    background-color: var(--rk-primary);
     pointer-events: none;
 }
 
-.ProseMirror .tableWrapper {
-    overflow-x: auto;
-    margin: 1em 0;
+/* ---- Lists ---- */
+.ProseMirror ul {
+    list-style-type: disc;
 }
 
-/* Page Breaks */
-.rk-page-break {
-    border-top: 2px dashed #b1b1b1;
-    margin: 40px 0;
-    position: relative;
-    height: 0;
+.ProseMirror ol {
+    list-style-type: decimal;
 }
 
-.rk-page-break::after {
-    content: "PAGE BREAK";
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fff;
-    padding: 0 10px;
-    font-size: 10px;
-    color: #888;
-    letter-spacing: 2px;
-}
-
-/* Lists */
 .ProseMirror ul,
 .ProseMirror ol {
-    padding: 0 1rem;
-    margin: 1.25rem 1rem 1.25rem 0.4rem;
-}
-
-.ProseMirror li {
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
+    padding-left: 1.5em;
+    margin: 0.5em 0;
 }
 
 .ProseMirror ul[data-type="taskList"] {
     list-style: none;
-    padding: 0;
+    padding-left: 0.5em;
 }
 
 .ProseMirror ul[data-type="taskList"] li {
     display: flex;
     align-items: flex-start;
+    gap: 6px;
 }
 
-.ProseMirror ul[data-type="taskList"] label {
-    user-select: none;
-    margin-right: 0.5rem;
+.ProseMirror ul[data-type="taskList"] li>label {
+    margin-top: 2px;
+    flex-shrink: 0;
 }
 
-.ProseMirror ul[data-type="taskList"] input {
-    cursor: pointer;
+/* ---- Blockquote / Code ---- */
+.ProseMirror blockquote {
+    border-left: 4px solid var(--rk-border-strong);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #555;
+    font-style: italic;
 }
 
-/* Alignment */
-.ProseMirror [style*="text-align: left"] {
-    text-align: left;
+.ProseMirror pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: var(--rk-radius);
+    padding: 1em;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    overflow-x: auto;
 }
 
-.ProseMirror [style*="text-align: center"] {
-    text-align: center;
+.ProseMirror code {
+    background: #f0f2f5;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    padding: 1px 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
 }
 
-.ProseMirror [style*="text-align: right"] {
-    text-align: right;
+/* ---- Page Break ---- */
+.rk-page-break {
+    display: block;
+    page-break-after: always;
+    border-top: 2px dashed #c8ccd0;
+    margin: 16px 0;
 }
 
-.ProseMirror [style*="text-align: justify"] {
-    text-align: justify;
-}
-
-/* Footnotes */
-footnote {
-    background-color: #f3f4f6;
-    border-radius: 4px;
-    padding: 2px 4px;
-    font-size: 0.8em;
-    vertical-align: super;
-    cursor: pointer;
-    color: #1a73e8;
-    border: 1px solid #e1e4e8;
-}
-
-footnote:hover {
-    background-color: #e5e7eb;
-}
-
-/* Images */
-.ProseMirror img {
+/* ---- Image ---- */
+.rk-image {
     max-width: 100%;
     height: auto;
-    display: block;
-    margin: 1.5rem 0;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.ProseMirror img.ProseMirror-selectednode {
-    outline: 3px solid #1a73e8;
-}
-
-.rk-image {
     cursor: default;
 }
 
-/* Phase 6 - List Styles */
+/* ---- Image Resize Wrapper ---- */
+.rk-image-resize-wrapper {
+    display: inline-block;
+    position: relative;
+    line-height: 0;
+}
+
+.rk-image-resize-wrapper.is-selected img {
+    outline: 2px solid var(--rk-primary);
+    outline-offset: 2px;
+}
+
+.rk-resize-handle {
+    display: none;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--rk-primary);
+    border: 2px solid white;
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.rk-image-resize-wrapper.is-selected .rk-resize-handle {
+    display: block;
+}
+
+/* Handle positions */
+.rk-resize-handle-nw {
+    top: -5px;
+    left: -5px;
+    cursor: nw-resize;
+}
+
+.rk-resize-handle-n {
+    top: -5px;
+    left: calc(50% - 5px);
+    cursor: n-resize;
+}
+
+.rk-resize-handle-ne {
+    top: -5px;
+    right: -5px;
+    cursor: ne-resize;
+}
+
+.rk-resize-handle-e {
+    top: calc(50% - 5px);
+    right: -5px;
+    cursor: e-resize;
+}
+
+.rk-resize-handle-se {
+    bottom: -5px;
+    right: -5px;
+    cursor: se-resize;
+}
+
+.rk-resize-handle-s {
+    bottom: -5px;
+    left: calc(50% - 5px);
+    cursor: s-resize;
+}
+
+.rk-resize-handle-sw {
+    bottom: -5px;
+    left: -5px;
+    cursor: sw-resize;
+}
+
+.rk-resize-handle-w {
+    top: calc(50% - 5px);
+    left: -5px;
+    cursor: w-resize;
+}
+
+.rk-image-resize-wrapper.is-resizing {
+    cursor: move;
+}
+
+/* ---- Drag Handle ---- */
+.rk-drag-handle {
+    position: fixed;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    cursor: grab;
+    color: var(--rk-text-muted);
+    font-size: 13px;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    user-select: none;
+}
+
+.rk-drag-handle:active {
+    cursor: grabbing;
+}
+
+/* ---- Format Painter cursor ---- */
+.rk-format-paint-mode,
+.rk-format-paint-mode * {
+    cursor: crosshair !important;
+}
+
+/* ---- Phase 6 - List Styles ---- */
 .ProseMirror ol[data-list-style] {
     list-style-type: attr(data-list-style);
 }
 
-.ProseMirror ol[start] {
-    list-style-type: decimal;
-}
-
-/* Phase 7 - Captions & Math */
+/* ---- Phase 7 - Captions & Math ---- */
 .rk-caption {
     display: block;
     text-align: center;
@@ -311,10 +594,10 @@ footnote:hover {
     white-space: pre;
 }
 
-/* Phase 8 - Citations & Bibliography */
+/* ---- Phase 8 - Citations & Bibliography ---- */
 .rk-citation {
     font-style: normal;
-    color: #0366d6;
+    color: var(--rk-primary);
     cursor: pointer;
     font-size: 0.9em;
     vertical-align: super;
@@ -322,7 +605,7 @@ footnote:hover {
 }
 
 .rk-bibliography {
-    border-top: 2px solid #e1e4e8;
+    border-top: 2px solid var(--rk-border);
     margin-top: 32px;
     padding-top: 16px;
 }
@@ -335,13 +618,28 @@ footnote:hover {
     text-indent: -1.5em;
 }
 
-/* Phase 10 - Slash Command Palette (for consumers to implement with these styles) */
+/* ---- Track Changes ---- */
+[data-change="insert"] {
+    background: rgba(0, 180, 0, 0.12);
+    text-decoration: underline;
+    text-decoration-color: #00a000;
+    border-radius: 2px;
+}
+
+[data-change="delete"] {
+    background: rgba(220, 0, 0, 0.1);
+    text-decoration: line-through;
+    text-decoration-color: #cc0000;
+    color: #cc0000;
+}
+
+/* ---- Phase 10 - Slash Command Palette ---- */
 .rk-slash-menu {
     position: absolute;
     background: white;
-    border: 1px solid #e1e4e8;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-menu-shadow);
     min-width: 240px;
     max-height: 360px;
     overflow-y: auto;
@@ -359,7 +657,7 @@ footnote:hover {
 
 .rk-slash-menu-item:hover,
 .rk-slash-menu-item.is-selected {
-    background: #f6f8fa;
+    background: var(--rk-hover-bg);
 }
 
 .rk-slash-menu-item-icon {
@@ -380,17 +678,116 @@ footnote:hover {
 .rk-slash-menu-item-title {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #24292e;
+    color: var(--rk-text);
 }
 
 .rk-slash-menu-item-desc {
     font-size: 0.75rem;
-    color: #6a737d;
+    color: var(--rk-text-muted);
 }
 
-/* Accessibility - focus ring */
-.rk-toolbar button:focus-visible,
-.rk-toolbar select:focus-visible {
-    outline: 2px solid #1a73e8;
-    outline-offset: 2px;
+/* ---- Command Palette Overlay ---- */
+.rk-cmd-palette {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+.rk-cmd-palette-inner {
+    background: white;
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-menu-shadow);
+    width: 560px;
+    max-width: 95vw;
+    overflow: hidden;
+}
+
+#rk-cmd-query {
+    width: 100%;
+    padding: 14px 18px;
+    border: none;
+    border-bottom: 1px solid var(--rk-border);
+    font-size: 15px;
+    font-family: var(--rk-font-ui);
+    color: var(--rk-text);
+    outline: none;
+    background: white;
+}
+
+#rk-cmd-query::placeholder {
+    color: var(--rk-text-muted);
+}
+
+.rk-cmd-palette-results {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.rk-cmd-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: var(--rk-radius-sm);
+    cursor: pointer;
+    gap: 8px;
+    transition: background 0.1s;
+}
+
+.rk-cmd-item:hover {
+    background: var(--rk-hover-bg);
+}
+
+.rk-cmd-item-label {
+    font-size: 14px;
+    color: var(--rk-text);
+    flex: 1;
+}
+
+.rk-cmd-item-shortcut {
+    font-size: 11px;
+    color: var(--rk-text-muted);
+    background: var(--rk-hover-bg);
+    border: 1px solid var(--rk-border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    font-family: monospace;
+}
+
+.rk-cmd-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--rk-text-muted);
+    font-size: 14px;
+}
+
+/* ---- Print / PDF ---- */
+@media print {
+
+    .rk-editor-shell,
+    .rk-menubar,
+    .rk-toolbar,
+    .rk-drag-handle,
+    .rk-cmd-palette {
+        display: none !important;
+    }
+
+    .rk-editor {
+        padding: 0 !important;
+        background: white !important;
+    }
+
+    .ProseMirror {
+        box-shadow: none !important;
+        width: 100% !important;
+        min-height: unset !important;
+        padding: 0 !important;
+    }
 }

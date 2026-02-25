@@ -1,0 +1,52 @@
+
+> @rk-editor/core@0.1.0 test
+> vitest run
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/raazk/Desktop/Apps/Antigravity/rk-word-editor/packages/core[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯[1m[7m Unhandled Errors [27m[22m⎯⎯⎯⎯⎯⎯[39m
+[31m[1m
+Vitest caught 3 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[1m[7m Unhandled Error [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: require() of ES Module C:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\node_modules\@csstools\css-calc\dist\index.mjs not supported.
+Instead change the require of C:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\node_modules\@csstools\css-calc\dist\index.mjs to a dynamic import() which is available in all CommonJS modules.[39m
+[90m [2m❯[22m Object.<anonymous> ../../node_modules/@asamuzakjp/css-color/dist/cjs/index.cjs:[2m30:24[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'ERR_REQUIRE_ESM' }[39m
+
+[31m⎯⎯⎯⎯⎯⎯[1m[7m Unhandled Error [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: require() of ES Module C:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\node_modules\@csstools\css-calc\dist\index.mjs not supported.
+Instead change the require of C:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\node_modules\@csstools\css-calc\dist\index.mjs to a dynamic import() which is available in all CommonJS modules.[39m
+[90m [2m❯[22m Object.<anonymous> ../../node_modules/@asamuzakjp/css-color/dist/cjs/index.cjs:[2m30:24[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'ERR_REQUIRE_ESM' }[39m
+
+[31m⎯⎯⎯⎯⎯⎯[1m[7m Unhandled Error [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: require() of ES Module C:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\node_modules\@csstools\css-calc\dist\index.mjs not supported.
+Instead change the require of C:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\node_modules\@csstools\css-calc\dist\index.mjs to a dynamic import() which is available in all CommonJS modules.[39m
+[90m [2m❯[22m Object.<anonymous> ../../node_modules/@asamuzakjp/css-color/dist/cjs/index.cjs:[2m30:24[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'ERR_REQUIRE_ESM' }[39m
+[31m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39m
+
+[2m Test Files [22m [2mno tests[22m
+[2m      Tests [22m [2mno tests[22m
+[2m     Errors [22m [1m[31m3 errors[39m[22m
+[2m   Start at [22m 22:20:31
+[2m   Duration [22m 806ms[2m (transform 36ms, setup 0ms, collect 0ms, tests 0ms, environment 0ms, prepare 0ms)[22m
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path C:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\packages\core
+npm error workspace @rk-editor/core@0.1.0
+npm error location C:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\packages\core
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vitest run
