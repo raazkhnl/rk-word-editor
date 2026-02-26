@@ -23,9 +23,9 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=@rk-editor/demo",
-    "build": "npm run build --workspace=@rk-editor/core && npm run build --workspace=@rk-editor/ui",
-    "build:all": "npm run build && npm run build --workspace=@rk-editor/demo",
+    "dev": "npm run dev --workspace=@raazkhnl/rk-editor-demo",
+    "build": "npm run build --workspace=@raazkhnl/rk-editor-core && npm run build --workspace=@raazkhnl/rk-editor-ui",
+    "build:all": "npm run build && npm run build --workspace=@raazkhnl/rk-editor-demo",
     "clean": "rimraf node_modules packages/*/node_modules packages/*/dist apps/*/node_modules apps/*/dist",
     "publish:packages": "npm publish --workspaces --access public"
   },

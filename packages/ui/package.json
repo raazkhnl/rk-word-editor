@@ -1,5 +1,5 @@
 {
-    "name": "@rk-editor/ui",
+    "name": "@raazkhnl/rk-editor-ui",
     "version": "3.2.0",
     "description": "UI components for RK Word Editor",
     "author": {
@@ -40,7 +40,7 @@
         "./styles.css": "./dist/style.css"
     },
     "peerDependencies": {
-        "@rk-editor/core": "*"
+        "@raazkhnl/rk-editor-core": "*"
     },
     "devDependencies": {
         "@tiptap/extension-underline": "^2.27.0",

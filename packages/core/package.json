@@ -1,5 +1,5 @@
 {
-    "name": "@rk-editor/core",
+    "name": "@raazkhnl/rk-editor-core",
     "version": "3.2.0",
     "description": "Core engine for RK Word Editor built with Tiptap and ProseMirror",
     "author": {
@@ -71,7 +71,6 @@
         "@types/marked": "^5.0.2",
         "@types/node": "^20.11.0",
         "@types/turndown": "^5.0.6",
-        "@types/turndown-plugin-gfm": "^1.0.2",
         "@vitest/coverage-v8": "^4.0.18",
         "@vitest/ui": "^2.1.9",
         "jsdom": "^27.0.1",

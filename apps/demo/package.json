@@ -1,5 +1,5 @@
 {
-    "name": "@rk-editor/demo",
+    "name": "@raazkhnl/rk-editor-demo",
     "version": "3.2.0",
     "private": true,
     "scripts": {
@@ -8,8 +8,8 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@rk-editor/core": "*",
-        "@rk-editor/ui": "*"
+        "@raazkhnl/rk-editor-core": "*",
+        "@raazkhnl/rk-editor-ui": "*"
     },
     "devDependencies": {
         "typescript": "^5.0.0",
