@@ -19,7 +19,6 @@
         "emitDeclarationOnly": true,
         "rootDir": "./src",
         "baseUrl": ".",
-        "skipLibCheck": true,
         "paths": {
             "@rk-editor/core": [
                 "../core/dist/index.d.ts"

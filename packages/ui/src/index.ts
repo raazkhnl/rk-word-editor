@@ -101,7 +101,7 @@ export class WordToolbar {
     ])}
           ${this.buildMenu('Insert', [
       { label: '⊞ Table...', action: 'insertTable' },
-      { label: '🖼 Image from PC', action: 'insertImage' },
+      { label: '🏞 Image from PC', action: 'insertImage' },
       { label: '🔗 Link...', action: 'insertLink' },
       { sep: true },
       { label: '∑ Math (LaTeX)...', action: 'insertMath' },
@@ -190,7 +190,7 @@ export class WordToolbar {
           <!-- Row 2: Tables, Colors, Inserts & Exports -->
           <div class="rk-toolbar-row">
             <div class="rk-toolbar-group" data-label="Table">
-              <button id="insert-table-btn" title="Insert Table">▦</button>
+              <button id="insert-table-btn" title="Insert Table">⊞</button>
               ${this.buildToolbarMenu('Props', [
       { label: 'Row Before', action: 'addRowBefore' },
       { label: 'Row After', action: 'addRowAfter' },
@@ -216,10 +216,10 @@ export class WordToolbar {
             </div>
 
             <div class="rk-toolbar-group" data-label="Insert">
-              <button id="upload-image-btn" title="Image">🖼</button>
+              <button id="upload-image-btn" title="Image">🏞</button>
               <button id="insert-link-btn" title="Link">🔗</button>
               <button id="insert-math-btn" title="Math">∑</button>
-              <button id="insert-footnote-btn" title="Footnote">†</button>
+              <button id="insert-footnote-btn" title="Footnote">_🖋</button>
               <button id="toc-btn" title="TOC">☰</button>
               <button id="page-break-btn" title="Break">✂</button>
             </div>
@@ -231,7 +231,7 @@ export class WordToolbar {
 
             <div class="rk-toolbar-group" data-label="Export">
               <select id="export-format" class="rk-select-narrow">
-                <option value="">Exp</option>
+                <option value="">Exp.</option>
                 <option value="docx">DOCX</option>
                 <option value="pdf">PDF</option>
                 <option value="markdown">MD</option>
