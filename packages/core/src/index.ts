@@ -15,6 +15,7 @@ import { TableRow } from '@tiptap/extension-table-row';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { Image } from '@tiptap/extension-image';
+import { Link } from './extensions/Link';
 
 // Core Extensions (Phase 0-2)
 import { FontSize } from './extensions/FontSize';
@@ -110,6 +111,12 @@ export class WordEditor {
         TaskList,
         TaskItem.configure({ nested: true }),
         MultilevelList,
+        Link.configure({
+          openOnClick: false,
+          HTMLAttributes: {
+            class: 'rk-link',
+          },
+        }),
         // ---- Media (Phase 7) ----
         Image.configure({ HTMLAttributes: { class: 'rk-image' } }),
         ImageResize,
@@ -274,4 +281,24 @@ export class WordEditor {
   // ---- Instance access ----
   public get instance(): Editor { return this.editor; }
   public get styleManager(): StyleManager { return this._styleManager; }
+
+  // Upgrade: Auto-save functionality
+  public enableAutoSave(key: string = 'rk-editor-content'): void {
+    this.editor.on('update', () => {
+      localStorage.setItem(key, JSON.stringify(this.getJSON()));
+    });
+  }
+
+  public loadAutoSave(key: string = 'rk-editor-content'): boolean {
+    const saved = localStorage.getItem(key);
+    if (saved) {
+      try {
+        this.setDocument(JSON.parse(saved));
+        return true;
+      } catch (e) {
+        console.error('Failed to load autosave:', e);
+      }
+    }
+    return false;
+  }
 }

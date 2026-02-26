@@ -141,54 +141,156 @@
 /* ---- Toolbar ---- */
 .rk-toolbar {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 4px 8px;
-    gap: 2px;
-    background: var(--rk-surface);
-    border-bottom: 1px solid var(--rk-border);
+    flex-direction: column;
+    gap: 0;
+    padding: 2px 8px;
+    background: #ffffff;
+    border-bottom: 1px solid #a09e9e;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.rk-tb-group {
+.rk-toolbar-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    height: 34px;
+    flex-wrap: wrap;
+    /* Responsive wrapping */
+}
+
+.rk-toolbar-group {
     display: flex;
     align-items: center;
     gap: 1px;
-    margin-right: 4px;
-    padding-right: 6px;
-    border-right: 1px solid var(--rk-border);
+    padding: 2px 6px;
+    border-right: 1px solid #f0f0f0;
+    height: 100%;
+    position: relative;
 }
 
-.rk-tb-group:last-child {
+.rk-toolbar-group:last-child {
     border-right: none;
 }
 
-.rk-toolbar button {
-    min-width: 28px;
-    height: 28px;
-    padding: 0 6px;
-    background: none;
-    border: 1px solid transparent;
-    border-radius: var(--rk-radius-sm);
+/* Tooltip style labels using data-label */
+/* .rk-toolbar-group:hover::after {
+    content: attr(data-label);
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: #fff;
+    padding: 1px 4px;
+    font-size: 9px;
+    border-radius: 2px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 200;
+} */
+
+.rk-toolbar-group:hover::after {
+    opacity: 1;
+}
+
+.rk-toolbar button,
+.rk-btn {
+    min-width: 24px;
+    height: 24px;
+    padding: 0 4px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
     cursor: pointer;
-    font-size: 13px;
-    color: var(--rk-text);
-    font-family: var(--rk-font-ui);
-    transition: background 0.1s, border-color 0.1s;
+    font-size: 11px;
+    color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    white-space: nowrap;
+    transition: all 0.1s ease;
 }
 
-.rk-toolbar button:hover {
-    background: var(--rk-hover-bg);
-    border-color: var(--rk-border);
+.rk-toolbar button:hover,
+.rk-btn:hover {
+    background: #eee;
+    color: #333;
 }
 
-.rk-toolbar button.is-active {
-    background: var(--rk-active-bg);
-    color: var(--rk-active-text);
-    border-color: #b3cef6;
+.rk-toolbar button.is-active,
+.rk-btn.is-active {
+    background: #000;
+    color: #fff;
+}
+
+/* Toolbar Dropdowns (Standard UI feel) */
+.rk-toolbar-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.rk-toolbar-menu-trigger {
+    height: 24px;
+    padding: 0 6px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.rk-toolbar-menu-trigger:hover {
+    background: #eee;
+}
+
+.rk-toolbar-menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 300;
+    display: none;
+    flex-direction: column;
+    min-width: 140px;
+    padding: 4px 0;
+}
+
+.rk-toolbar-menu:hover .rk-toolbar-menu-dropdown {
+    display: flex;
+}
+
+.rk-toolbar-menu-item {
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #000;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+}
+
+.rk-toolbar-menu-item:hover {
+    background: #000;
+    color: #fff;
+}
+
+.rk-menu-sep {
+    height: 1px;
+    background: #eee;
+    margin: 4px 0;
 }
 
 .rk-toolbar button:focus-visible {
@@ -196,21 +298,29 @@
     outline-offset: 1px;
 }
 
-.rk-toolbar select {
-    height: 28px;
-    padding: 0 4px;
+.rk-select,
+.rk-select-wide,
+.rk-select-medium,
+.rk-select-narrow {
+    height: 30px;
+    padding: 0 8px;
     border: 1px solid var(--rk-border);
     border-radius: var(--rk-radius-sm);
     background: var(--rk-surface);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--rk-text);
     cursor: pointer;
     font-family: var(--rk-font-ui);
+    transition: border-color 0.2s;
 }
 
-.rk-toolbar select:focus-visible {
-    outline: 2px solid var(--rk-primary);
-    outline-offset: 1px;
+.rk-select:hover {
+    border-color: var(--rk-border-strong);
+}
+
+.rk-select:focus {
+    outline: none;
+    border-color: var(--rk-primary);
 }
 
 .rk-select-wide {
@@ -604,18 +714,74 @@
     font-weight: 600;
 }
 
-.rk-bibliography {
-    border-top: 2px solid var(--rk-border);
-    margin-top: 32px;
-    padding-top: 16px;
-}
-
 .rk-bibliography p {
     margin-bottom: 0.5em;
     font-size: 0.9em;
     color: #444;
     padding-left: 1.5em;
     text-indent: -1.5em;
+}
+
+/* ---- Table of Contents Refinements (Update 3.1) ---- */
+.rk-toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+    text-decoration: none;
+    color: var(--rk-text);
+}
+
+.rk-toc-text {
+    flex-shrink: 0;
+}
+
+.rk-toc-filler {
+    flex-grow: 1;
+    border-bottom: 1px dotted var(--rk-border-strong);
+    height: 12px;
+}
+
+.rk-toc-page {
+    flex-shrink: 0;
+    font-weight: 500;
+}
+
+/* ---- Nepali Numbering System (Update 3.1) ---- */
+@counter-style nepali {
+    system: numeric;
+    symbols: '०' '१' '२' '३' '४' '५' '६' '७' '८' '९';
+}
+
+.rk-list-nepali {
+    list-style-type: none !important;
+}
+
+.rk-list-nepali li {
+    counter-increment: nepali-counter;
+    display: flex;
+    align-items: flex-start;
+}
+
+.rk-list-nepali li::before {
+    content: counter(nepali-counter, nepali) ". ";
+    margin-right: 8px;
+    font-family: inherit;
+    min-width: 1.5em;
+}
+
+.rk-numbered-headings.rk-nepali-headings h1 {
+    counter-reset: h2;
+}
+
+.rk-numbered-headings.rk-nepali-headings h1::before {
+    counter-increment: h1;
+    content: counter(h1, nepali) ". ";
+}
+
+.rk-numbered-headings.rk-nepali-headings h2::before {
+    counter-increment: h2;
+    content: counter(h1, nepali) "." counter(h2, nepali) " ";
 }
 
 /* ---- Track Changes ---- */
@@ -768,20 +934,51 @@
     font-size: 14px;
 }
 
-/* ---- Print / PDF ---- */
+/* ---- Print / PDF (High-Fidelity) ---- */
 @media print {
 
+    body,
+    .rk-word-editor {
+        background: #fff !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
     .rk-editor-shell,
-    .rk-menubar,
     .rk-toolbar,
+    .rk-menubar,
+    .rk-cmd-palette,
     .rk-drag-handle,
-    .rk-cmd-palette {
+    .rk-modal-overlay,
+    .rk-toolbar-container {
         display: none !important;
     }
 
-    .rk-editor {
+    .rk-editor-container {
         padding: 0 !important;
-        background: white !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        border: none !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Ensure outer containers don't show scrollbars */
+    html,
+    body {
+        overflow: hidden !important;
+    }
+
+    .rk-page-view {
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #fff !important;
+        width: 100% !important;
+        height: auto !important;
+        page-break-after: always;
     }
 
     .ProseMirror {
@@ -789,5 +986,155 @@
         width: 100% !important;
         min-height: unset !important;
         padding: 0 !important;
+        background: white !important;
     }
+}
+
+/* ==================================================
+   MODAL SYSTEM (Update 3.0)
+   ================================================== */
+.rk-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rk-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.rk-modal-content {
+    background: var(--rk-surface);
+    width: 100%;
+    max-width: 400px;
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-menu-shadow);
+    transform: translateY(20px);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.rk-modal-overlay.active .rk-modal-content {
+    transform: translateY(0);
+}
+
+.rk-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--rk-border);
+    background: var(--rk-hover-bg);
+}
+
+.rk-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.rk-modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--rk-text-muted);
+}
+
+.rk-modal-body {
+    padding: 16px;
+}
+
+.rk-modal-field {
+    margin-bottom: 12px;
+}
+
+.rk-modal-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--rk-text-muted);
+}
+
+.rk-modal-field input,
+.rk-modal-field select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    font-family: var(--rk-font-ui);
+    font-size: 14px;
+}
+
+.rk-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--rk-hover-bg);
+    border-top: 1px solid var(--rk-border);
+}
+
+/* ==================================================
+   HEADING NUMBERING (Update 3.0)
+   ================================================== */
+.rk-numbered-headings {
+    counter-reset: h1;
+}
+
+.rk-numbered-headings h1 {
+    counter-reset: h2;
+}
+
+.rk-numbered-headings h2 {
+    counter-reset: h3;
+}
+
+.rk-numbered-headings h3 {
+    counter-reset: h4;
+}
+
+.rk-numbered-headings h1::before {
+    counter-increment: h1;
+    content: counter(h1) ". ";
+}
+
+.rk-numbered-headings h2::before {
+    counter-increment: h2;
+    content: counter(h1) "." counter(h2) " ";
+}
+
+.rk-numbered-headings h3::before {
+    counter-increment: h3;
+    content: counter(h1) "." counter(h2) "." counter(h3) " ";
+}
+
+.rk-btn-primary {
+    background: var(--rk-primary);
+    color: white;
+    border-radius: var(--rk-radius-sm);
+    padding: 8px 16px;
+    cursor: pointer;
+    border: none;
+}
+
+.rk-btn-secondary {
+    background: white;
+    border: 1px solid var(--rk-border);
+    color: var(--rk-text);
+    border-radius: var(--rk-radius-sm);
+    padding: 8px 16px;
+    cursor: pointer;
 }

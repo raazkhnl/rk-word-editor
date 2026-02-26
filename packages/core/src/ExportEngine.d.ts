@@ -1,9 +1,31 @@
-export type ExportFormat = 'pdf' | 'docx' | 'txt' | 'html';
+import { StyleManager } from './StyleManager';
+export type ExportFormat = 'docx' | 'pdf' | 'html';
 export interface ExportOptions {
     filename?: string;
+    margin?: {
+        top: number;
+        bottom: number;
+        left: number;
+        right: number;
+    };
 }
 export declare class ExportEngine {
-    static export(htmlContent: string, format: ExportFormat, options?: ExportOptions): Promise<void>;
-    private static stripHtml;
-    private static downloadFile;
+    private styleManager;
+    constructor(styleManager: StyleManager);
+    /**
+     * Main entry point for DOCX export.
+     * Converts Tiptap JSON to docx Document.
+     */
+    exportToDocx(json: any): Promise<void>;
+    private convertNodes;
+    private convertParagraph;
+    private convertHeading;
+    private convertTable;
+    private convertTableRow;
+    private convertTableCell;
+    private convertInlines;
+    private parseSpacing;
+    private parseIndent;
+    private parseFontSize;
+    private mapAlignment;
 }

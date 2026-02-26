@@ -44,15 +44,21 @@ export const DragHandle = Extension.create({
                     if (!blockNode || !blockNode.isBlock) { hide(); return; }
 
                     const dom = editorView.nodeDOM(resolved.start(blockDepth));
-                    if (!dom) { hide(); return; }
+                    if (!dom || !(dom instanceof Element)) { hide(); return; }
 
-                    const rect = (dom as HTMLElement).getBoundingClientRect();
+                    const rect = dom.getBoundingClientRect();
                     const editorRect = editorView.dom.getBoundingClientRect();
 
                     handleEl.style.display = 'flex';
                     handleEl.style.top = `${rect.top + window.scrollY}px`;
-                    handleEl.style.left = `${editorRect.left + window.scrollX - 28}px`;
-                    currentPos = resolved.start(blockDepth) - 1;
+                    handleEl.style.left = `${editorRect.left + window.scrollX - 25}px`;
+
+                    // FIXED: Ensure we don't try to get 'before' the top-level document node (depth 0)
+                    try {
+                        currentPos = blockDepth > 0 ? resolved.before(blockDepth) : 0;
+                    } catch (err) {
+                        currentPos = 0;
+                    }
                 };
 
                 handleEl.addEventListener('dragstart', (e: DragEvent) => {

@@ -1,51 +1,60 @@
 import { Editor } from '@tiptap/core';
+import { SlashCommand } from './extensions/SlashCommands';
+import { CommandManager } from './CommandManager';
 import { ExportFormat, ExportOptions } from './ExportEngine';
+import { StyleManager } from './StyleManager';
+export type { ExportFormat, ExportOptions, SlashCommand };
+export { StyleManager } from './StyleManager';
+export { ExportEngine } from './ExportEngine';
+export { ImportEngine } from './ImportEngine';
+export type { ChangeRecord } from './extensions/TrackChanges';
 export interface WordEditorOptions {
     element: HTMLElement;
-    content?: string;
-    onUpdate?: (props: {
-        editor: Editor;
+    initialContent?: string;
+    onUpdate?: (json: any) => void;
+    onWordCount?: (stats: {
+        words: number;
+        characters: number;
+        paragraphs: number;
     }) => void;
+    slashCommands?: SlashCommand[];
+    trackAuthor?: string;
+    imageUploadHandler?: (file: File) => Promise<string>;
+    dragHandles?: boolean;
 }
 export declare class WordEditor {
     private editor;
+    commands: CommandManager;
+    private exporter;
+    private importer;
+    private _styleManager;
     constructor(options: WordEditorOptions);
     getHTML(): string;
     getJSON(): any;
     setDocument(content: string | any): void;
     focus(): void;
     destroy(): void;
-    format: {
-        bold: () => boolean;
-        italic: () => boolean;
-        underline: () => boolean;
-        strike: () => boolean;
-        subscript: () => boolean;
-        superscript: () => boolean;
-        fontFamily: (font: string) => boolean;
-        fontSize: (size: string) => boolean;
-        color: (color: string) => boolean;
-        highlight: (color: string) => boolean;
-        transform: (type: any) => boolean;
-        align: (alignment: any) => boolean;
-        lineHeight: (height: string) => boolean;
-        spacing: (top: string, bottom: string) => boolean;
-        indent: () => boolean;
-        outdent: () => boolean;
-        heading: (level: any) => boolean;
-        paragraph: () => boolean;
-        bulletList: () => boolean;
-        orderedList: () => boolean;
-        taskList: () => any;
-        insertTable: (options: any) => boolean;
-        insertImage: (src: string) => boolean;
-        pageBreak: () => any;
-        footnote: () => any;
-        clear: () => boolean;
-        undo: () => boolean;
-        redo: () => boolean;
+    get format(): CommandManager;
+    exportDocx(): Promise<void>;
+    exportMarkdown(): Promise<void>;
+    export(format: ExportFormat | 'markdown', _options?: ExportOptions): Promise<void>;
+    importDocx(file: File): Promise<void>;
+    importMarkdown(text: string): Promise<void>;
+    importFromFile(file: File): Promise<void>;
+    getTableOfContents(): {
+        level: number;
+        text: string;
+        id: string;
+    }[];
+    getWordCount(): {
+        words: number;
+        characters: number;
+        paragraphs: number;
     };
-    export(format: ExportFormat, options?: ExportOptions): Promise<void>;
-    getTableOfContents(): any[];
+    toggleTrackChanges(): void;
+    isTrackingChanges(): boolean;
     get instance(): Editor;
+    get styleManager(): StyleManager;
+    enableAutoSave(key?: string): void;
+    loadAutoSave(key?: string): boolean;
 }

@@ -32,9 +32,10 @@ export class ImportEngine {
                     "p[style-name='Heading 4'] => h4:fresh",
                     "p[style-name='Heading 5'] => h5:fresh",
                     "p[style-name='Heading 6'] => h6:fresh",
+                    "p[style-name='List Paragraph'] => li:fresh",
                     "b => strong",
                     "i => em",
-                    "u => s", // Map underline to the underline extension
+                    "u => span.underline",
                 ],
                 includeDefaultStyleMap: true,
             }

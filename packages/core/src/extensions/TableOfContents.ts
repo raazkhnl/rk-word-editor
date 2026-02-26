@@ -33,13 +33,18 @@ export const TableOfContents = Extension.create({
                     content: [
                         {
                             type: 'text',
-                            text: `${' '.repeat((h.level - 1) * 4)}${h.text}`,
+                            text: h.text,
                             marks: [
-                                {
-                                    type: 'textStyle',
-                                    attrs: { color: '#1a73e8' },
-                                },
+                                { type: 'textStyle', attrs: { color: '#1a73e8' } },
                             ],
+                        },
+                        {
+                            type: 'text',
+                            text: ' ',
+                        },
+                        {
+                            type: 'text',
+                            text: '1', // Placeholder pg no
                         },
                     ],
                 }));

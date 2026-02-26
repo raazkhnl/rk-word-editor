@@ -1,18 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RK-Word-Editor Demo</title>
     <style>
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: #f0f2f5; }
-        #app { display: flex; flex-direction: column; flex: 1; max-width: 1000px; margin: 40px auto; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
-        #toolbar-container { }
-        #editor-container { flex: 1; padding: 40px; overflow-y: auto; }
-        .ProseMirror { outline: none; min-height: 500px; line-height: 1.6; }
-        .ProseMirror p { margin-bottom: 1em; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            max-width: 1200px;
+            margin: 40px auto;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #toolbar-container {}
+
+        #editor-container {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .ProseMirror {
+            outline: none;
+            min-height: 500px;
+            line-height: 1.6;
+        }
+
+        .ProseMirror p {
+            margin-bottom: 1em;
+        }
     </style>
 </head>
+
 <body>
     <div id="app">
         <div id="toolbar-container"></div>
@@ -20,4 +54,5 @@
     </div>
     <script type="module" src="/src/main.ts"></script>
 </body>
+
 </html>

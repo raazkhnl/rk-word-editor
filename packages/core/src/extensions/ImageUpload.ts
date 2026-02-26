@@ -62,6 +62,7 @@ export const ImageUpload = Extension.create({
                 props: {
                     handleDOMEvents: {
                         drop(_view: any, event: DragEvent) {
+                            console.log('[ImageUpload] Drop event detected');
                             const files = event.dataTransfer?.files;
                             if (!files || files.length === 0) return false;
 
@@ -72,11 +73,13 @@ export const ImageUpload = Extension.create({
 
                             event.preventDefault();
                             imageFiles.forEach(file => {
+                                console.log('[ImageUpload] Uploading dropped image:', file.name);
                                 (editor.commands as any).uploadImage(file);
                             });
                             return true;
                         },
                         paste(_view: any, event: ClipboardEvent) {
+                            console.log('[ImageUpload] Paste event detected');
                             const items = event.clipboardData?.items;
                             if (!items) return false;
 
@@ -85,6 +88,7 @@ export const ImageUpload = Extension.create({
                                 if (item.type.startsWith('image/')) {
                                     const file = item.getAsFile();
                                     if (file) {
+                                        console.log('[ImageUpload] Uploading pasted image');
                                         event.preventDefault();
                                         (editor.commands as any).uploadImage(file);
                                         handled = true;

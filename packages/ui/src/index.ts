@@ -1,4 +1,5 @@
 import { WordEditor } from '@rk-editor/core';
+import { Modal } from './Modal';
 import './styles.css';
 
 const FONT_FAMILIES = [
@@ -74,7 +75,6 @@ export class WordToolbar {
   private render() {
     this.container.innerHTML = `
       <div class="rk-editor-shell">
-
         <!-- === MENU BAR === -->
         <nav class="rk-menubar" role="menubar" aria-label="Menu Bar">
           ${this.buildMenu('File', [
@@ -131,163 +131,112 @@ export class WordToolbar {
       { label: '1. Numbered List', action: 'orderedList' },
       { label: '☑ Task List', action: 'taskList' },
     ])}
-          ${this.buildMenu('References', [
-      { label: 'TOC Insert Table of Contents', action: 'insertToc' },
-      { label: '[ref] Citation...', action: 'insertCitation' },
-      { label: '📚 Bibliography', action: 'insertBibliography' },
-      { label: '† Footnote', action: 'insertFootnote' },
-    ])}
-          ${this.buildMenu('View', [
-      { label: '📊 Word Count', action: 'wordCount' },
-      { label: '🔍 Command Palette', action: 'cmdPalette', shortcut: 'Ctrl+K' },
-    ])}
-
           <div class="rk-menubar-spacer"></div>
           <div class="rk-wordcount-display" id="rk-wc-display">0 words</div>
         </nav>
 
         <!-- === TOOLBAR === -->
         <div class="rk-toolbar" role="toolbar" aria-label="Formatting Toolbar">
+          <!-- Row 1: Core Formatting & Typography -->
+          <div class="rk-toolbar-row">
+            <div class="rk-toolbar-group" data-label="Nav">
+              <button id="undo-btn" title="Undo (Ctrl+Z)">↺</button>
+              <button id="redo-btn" title="Redo (Ctrl+Y)">↻</button>
+            </div>
 
-          <!-- Undo/Redo -->
-          <div class="rk-tb-group">
-            <button id="undo-btn" title="Undo (Ctrl+Z)" aria-label="Undo">↺</button>
-            <button id="redo-btn" title="Redo (Ctrl+Y)" aria-label="Redo">↻</button>
+            <div class="rk-toolbar-group" data-label="Font">
+              <select id="font-family" title="Font Family" class="rk-select-wide">
+                <option value="">Font...</option>
+                ${FONT_FAMILIES.map(f => `<option value="${f.value}">${f.label}</option>`).join('')}
+              </select>
+              <select id="font-size" title="Size" class="rk-select-narrow">
+                ${FONT_SIZES.map(s => `<option value="${s}pt" ${s === 12 ? 'selected' : ''}>${s}</option>`).join('')}
+              </select>
+              <select id="heading-style" title="Style" class="rk-select-medium">
+                <option value="p">Normal</option>
+                <option value="1">H1</option>
+                <option value="2">H2</option>
+                <option value="3">H3</option>
+              </select>
+            </div>
+
+            <div class="rk-toolbar-group" data-label="Basic">
+              <button id="bold-btn" title="Bold (Ctrl+B)"><b>B</b></button>
+              <button id="italic-btn" title="Italic (Ctrl+I)"><i>I</i></button>
+              <button id="underline-btn" title="Underline (Ctrl+U)"><u>U</u></button>
+              <button id="strike-btn" title="Strike">S</button>
+            </div>
+
+            <div class="rk-toolbar-group" data-label="Scripts">
+              <button id="sup-btn" title="Superscript">x²</button>
+              <button id="sub-btn" title="Subscript">x₂</button>
+            </div>
+            
+            <div class="rk-toolbar-group" data-label="Para">
+              <button id="align-left-btn" title="Left">L</button>
+              <button id="align-center-btn" title="Center">C</button>
+              <button id="align-right-btn" title="Right">R</button>
+              <button id="align-justify-btn" title="Justify">J</button>
+            </div>
+
+            <div class="rk-toolbar-group" data-label="Lists">
+              <button id="bullet-list-btn" title="Bullets">•</button>
+              <button id="ordered-list-btn" title="Numbers">1.</button>
+              <button id="indent-btn" title="Indent">⇥</button>
+              <button id="outdent-btn" title="Outdent">⇤</button>
+            </div>
           </div>
 
-          <!-- Font Family -->
-          <div class="rk-tb-group">
-            <select id="font-family" title="Font Family" aria-label="Font Family" class="rk-select-wide">
-              <option value="">Font...</option>
-              ${FONT_FAMILIES.map(f => `<option value="${f.value}">${f.label}</option>`).join('')}
-            </select>
-          </div>
+          <!-- Row 2: Tables, Colors, Inserts & Exports -->
+          <div class="rk-toolbar-row">
+            <div class="rk-toolbar-group" data-label="Table">
+              <button id="insert-table-btn" title="Insert Table">▦</button>
+              ${this.buildToolbarMenu('Props', [
+      { label: 'Row Before', action: 'addRowBefore' },
+      { label: 'Row After', action: 'addRowAfter' },
+      { sep: true },
+      { label: 'Col Before', action: 'addColBefore' },
+      { label: 'Col After', action: 'addColAfter' },
+      { sep: true },
+      { label: 'Delete Row', action: 'delRow' },
+      { label: 'Delete Col', action: 'delCol' },
+      { label: 'Delete Table', action: 'delTable' },
+      { sep: true },
+      { label: 'Merge Cells', action: 'mergeCells' },
+      { label: 'Split Cell', action: 'splitCell' },
+      { sep: true },
+      { label: 'Toggle Header Row', action: 'toggleHeaderRow' },
+      { label: 'Toggle Header Col', action: 'toggleHeaderCol' },
+    ])}
+            </div>
 
-          <!-- Font Size -->
-          <div class="rk-tb-group">
-            <select id="font-size" title="Font Size" aria-label="Font Size" class="rk-select-narrow">
-              ${FONT_SIZES.map(s => `<option value="${s}pt" ${s === 12 ? 'selected' : ''}>${s}</option>`).join('')}
-            </select>
-          </div>
+            <div class="rk-toolbar-group" data-label="Color">
+              <input type="color" id="text-color" title="Color">
+              <input type="color" id="highlight-color" title="Highlight" value="#ffff00">
+            </div>
 
-          <!-- Heading Style -->
-          <div class="rk-tb-group">
-            <select id="heading-style" title="Paragraph Style" aria-label="Paragraph Style" class="rk-select-medium">
-              <option value="p">Normal</option>
-              <option value="1">Heading 1</option>
-              <option value="2">Heading 2</option>
-              <option value="3">Heading 3</option>
-              <option value="4">Heading 4</option>
-              <option value="5">Heading 5</option>
-              <option value="6">Heading 6</option>
-            </select>
-          </div>
+            <div class="rk-toolbar-group" data-label="Insert">
+              <button id="upload-image-btn" title="Image">🖼</button>
+              <button id="insert-link-btn" title="Link">🔗</button>
+              <button id="insert-math-btn" title="Math">∑</button>
+              <button id="insert-footnote-btn" title="Footnote">†</button>
+              <button id="toc-btn" title="TOC">☰</button>
+              <button id="page-break-btn" title="Break">✂</button>
+            </div>
 
-          <!-- Character Formatting -->
-          <div class="rk-tb-group">
-            <button id="bold-btn" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button>
-            <button id="italic-btn" title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button>
-            <button id="underline-btn" title="Underline (Ctrl+U)" aria-label="Underline" style="text-decoration:underline">U</button>
-            <button id="strike-btn" title="Strikethrough" aria-label="Strikethrough" style="text-decoration:line-through">S</button>
-            <button id="super-btn" title="Superscript" aria-label="Superscript">x²</button>
-            <button id="sub-btn" title="Subscript" aria-label="Subscript">x₂</button>
-          </div>
+            <div class="rk-toolbar-group" data-label="Track">
+              <button id="track-changes-btn" title="Track Changes">🔴</button>
+              <button id="clear-format-btn" title="Clear Formatting">⊘</button>
+            </div>
 
-          <!-- Color Pickers -->
-          <div class="rk-tb-group">
-            <label class="rk-color-btn" title="Text Color" aria-label="Text Color">
-              <span>A</span>
-              <input type="color" id="text-color" value="#000000">
-            </label>
-            <label class="rk-color-btn rk-highlight-btn" title="Highlight Color" aria-label="Highlight Color">
-              <span>H</span>
-              <input type="color" id="highlight-color" value="#ffff00">
-            </label>
-          </div>
-
-          <!-- Alignment -->
-          <div class="rk-tb-group">
-            <button id="align-left-btn" title="Align Left" aria-label="Align Left">⬅</button>
-            <button id="align-center-btn" title="Align Center" aria-label="Align Center">↔</button>
-            <button id="align-right-btn" title="Align Right" aria-label="Align Right">➡</button>
-            <button id="align-justify-btn" title="Justify" aria-label="Justify">☰</button>
-          </div>
-
-          <!-- Lists -->
-          <div class="rk-tb-group">
-            <button id="bullet-list-btn" title="Bullet List" aria-label="Bullet List">•≡</button>
-            <button id="ordered-list-btn" title="Numbered List" aria-label="Ordered List">1.≡</button>
-            <button id="task-list-btn" title="Task List" aria-label="Task List">☑</button>
-          </div>
-
-          <!-- Indent -->
-          <div class="rk-tb-group">
-            <button id="indent-btn" title="Increase Indent" aria-label="Indent">→|</button>
-            <button id="outdent-btn" title="Decrease Indent" aria-label="Outdent">|←</button>
-          </div>
-
-          <!-- Tables -->
-          <div class="rk-tb-group">
-            <button id="insert-table-btn" title="Insert Table" aria-label="Insert Table">⊞</button>
-            <select id="table-actions" title="Table Actions" aria-label="Table Actions">
-              <option value="">Table ▾</option>
-              <option value="mergeOrSplit">Merge/Split</option>
-              <option value="toggleHeaderRow">Header Row</option>
-              <option value="addRowBefore">Row Above</option>
-              <option value="addRowAfter">Row Below</option>
-              <option value="deleteRow">Delete Row</option>
-              <option value="addColumnBefore">Col Before</option>
-              <option value="addColumnAfter">Col After</option>
-              <option value="deleteColumn">Delete Col</option>
-              <option value="deleteTable">Delete Table</option>
-            </select>
-          </div>
-
-          <!-- Media -->
-          <div class="rk-tb-group">
-            <button id="upload-image-btn" title="Upload Image from PC" aria-label="Upload Image">🖼</button>
-            <button id="insert-math-btn" title="Insert Math (LaTeX)" aria-label="Insert Math">∑</button>
-          </div>
-
-          <!-- Format Painter -->
-          <div class="rk-tb-group">
-            <button id="format-painter-btn" title="Format Painter" aria-label="Format Painter">🖌️</button>
-          </div>
-
-          <!-- Insert blocks -->
-          <div class="rk-tb-group">
-            <button id="page-break-btn" title="Page Break" aria-label="Page Break">✂</button>
-            <button id="blockquote-btn" title="Blockquote" aria-label="Blockquote">"</button>
-            <button id="hr-btn" title="Horizontal Rule" aria-label="Horizontal Rule">—</button>
-          </div>
-
-          <!-- References -->
-          <div class="rk-tb-group">
-            <button id="toc-btn" title="Table of Contents" aria-label="TOC">TOC</button>
-            <button id="citation-btn" title="Insert Citation" aria-label="Citation">[ref]</button>
-          </div>
-
-          <!-- Track Changes -->
-          <div class="rk-tb-group">
-            <button id="track-changes-btn" title="Toggle Track Changes" aria-label="Track Changes">🔴 Track</button>
-          </div>
-
-          <!-- Export/Import -->
-          <div class="rk-tb-group">
-            <select id="export-format" title="Export" aria-label="Export Format">
-              <option value="">Export ▾</option>
-              <option value="docx">Word (.docx)</option>
-              <option value="markdown">Markdown (.md)</option>
-              <option value="html">HTML</option>
-              <option value="pdf">PDF (Print)</option>
-            </select>
-          </div>
-
-          <!-- Utilities -->
-          <div class="rk-tb-group">
-            <button id="wordcount-btn" title="Word Count" aria-label="Word Count">📊</button>
-            <button id="clear-btn" title="Clear Formatting" aria-label="Clear Formatting">⊘</button>
-            <button id="cmd-palette-btn" title="Command Palette (Ctrl+K)" aria-label="Command Palette">⌘</button>
+            <div class="rk-toolbar-group" data-label="Export">
+              <select id="export-format" class="rk-select-narrow">
+                <option value="">Exp</option>
+                <option value="docx">DOCX</option>
+                <option value="pdf">PDF</option>
+                <option value="markdown">MD</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -297,9 +246,9 @@ export class WordToolbar {
       </div>
 
       <!-- Command Palette Overlay -->
-      <div class="rk-cmd-palette" id="rk-cmd-palette" role="dialog" aria-label="Command Palette" aria-modal="true" style="display:none">
+      <div class="rk-cmd-palette" id="rk-cmd-palette" role="dialog" aria-modal="true" style="display:none">
         <div class="rk-cmd-palette-inner">
-          <input type="text" id="rk-cmd-query" placeholder="Type a command..." aria-label="Command search" autocomplete="off">
+          <input type="text" id="rk-cmd-query" placeholder="Type a command..." autocomplete="off">
           <div class="rk-cmd-palette-results" id="rk-cmd-results" role="listbox"></div>
         </div>
       </div>
@@ -329,276 +278,186 @@ export class WordToolbar {
     `;
   }
 
+  private buildToolbarMenu(label: string, items: any[]): string {
+    const itemsHtml = items.map(item => {
+      if (item.sep) return `<div class="rk-menu-sep"></div>`;
+      return `<button class="rk-toolbar-menu-item" data-action="${item.action}">${item.label}</button>`;
+    }).join('');
+
+    return `
+      <div class="rk-toolbar-menu">
+        <button class="rk-toolbar-menu-trigger">${label} ▾</button>
+        <div class="rk-toolbar-menu-dropdown">${itemsHtml}</div>
+      </div>
+    `;
+  }
+
   private setupEvents() {
     const ed = this.editor;
-    const q = (s: string): HTMLElement | null => this.container.querySelector(s);
-
-    // ---- Menu action dispatcher ----
-    this.container.querySelectorAll('.rk-menu-item').forEach(btn => {
-      btn.addEventListener('click', (e: any) => {
-        const action = e.currentTarget.dataset.action;
-        this.handleMenuAction(action);
-        // Close menu
-        btn.closest('.rk-menu')?.querySelector('.rk-menu-trigger')?.setAttribute('aria-expanded', 'false');
-      });
-    });
+    const q = (s: string): HTMLElement | null => this.container.querySelector(s) as HTMLElement | null;
 
     // Menu trigger toggle
     this.container.querySelectorAll('.rk-menu-trigger').forEach(trigger => {
       trigger.addEventListener('click', (e: any) => {
         const expanded = e.currentTarget.getAttribute('aria-expanded') === 'true';
-        // Close all menus first
-        this.container.querySelectorAll('.rk-menu-trigger').forEach(t =>
-          t.setAttribute('aria-expanded', 'false')
-        );
+        this.container.querySelectorAll('.rk-menu-trigger').forEach(t => t.setAttribute('aria-expanded', 'false'));
         e.currentTarget.setAttribute('aria-expanded', expanded ? 'false' : 'true');
         e.stopPropagation();
       });
     });
-    document.addEventListener('click', () => {
-      this.container.querySelectorAll('.rk-menu-trigger').forEach(t =>
-        t.setAttribute('aria-expanded', 'false')
-      );
+
+    this.container.querySelectorAll('.rk-menu-item, .rk-toolbar-menu-item').forEach(btn => {
+      btn.addEventListener('click', (e: any) => {
+        const action = e.currentTarget.dataset.action;
+        this.handleMenuAction(action);
+        btn.closest('.rk-menu, .rk-toolbar-menu')?.querySelectorAll('.rk-menu-trigger')?.forEach(t => t.setAttribute('aria-expanded', 'false'));
+      });
     });
 
-    // ---- Toolbar events ----
+    document.addEventListener('click', () => {
+      this.container.querySelectorAll('.rk-menu-trigger').forEach(t => t.setAttribute('aria-expanded', 'false'));
+    });
+
+    // Toolbar events
     q('#undo-btn')?.addEventListener('click', () => ed.format.undo());
     q('#redo-btn')?.addEventListener('click', () => ed.format.redo());
 
-    // Font family
     q('#font-family')?.addEventListener('change', (e: any) => {
       if (e.target.value) ed.format.fontFamily(e.target.value);
     });
 
-    // Font size
     q('#font-size')?.addEventListener('change', (e: any) => {
       if (e.target.value) ed.format.fontSize(e.target.value);
     });
 
-    // Heading style
     q('#heading-style')?.addEventListener('change', (e: any) => {
       const v = e.target.value;
       if (v === 'p') ed.format.paragraph();
       else ed.format.heading(parseInt(v) as any);
     });
 
-    // Character formatting
     q('#bold-btn')?.addEventListener('click', () => ed.format.bold());
     q('#italic-btn')?.addEventListener('click', () => ed.format.italic());
     q('#underline-btn')?.addEventListener('click', () => ed.format.underline());
     q('#strike-btn')?.addEventListener('click', () => ed.format.strike());
-    q('#super-btn')?.addEventListener('click', () => ed.format.superscript());
+    q('#sup-btn')?.addEventListener('click', () => ed.format.superscript());
     q('#sub-btn')?.addEventListener('click', () => ed.format.subscript());
 
-    // Colors
-    q('#text-color')?.addEventListener('input', (e: any) => ed.format.setColor(e.target.value));
-    q('#highlight-color')?.addEventListener('input', (e: any) => ed.format.highlight(e.target.value));
-
-    // Alignment
     q('#align-left-btn')?.addEventListener('click', () => ed.format.align('left'));
     q('#align-center-btn')?.addEventListener('click', () => ed.format.align('center'));
     q('#align-right-btn')?.addEventListener('click', () => ed.format.align('right'));
     q('#align-justify-btn')?.addEventListener('click', () => ed.format.align('justify'));
 
-    // Lists
     q('#bullet-list-btn')?.addEventListener('click', () => ed.format.bulletList());
     q('#ordered-list-btn')?.addEventListener('click', () => ed.format.orderedList());
-    q('#task-list-btn')?.addEventListener('click', () => ed.format.taskList());
-
-    // Indent
     q('#indent-btn')?.addEventListener('click', () => ed.format.indent());
     q('#outdent-btn')?.addEventListener('click', () => ed.format.outdent());
 
-    // Tables
-    q('#insert-table-btn')?.addEventListener('click', () => {
-      const r = parseInt(prompt('Rows:', '3') || '3');
-      const c = parseInt(prompt('Cols:', '3') || '3');
-      if (r > 0 && c > 0) ed.format.insertTable({ rows: r, cols: c, withHeaderRow: true });
-    });
-    q('#table-actions')?.addEventListener('change', (e: any) => {
-      const action = e.target.value;
-      if (action && (ed.format as any)[action]) (ed.format as any)[action]();
-      e.target.value = '';
+    q('#text-color')?.addEventListener('input', (e: any) => ed.format.setColor(e.target.value));
+    q('#highlight-color')?.addEventListener('input', (e: any) => ed.format.setHighlight(e.target.value));
+
+    q('#insert-table-btn')?.addEventListener('click', () => ed.format.insertTable({ rows: 3, cols: 3 }));
+    q('#upload-image-btn')?.addEventListener('click', () => (q('#rk-import-input') as HTMLInputElement)?.click());
+
+    q('#insert-link-btn')?.addEventListener('click', () => {
+      const u = prompt('Enter URL:');
+      if (u) (ed.instance.chain().focus() as any).setLink({ href: u }).run();
     });
 
-    // Media
-    q('#upload-image-btn')?.addEventListener('click', () => {
-      (ed.format as any).openImageUpload?.();
-    });
     q('#insert-math-btn')?.addEventListener('click', () => {
-      const latex = prompt('LaTeX expression:', 'E = mc^2');
-      if (latex) (ed.format as any).insertMathInline(latex);
+      const l = prompt('Enter LaTeX:');
+      if (l) ed.format.insertMathInline(l);
     });
 
-    // Format painter
-    q('#format-painter-btn')?.addEventListener('click', () => {
-      (ed.format as any).startFormatPaint?.();
-      q('#format-painter-btn')?.classList.toggle('is-active');
-    });
-
-    // Insert blocks
+    q('#insert-footnote-btn')?.addEventListener('click', () => ed.format.footnote());
+    q('#toc-btn')?.addEventListener('click', () => (ed as any).insertTableOfContents?.());
     q('#page-break-btn')?.addEventListener('click', () => ed.format.pageBreak());
-    q('#blockquote-btn')?.addEventListener('click', () => ed.format.blockquote());
-    q('#hr-btn')?.addEventListener('click', () => ed.format.horizontalRule());
+    q('#clear-format-btn')?.addEventListener('click', () => ed.format.clearFormatting());
 
-    // References
-    q('#toc-btn')?.addEventListener('click', () => (ed.format as any).insertTableOfContents?.());
-    q('#citation-btn')?.addEventListener('click', () => {
-      const key = prompt('Citation key:');
-      if (key) (ed.format as any).insertCitation?.(key);
-    });
-
-    // Track changes
     q('#track-changes-btn')?.addEventListener('click', () => {
-      ed.toggleTrackChanges();
-      q('#track-changes-btn')?.classList.toggle('is-active', ed.isTrackingChanges());
+      (ed as any).toggleTrackChanges();
+      this.updateActiveStates();
     });
 
-    // Export
     q('#export-format')?.addEventListener('change', (e: any) => {
       const format = e.target.value;
       if (format === 'docx') ed.exportDocx();
-      else if (format === 'markdown') ed.exportMarkdown();
       else if (format === 'pdf') ed.format.printDoc();
-      else if (format) ed.export(format as any);
+      else if (format === 'markdown') (ed as any).exportMarkdown();
       e.target.value = '';
     });
 
-    // Import
     const importInput = this.container.querySelector('#rk-import-input') as HTMLInputElement;
     importInput?.addEventListener('change', async (e: any) => {
       const file = e.target.files?.[0];
       if (file) {
-        try {
-          await ed.importFromFile(file);
-        } catch (err: any) {
-          alert(`Import failed: ${err.message}`);
-        }
+        try { await (ed as any).importFromFile(file); } catch (err: any) { alert(`Import failed: ${err.message}`); }
         importInput.value = '';
       }
     });
 
-    // Word count
-    q('#wordcount-btn')?.addEventListener('click', () => {
-      const s = ed.getWordCount();
-      alert(`Words: ${s.words}\nCharacters: ${s.characters}\nParagraphs: ${s.paragraphs}`);
-    });
-
-    // Clear formatting
-    q('#clear-btn')?.addEventListener('click', () => ed.format.clearFormatting());
-
-    // Command palette
-    q('#cmd-palette-btn')?.addEventListener('click', () => this.openCommandPalette());
-
-    // Command palette search
-    const cmdQuery = document.getElementById('rk-cmd-query') as HTMLInputElement;
-    cmdQuery?.addEventListener('input', (e: any) => {
-      this.paletteQuery = e.target.value;
-      this.renderPaletteResults();
-    });
-    cmdQuery?.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Escape') this.closeCommandPalette();
-    });
-
-    // Active state tracking
     ed.instance.on('transaction', () => this.updateActiveStates());
   }
 
   private handleMenuAction(action: string) {
     const ed = this.editor;
-    const fmt = ed.format as any;
-    const actions: Record<string, () => void> = {
-      newDoc: () => { if (confirm('Clear document?')) ed.setDocument(''); },
-      openImport: () => (document.getElementById('rk-import-input') as HTMLInputElement)?.click(),
-      exportDocx: () => ed.exportDocx(),
-      exportMd: () => ed.exportMarkdown(),
-      exportHtml: () => ed.export('html'),
-      printDoc: () => window.print(),
-      undo: () => fmt.undo(),
-      redo: () => fmt.redo(),
-      cut: () => document.execCommand('cut'),
-      copy: () => document.execCommand('copy'),
-      paste: () => document.execCommand('paste'),
-      formatPainter: () => fmt.startFormatPaint?.(),
-      clearFormatting: () => fmt.clearFormatting(),
-      trackChanges: () => { ed.toggleTrackChanges(); },
-      insertTable: () => fmt.insertTable({ rows: 3, cols: 3, withHeaderRow: true }),
-      insertImage: () => fmt.openImageUpload?.(),
-      insertLink: () => { const u = prompt('URL:'); if (u) ed.instance.chain().focus().setLink({ href: u }).run(); },
-      insertMath: () => { const l = prompt('LaTeX:'); if (l) fmt.insertMathInline(l); },
-      pageBreak: () => fmt.pageBreak(),
-      hr: () => fmt.horizontalRule(),
-      blockquote: () => fmt.blockquote(),
-      insertToc: () => fmt.insertTableOfContents?.(),
-      insertCitation: () => { const k = prompt('Citation key:'); if (k) fmt.insertCitation?.(k); },
-      insertFootnote: () => fmt.footnote?.(),
-      insertBibliography: () => fmt.insertBibliography?.(),
-      bold: () => fmt.bold(),
-      italic: () => fmt.italic(),
-      underline: () => fmt.underline(),
-      strike: () => fmt.strike(),
-      superscript: () => fmt.superscript(),
-      subscript: () => fmt.subscript(),
-      alignLeft: () => fmt.align('left'),
-      alignCenter: () => fmt.align('center'),
-      alignRight: () => fmt.align('right'),
-      alignJustify: () => fmt.align('justify'),
-      bulletList: () => fmt.bulletList(),
-      orderedList: () => fmt.orderedList(),
-      taskList: () => fmt.taskList(),
-      wordCount: () => { const s = ed.getWordCount(); alert(`Words: ${s.words}\nChars: ${s.characters}\nParagraphs: ${s.paragraphs}`); },
-      cmdPalette: () => this.openCommandPalette(),
-    };
-    actions[action]?.();
+    const q = (s: string): HTMLElement | null => this.container.querySelector(s) as HTMLElement | null;
+    switch (action) {
+      case 'newDoc': ed.instance.commands.setContent('<p></p>'); break;
+      case 'openImport': (this.container.querySelector('#rk-import-input') as HTMLInputElement)?.click(); break;
+      case 'exportDocx': ed.exportDocx(); break;
+      case 'exportMd': (ed as any).exportMarkdown(); break;
+      case 'printDoc': ed.format.printDoc(); break;
+      case 'undo': ed.format.undo(); break;
+      case 'redo': ed.format.redo(); break;
+      case 'bold': ed.format.bold(); break;
+      case 'italic': ed.format.italic(); break;
+      case 'underline': ed.format.underline(); break;
+      case 'strike': ed.format.strike(); break;
+      case 'superscript': ed.format.superscript(); break;
+      case 'subscript': ed.format.subscript(); break;
+      case 'alignLeft': ed.format.align('left'); break;
+      case 'alignCenter': ed.format.align('center'); break;
+      case 'alignRight': ed.format.align('right'); break;
+      case 'alignJustify': ed.format.align('justify'); break;
+      case 'bulletList': ed.format.bulletList(); break;
+      case 'orderedList': ed.format.orderedList(); break;
+      case 'clearFormatting': ed.format.clearFormatting(); break;
+      case 'trackChanges': (ed as any).toggleTrackChanges(); break;
+      case 'insertTable': ed.format.insertTable({ rows: 3, cols: 3 }); break;
+      case 'insertLink': q('#insert-link-btn')?.click(); break;
+      case 'insertToc': (ed as any).insertTableOfContents(); break;
+      case 'insertImage': (q('#rk-import-input') as HTMLInputElement)?.click(); break;
+      case 'pageBreak': ed.format.pageBreak(); break;
+      case 'addRowBefore': ed.format.addRowBefore(); break;
+      case 'addRowAfter': ed.format.addRowAfter(); break;
+      case 'delRow': ed.format.deleteRow(); break;
+      case 'addColBefore': ed.format.addColumnBefore(); break;
+      case 'addColAfter': ed.format.addColumnAfter(); break;
+      case 'delCol': ed.format.deleteColumn(); break;
+      case 'delTable': ed.format.deleteTable(); break;
+      case 'mergeCells': ed.format.mergeCells(); break;
+      case 'splitCell': ed.format.splitCell(); break;
+      case 'toggleHeaderRow': ed.format.toggleHeaderRow(); break;
+      case 'toggleHeaderCol': ed.format.toggleHeaderColumn(); break;
+    }
+    this.updateActiveStates();
   }
 
   private openCommandPalette() {
-    const palette = document.getElementById('rk-cmd-palette');
-    if (!palette) return;
-    palette.style.display = 'flex';
-    this.paletteQuery = '';
-    const input = document.getElementById('rk-cmd-query') as HTMLInputElement;
-    input.value = '';
-    this.renderPaletteResults();
-    setTimeout(() => input.focus(), 10);
+    const el = document.getElementById('rk-cmd-palette');
+    if (el) { el.style.display = 'flex'; document.getElementById('rk-cmd-query')?.focus(); }
   }
 
   private closeCommandPalette() {
-    const palette = document.getElementById('rk-cmd-palette');
-    if (palette) palette.style.display = 'none';
-  }
-
-  private renderPaletteResults() {
-    const results = document.getElementById('rk-cmd-results');
-    if (!results) return;
-    const q = this.paletteQuery.toLowerCase();
-    const filtered = ALL_COMMANDS.filter(c => c.label.toLowerCase().includes(q));
-    results.innerHTML = filtered.slice(0, 12).map((cmd, i) => `
-      <div class="rk-cmd-item" role="option" data-index="${i}" tabindex="0">
-        <span class="rk-cmd-item-label">${cmd.label}</span>
-        ${cmd.shortcut ? `<span class="rk-cmd-item-shortcut">${cmd.shortcut}</span>` : ''}
-      </div>
-    `).join('') || `<div class="rk-cmd-empty">No commands found</div>`;
-
-    results.querySelectorAll('.rk-cmd-item').forEach((el, i) => {
-      el.addEventListener('click', () => {
-        filtered[i]?.action(this.editor);
-        this.closeCommandPalette();
-      });
-    });
+    const el = document.getElementById('rk-cmd-palette');
+    if (el) el.style.display = 'none';
   }
 
   private setupKeyboardShortcuts() {
     document.addEventListener('keydown', (e: KeyboardEvent) => {
-      // Ctrl+K or Cmd+K = command palette
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        this.openCommandPalette();
-      }
-      // Escape = close palette
-      if (e.key === 'Escape') {
-        this.closeCommandPalette();
-      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); this.openCommandPalette(); }
+      if (e.key === 'Escape') this.closeCommandPalette();
     });
   }
 
@@ -624,27 +483,21 @@ export class WordToolbar {
     toggle('#italic-btn', ed.isActive('italic'));
     toggle('#underline-btn', ed.isActive('underline'));
     toggle('#strike-btn', ed.isActive('strike'));
-    toggle('#super-btn', ed.isActive('superscript'));
+    toggle('#sup-btn', ed.isActive('superscript'));
     toggle('#sub-btn', ed.isActive('subscript'));
     toggle('#bullet-list-btn', ed.isActive('bulletList'));
     toggle('#ordered-list-btn', ed.isActive('orderedList'));
-    toggle('#task-list-btn', ed.isActive('taskList'));
-    toggle('#blockquote-btn', ed.isActive('blockquote'));
     toggle('#align-left-btn', ed.isActive({ textAlign: 'left' }));
     toggle('#align-center-btn', ed.isActive({ textAlign: 'center' }));
     toggle('#align-right-btn', ed.isActive({ textAlign: 'right' }));
     toggle('#align-justify-btn', ed.isActive({ textAlign: 'justify' }));
-    toggle('#track-changes-btn', this.editor.isTrackingChanges());
+    toggle('#track-changes-btn', (this.editor as any).isTrackingChanges?.() || false);
 
-    // Update heading select
     const headingSel = q('#heading-style') as HTMLSelectElement;
     if (headingSel) {
       if (ed.isActive('heading', { level: 1 })) headingSel.value = '1';
       else if (ed.isActive('heading', { level: 2 })) headingSel.value = '2';
       else if (ed.isActive('heading', { level: 3 })) headingSel.value = '3';
-      else if (ed.isActive('heading', { level: 4 })) headingSel.value = '4';
-      else if (ed.isActive('heading', { level: 5 })) headingSel.value = '5';
-      else if (ed.isActive('heading', { level: 6 })) headingSel.value = '6';
       else headingSel.value = 'p';
     }
   }

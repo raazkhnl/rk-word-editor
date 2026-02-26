@@ -15,7 +15,8 @@ export const MultilevelList = Extension.create({
                             if (!attributes.listStyle) return {};
                             return {
                                 'data-list-style': attributes.listStyle,
-                                style: `list-style-type: ${attributes.listStyle}`,
+                                class: attributes.listStyle === 'nepali' ? 'rk-list-nepali' : '',
+                                style: `list-style-type: ${attributes.listStyle === 'nepali' ? 'none' : attributes.listStyle}`,
                             };
                         },
                     },

@@ -25,8 +25,8 @@ export class CommandManager {
 
     public fontFamily = (font: string) => this.execute(c => c.setFontFamily(font));
     public fontSize = (size: string) => this.execute(c => c.setFontSize(size));
-    public color = (color: string) => this.execute(c => c.setColor(color));
-    public highlight = (color: string) => this.execute(c => c.setHighlight({ color }));
+    public setColor = (color: string) => this.execute(c => c.setColor(color));
+    public setHighlight = (color: string) => this.execute(c => c.setHighlight({ color }));
     public transform = (type: string) => this.execute(c => c.setTextTransform(type));
     public toggleSmallCaps = () => (this.editor.chain().focus() as any).toggleSmallCaps().run();
     public letterSpacing = (spacing: string) => (this.editor.chain().focus() as any).setLetterSpacing(spacing).run();
