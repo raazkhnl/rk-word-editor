@@ -1,6 +1,27 @@
 {
     "name": "@rk-editor/ui",
     "version": "3.2.0",
+    "description": "UI components for RK Word Editor",
+    "author": {
+        "name": "RaaZ Khanal",
+        "email": "raazkhnl@gmail.com",
+        "url": "https://github.com/raazkhnl"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/raazkhnl/rk-word-editor.git",
+        "directory": "packages/ui"
+    },
+    "homepage": "https://github.com/raazkhnl/rk-word-editor#readme",
+    "keywords": [
+        "editor",
+        "tiptap",
+        "prosemirror",
+        "ui",
+        "components",
+        "react"
+    ],
     "scripts": {
         "build": "vite build && tsc --project tsconfig.json"
     },

@@ -7,7 +7,7 @@ export default defineConfig({
             entry: resolve(__dirname, 'src/index.ts'),
             name: 'RkEditorCore',
             fileName: (format) => `rk-editor-core.${format}.js`,
-            formats: ['es'],
+            formats: ['es', 'umd'],
         },
         rollupOptions: {
             external: [

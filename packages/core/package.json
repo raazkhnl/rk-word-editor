@@ -1,6 +1,27 @@
 {
     "name": "@rk-editor/core",
     "version": "3.2.0",
+    "description": "Core engine for RK Word Editor built with Tiptap and ProseMirror",
+    "author": {
+        "name": "RaaZ Khanal",
+        "email": "raazkhnl@gmail.com",
+        "url": "https://github.com/raazkhnl"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/raazkhnl/rk-word-editor.git",
+        "directory": "packages/core"
+    },
+    "homepage": "https://github.com/raazkhnl/rk-word-editor#readme",
+    "keywords": [
+        "editor",
+        "tiptap",
+        "prosemirror",
+        "rich-text",
+        "wysiwyg",
+        "react"
+    ],
     "scripts": {
         "build": "vite build && tsc --project tsconfig.json",
         "test": "vitest run",
