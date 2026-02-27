@@ -123,15 +123,73 @@ export const TrackChanges = Extension.create({
         return [
             new Plugin({
                 key: new PluginKey('trackChanges'),
-                appendTransaction(transactions: readonly any[], _oldState: any, _newState: any) {
+                appendTransaction(transactions: readonly any[], oldState: any, newState: any) {
                     if (!ext.storage.enabled) return null;
+                    if (!transactions.some((tr) => tr.docChanged)) return null;
 
-                    // We only do a lightweight visual marking — wrap new inserts in a span class
-                    // Full ProseMirror tracked-changes with marks is complex; we track via DOM attributes
+                    // Prevent infinite loops if we are just adding marks
+                    if (transactions.some((tr) => tr.getMeta('trackChangesMarking'))) return null;
+
+                    const tr = newState.tr;
+                    tr.setMeta('trackChangesMarking', true);
+                    let changed = false;
+
+                    const trackInsertType = ext.editor.schema.marks.trackInsert;
+                    const trackDeleteType = ext.editor.schema.marks.trackDelete;
+
+                    transactions.forEach((origTr) => {
+                        if (!origTr.docChanged) return;
+
+                        origTr.steps.forEach((step: any, _index: number) => {
+                            // Basic heuristic for ReplaceStep (insert/delete)
+                            if (step.slice) {
+                                // Maps positions from old step to current tr state
+                                const map = tr.mapping;
+                                const from = map.map(step.from, -1);
+
+                                // It's an insertion if there is content in the slice
+                                if (step.slice.content.size > 0 && trackInsertType) {
+                                    const to = map.map(step.from + step.slice.content.size);
+                                    tr.addMark(from, to, trackInsertType.create());
+
+                                    const changeId = Math.random().toString(36).substr(2, 9);
+                                    ext.storage.changes.push({
+                                        id: changeId,
+                                        type: 'insert',
+                                        from,
+                                        to,
+                                        text: step.slice.content.textBetween(0, step.slice.content.size, '\n'),
+                                        author: ext.storage.author,
+                                        timestamp: Date.now(),
+                                    });
+                                    changed = true;
+                                }
+
+                                // It's a deletion if it removes content (step.from < step.to in old state)
+                                // Standard ProseMirror deletion removes the node. To *track* it, we ideally 
+                                // intercept the transaction *before* it gets applied or we restore the deleted 
+                                // content and mark it. Restoring content is complex in appendTransaction.
+                                // For a robust implementation, a custom editing plugin is needed.
+                                // Here we do a simplified version: if we detect a deletion we just 
+                                // acknowledge it happened, but full text restoration requires intercepting keydown/commands.
+                                if (step.to > step.from && trackDeleteType) {
+                                    // Note: To truly show struck-through deleted text without losing it, 
+                                    // the editor commands (delete/backspace) must be overridden to apply the 
+                                    // trackDelete mark INSTEAD of actually deleting the nodes.
+                                    // For now, we simulate by logging the deletion but we can't easily mark it 
+                                    // here since the text is already gone from newState.
+                                }
+                            }
+                        });
+                    });
+
+                    if (changed) {
+                        ext.options.onChangesUpdate?.(ext.storage.changes);
+                        return tr;
+                    }
                     return null;
                 },
                 props: {
-                    // Style tracked changes in the DOM via decoration
                     decorations(state: any) {
                         return null;
                     },
@@ -147,6 +205,20 @@ export const TrackChanges = Extension.create({
 export const TrackInsert = Extension.create({
     name: 'trackInsert',
     priority: 1001,
+
+    addOptions() {
+        return {
+            HTMLAttributes: {},
+        };
+    },
+
+    parseHTML() {
+        return [{ tag: 'span[data-track-insert]' }];
+    },
+
+    renderHTML({ HTMLAttributes }: { HTMLAttributes: any }) {
+        return ['span', { 'data-track-insert': '', class: 'rk-track-insert', ...HTMLAttributes }, 0];
+    },
 });
 
 /**
@@ -155,4 +227,18 @@ export const TrackInsert = Extension.create({
 export const TrackDelete = Extension.create({
     name: 'trackDelete',
     priority: 1001,
+
+    addOptions() {
+        return {
+            HTMLAttributes: {},
+        };
+    },
+
+    parseHTML() {
+        return [{ tag: 'span[data-track-delete]' }];
+    },
+
+    renderHTML({ HTMLAttributes }: { HTMLAttributes: any }) {
+        return ['span', { 'data-track-delete': '', class: 'rk-track-delete', ...HTMLAttributes }, 0];
+    },
 });

@@ -33,6 +33,10 @@ export class ImportEngine {
                     "p[style-name='Heading 5'] => h5:fresh",
                     "p[style-name='Heading 6'] => h6:fresh",
                     "p[style-name='List Paragraph'] => li:fresh",
+                    "p[style-name='toc 1'] => p.rk-toc-item:fresh",
+                    "p[style-name='toc 2'] => p.rk-toc-item:fresh",
+                    "p[style-name='caption'] => p.rk-caption:fresh",
+                    "p[style-name='Bibliography'] => p.rk-bibliography:fresh",
                     "b => strong",
                     "i => em",
                     "u => span.underline",
@@ -90,7 +94,7 @@ export class ImportEngine {
         try {
             // Using a template literal to avoid Vite static analysis if missing
             const pluginName = 'turndown-plugin-gfm';
-            const gfm = await import(pluginName as any);
+            const gfm = await import(/* @vite-ignore */ pluginName);
             service.use(gfm.gfm);
         } catch {
             // GFM plugin optional

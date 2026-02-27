@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, SectionType, IParagraphOptions, Table, TableRow, TableCell, WidthType, VerticalAlign, ShadingType } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, SectionType, IParagraphOptions, Table, TableRow, TableCell, WidthType, VerticalAlign, ShadingType, LevelFormat } from 'docx';
 import { saveAs } from 'file-saver';
 import { StyleManager } from './StyleManager';
 
@@ -29,9 +29,6 @@ export class ExportEngine {
         const doc = new Document({
             sections: [
                 {
-                    properties: {
-                        type: SectionType.CONTINUOUS,
-                    },
                     children: this.convertNodes(json.content) as any[],
                 },
             ],
@@ -44,32 +41,98 @@ export class ExportEngine {
     private convertNodes(nodes: any[]): any[] {
         if (!nodes) return [];
 
-        return nodes.map(node => {
+        let result: any[] = [];
+        nodes.forEach(node => {
             switch (node.type) {
                 case 'paragraph':
-                    return this.convertParagraph(node);
+                    result.push(this.convertParagraph(node));
+                    break;
                 case 'heading':
-                    return this.convertHeading(node);
+                    result.push(this.convertHeading(node));
+                    break;
                 case 'table':
-                    return this.convertTable(node);
+                    result.push(this.convertTable(node));
+                    break;
+                case 'bulletList':
+                case 'orderedList':
+                    result.push(...this.convertList(node));
+                    break;
+                case 'pageBreak':
+                    result.push(new Paragraph({ children: [], pageBreakBefore: true }));
+                    break;
+                case 'horizontalRule':
+                    result.push(new Paragraph({ thematicBreak: true }));
+                    break;
+                case 'image':
+                    result.push(this.convertImage(node));
+                    break;
+                case 'footnote':
+                    // Docx footnotes are complex, adding as a paragraph for now or ignoring if not supported
+                    result.push(new Paragraph({ children: [new TextRun({ text: '[Footnote]', italics: true })] }));
+                    break;
                 default:
-                    return new Paragraph({ children: [new TextRun({ text: `[Unsupported Node: ${node.type}]` })] });
+                    result.push(new Paragraph({ children: [new TextRun({ text: `[Unsupported Node: ${node.type}]` })] }));
             }
-        }).filter(Boolean);
+        });
+        return result.filter(Boolean);
     }
 
-    private convertParagraph(node: any): Paragraph {
-        const children = this.convertInlines(node.content);
+    private convertImage(node: any): Paragraph {
+        // This requires the 'ImageRun' from docx and potentially fetching the image data
+        // For now, we'll placeholder it as images in docx export usually require base64/buffer
+        return new Paragraph({
+            children: [
+                new TextRun({ text: `[Image: ${node.attrs?.src || 'unnamed'}]`, color: '0000FF' })
+            ],
+            alignment: AlignmentType.CENTER
+        });
+    }
+
+    private convertList(node: any, level: number = 0): Paragraph[] {
+        const paragraphs: Paragraph[] = [];
+        const isOrdered = node.type === 'orderedList';
+
+        (node.content || []).forEach((listItem: any) => {
+            if (listItem.type === 'listItem') {
+                (listItem.content || []).forEach((child: any) => {
+                    if (child.type === 'paragraph') {
+                        const p = this.convertParagraph(child, {
+                            numbering: {
+                                reference: isOrdered ? 'default-numbering' : 'bullet-numbering',
+                                level,
+                            },
+                        });
+                        paragraphs.push(p);
+                    } else if (child.type === 'bulletList' || child.type === 'orderedList') {
+                        paragraphs.push(...this.convertList(child, level + 1));
+                    }
+                });
+            }
+        });
+        return paragraphs;
+    }
+
+    private convertParagraph(node: any, listOptions?: any): Paragraph {
+        let children = this.convertInlines(node.content);
+
+        // Safety: Docx Paragraphs shouldn't be entirely empty
+        if (children.length === 0) {
+            children = [new TextRun("")];
+        }
+
         const options: any = {
             children,
             spacing: {
                 before: this.parseSpacing(node.attrs?.spacingBefore),
                 after: this.parseSpacing(node.attrs?.spacingAfter),
+                line: node.attrs?.lineHeight ? Math.round(parseFloat(node.attrs.lineHeight) * 240) : undefined,
+                lineRule: node.attrs?.lineHeight ? 'auto' : undefined,
             },
             indent: {
                 left: this.parseIndent(node.attrs?.indent),
                 firstLine: this.parseIndent(node.attrs?.firstLineIndent),
             },
+            ...listOptions,
         };
 
         const align = this.mapAlignment(node.attrs?.textAlign);

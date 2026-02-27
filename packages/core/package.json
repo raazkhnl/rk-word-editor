@@ -1,6 +1,6 @@
 {
     "name": "@raazkhnl/rk-editor-core",
-    "version": "3.2.0",
+    "version": "3.2.1",
     "description": "Core engine for RK Word Editor built with Tiptap and ProseMirror",
     "author": {
         "name": "RaaZ Khanal",

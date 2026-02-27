@@ -4,6 +4,7 @@ export interface IndentOptions {
     types: string[];
     minIndent: number;
     maxIndent: number;
+    indentSize: number; // Added indentSize
 }
 
 declare module '@tiptap/core' {
@@ -23,6 +24,7 @@ export const Indent = Extension.create<IndentOptions>({
             types: ['paragraph', 'heading', 'listItem'],
             minIndent: 0,
             maxIndent: 8,
+            indentSize: 1, // Default indent size
         };
     },
 
@@ -33,10 +35,10 @@ export const Indent = Extension.create<IndentOptions>({
                 attributes: {
                     indent: {
                         default: 0,
-                        parseHTML: (element) => parseInt(element.style.paddingLeft) / 40 || 0,
+                        parseHTML: (element) => parseInt(element.style.marginLeft) / 40 || 0,
                         renderHTML: (attributes) => {
                             if (!attributes.indent) return {};
-                            return { style: `padding-left: ${attributes.indent * 40}px` };
+                            return { style: `margin-left: ${attributes.indent * 40}px` };
                         },
                     },
                 },
@@ -47,18 +49,28 @@ export const Indent = Extension.create<IndentOptions>({
     addCommands() {
         return {
             indent: () => ({ commands }) => {
-                return this.options.types.every((type) =>
-                    commands.updateAttributes(type, (attrs: any) => ({
-                        indent: Math.min((attrs.indent || 0) + 1, this.options.maxIndent),
-                    }))
-                );
+                if (this.editor.isActive('listItem')) {
+                    return (this.editor.chain().focus() as any).sinkListItem('listItem').run();
+                }
+                const types = this.options.types.filter(t => t !== 'listItem');
+                return types.every(type => {
+                    const currentIndent = this.editor.getAttributes(type).indent || 0;
+                    return commands.updateAttributes(type, {
+                        indent: Math.min(currentIndent + this.options.indentSize, this.options.maxIndent),
+                    });
+                });
             },
             outdent: () => ({ commands }) => {
-                return this.options.types.every((type) =>
-                    commands.updateAttributes(type, (attrs: any) => ({
-                        indent: Math.max((attrs.indent || 0) - 1, this.options.minIndent),
-                    }))
-                );
+                if (this.editor.isActive('listItem')) {
+                    return (this.editor.chain().focus() as any).liftListItem('listItem').run();
+                }
+                const types = this.options.types.filter(t => t !== 'listItem');
+                return types.every(type => {
+                    const currentIndent = this.editor.getAttributes(type).indent || 0;
+                    return commands.updateAttributes(type, {
+                        indent: Math.max(this.options.minIndent, currentIndent - this.options.indentSize),
+                    });
+                });
             },
         };
     },

@@ -17,6 +17,8 @@ declare module '@tiptap/core' {
                 hangingIndent?: string;
                 backgroundColor?: string;
                 border?: string;
+                class?: string;
+                id?: string;
             }) => ReturnType;
         };
     }
@@ -91,6 +93,22 @@ export const ParagraphSystem = Extension.create<ParagraphSystemOptions>({
                             return { style: `border: ${attributes.border}` };
                         },
                     },
+                    class: {
+                        default: null,
+                        parseHTML: element => element.getAttribute('class'),
+                        renderHTML: attributes => {
+                            if (!attributes.class) return {};
+                            return { class: attributes.class };
+                        },
+                    },
+                    id: {
+                        default: null,
+                        parseHTML: element => element.getAttribute('id'),
+                        renderHTML: attributes => {
+                            if (!attributes.id) return {};
+                            return { id: attributes.id };
+                        },
+                    },
                 },
             },
         ];
@@ -107,6 +125,8 @@ export const ParagraphSystem = Extension.create<ParagraphSystemOptions>({
                         hangingIndent: attrs.hangingIndent,
                         backgroundColor: attrs.backgroundColor,
                         border: attrs.border,
+                        class: attrs.class,
+                        id: attrs.id,
                     })
                 );
             },

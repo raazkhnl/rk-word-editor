@@ -29,7 +29,7 @@ export const TableOfContents = Extension.create({
 
                 const tocContent = headings.map((h: any) => ({
                     type: 'paragraph',
-                    attrs: { textAlign: 'left' },
+                    attrs: { textAlign: 'justify', class: 'rk-toc-item' },
                     content: [
                         {
                             type: 'text',
@@ -41,6 +41,7 @@ export const TableOfContents = Extension.create({
                         {
                             type: 'text',
                             text: ' ',
+                            marks: [{ type: 'leader' }],
                         },
                         {
                             type: 'text',
@@ -49,7 +50,10 @@ export const TableOfContents = Extension.create({
                     ],
                 }));
 
-                return commands.insertContent(tocContent);
+                return commands.insertContent([
+                    { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'Table of Contents' }] },
+                    ...tocContent
+                ]);
             },
         } as any;
     },

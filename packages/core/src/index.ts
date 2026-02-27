@@ -51,6 +51,7 @@ import { ImageUpload } from './extensions/ImageUpload';
 import { FormatPainter } from './extensions/FormatPainter';
 import { DragHandle } from './extensions/DragHandle';
 import { TrackChanges } from './extensions/TrackChanges';
+import { LeaderMark } from './extensions/LeaderMark';
 
 // Utilities
 import { DocumentValidator } from './DocumentValidator';
@@ -58,6 +59,7 @@ import { CommandManager } from './CommandManager';
 import { ExportEngine, ExportFormat, ExportOptions } from './ExportEngine';
 import { ImportEngine } from './ImportEngine';
 import { StyleManager } from './StyleManager';
+import { createImageResizeView } from './extensions/ImageResizeHandle';
 
 // Re-export types and utilities for consumers
 export type { ExportFormat, ExportOptions, SlashCommand };
@@ -118,7 +120,15 @@ export class WordEditor {
           },
         }),
         // ---- Media (Phase 7) ----
-        Image.configure({ HTMLAttributes: { class: 'rk-image' } }),
+        Image.configure({
+          HTMLAttributes: { class: 'rk-image' },
+        }).extend({
+          addNodeView() {
+            return (props) => {
+              return createImageResizeView(props.node, props.view, props.getPos);
+            };
+          },
+        }),
         ImageResize,
         ImageUpload.configure({
           onUpload: options.imageUploadHandler || null,
@@ -157,6 +167,7 @@ export class WordEditor {
         TrackChanges.configure({
           author: options.trackAuthor || 'Author',
         }),
+        LeaderMark,
         ...(options.dragHandles !== false ? [DragHandle] : []),
       ],
       content: options.initialContent || '',

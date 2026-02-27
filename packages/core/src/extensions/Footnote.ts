@@ -25,8 +25,11 @@ export const Footnote = Node.create({
 
     addCommands() {
         return {
-            setFootnote: () => ({ commands }: { commands: any }) => {
-                return commands.insertContent({ type: this.name });
+            setFootnote: (content?: string) => ({ commands }: { commands: any }) => {
+                return commands.insertContent({
+                    type: this.name,
+                    content: content ? [{ type: 'text', text: content }] : undefined
+                });
             },
         } as any;
     },

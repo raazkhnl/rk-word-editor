@@ -35,7 +35,8 @@ const ALL_COMMANDS: { label: string; shortcut?: string; action: (editor: any) =>
   { label: 'Heading 3', shortcut: 'Ctrl+Alt+3', action: e => e.format.heading(3) },
   { label: 'Bullet List', action: e => e.format.bulletList() },
   { label: 'Numbered List', action: e => e.format.orderedList() },
-  { label: 'Task List', action: e => e.format.taskList() },
+  { label: 'Nepali Numbering', action: e => e.format.setListStyle('nepali') },
+  { label: 'Task List', action: e => (e.instance.commands as any).toggleTaskList() },
   { label: 'Insert Table (3x3)', action: e => e.format.insertTable({ rows: 3, cols: 3, withHeaderRow: true }) },
   { label: 'Insert Image from PC', action: e => e.format.openImageUpload() },
   { label: 'Insert Math', action: e => { const l = prompt('LaTeX:'); if (l) e.format.insertMathInline(l); } },
@@ -59,6 +60,25 @@ const ALL_COMMANDS: { label: string; shortcut?: string; action: (editor: any) =>
   { label: 'Import File (DOCX/MD)...', action: e => (document.getElementById('rk-import-input') as HTMLInputElement)?.click() },
   { label: 'Word Count', action: e => { const s = e.getWordCount(); alert(`Words: ${s.words}\nChars: ${s.characters}\nParagraphs: ${s.paragraphs}`); } },
 ];
+
+const ICONS = {
+  bold: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10.5 6.5h2.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-2.5v-3zm3.5 11h-3.5v-3.5h3.5c.97 0 1.75.78 1.75 1.75s-.78 1.75-1.75 1.75z"/></svg>',
+  italic: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>',
+  underline: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>',
+  strike: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M10 19h4v-3h-4v3zM5 4v3h5v3H5v3h5v3H5v3h14v-3h-5v-3h5v-3h-5V7h5V4H5z"/></svg>',
+  alignLeft: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>',
+  alignCenter: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M7 15v2h10v-2H7zm-4-4v2h18v-2H3zm4-4v2h10V7H7zm-4-4v2h18V3H3zm0 16v2h18v-2H3z"/></svg>',
+  alignRight: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 15v2h12v-2H9zm-6-4v2h18v-2H3zM9 7v2h12V7H9zm-6-4v2h18V3H3zm0 16v2h18v-2H3z"/></svg>',
+  alignJustify: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V3H3v2z"/></svg>',
+  bulletList: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>',
+  orderedList: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>',
+  nepaliList: '<svg viewBox="0 0 24 24" width="16" height="16"><text x="2" y="18" fill="currentColor" style="font-size:16px; font-weight:bold">१</text><path fill="currentColor" d="M7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>',
+  taskList: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+  indent: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 5h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zM3 13h18v-2H3v2z"/></svg>',
+  outdent: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M3 21h18v-2H3v2zm11-9l-4-4v8l4-4zm-3 1h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zM3 13h18v-2H3v2z"/></svg>',
+  image: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>',
+  table: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"/></svg>',
+};
 
 export class WordToolbar {
   private container: HTMLElement;
@@ -173,17 +193,19 @@ export class WordToolbar {
             </div>
             
             <div class="rk-toolbar-group" data-label="Para">
-              <button id="align-left-btn" title="Left">L</button>
-              <button id="align-center-btn" title="Center">C</button>
-              <button id="align-right-btn" title="Right">R</button>
-              <button id="align-justify-btn" title="Justify">J</button>
+              <button id="align-left-btn" title="Left">${ICONS.alignLeft}</button>
+              <button id="align-center-btn" title="Center">${ICONS.alignCenter}</button>
+              <button id="align-right-btn" title="Right">${ICONS.alignRight}</button>
+              <button id="align-justify-btn" title="Justify">${ICONS.alignJustify}</button>
             </div>
 
             <div class="rk-toolbar-group" data-label="Lists">
-              <button id="bullet-list-btn" title="Bullets">•</button>
-              <button id="ordered-list-btn" title="Numbers">1.</button>
-              <button id="indent-btn" title="Indent">⇥</button>
-              <button id="outdent-btn" title="Outdent">⇤</button>
+              <button id="bullet-list-btn" title="Bullets">${ICONS.bulletList}</button>
+              <button id="ordered-list-btn" title="Numbers">${ICONS.orderedList}</button>
+              <button id="nepali-list-btn" title="Nepali">${ICONS.nepaliList}</button>
+              <button id="task-list-btn" title="Tasks">${ICONS.taskList}</button>
+              <button id="indent-btn" title="Indent">${ICONS.indent}</button>
+              <button id="outdent-btn" title="Outdent">${ICONS.outdent}</button>
             </div>
           </div>
 
@@ -216,11 +238,13 @@ export class WordToolbar {
             </div>
 
             <div class="rk-toolbar-group" data-label="Insert">
-              <button id="upload-image-btn" title="Image">🏞</button>
+              <button id="upload-image-btn" title="Image">${ICONS.image}</button>
               <button id="insert-link-btn" title="Link">🔗</button>
+              <button id="insert-citation-btn" title="Citation">[ref]</button>
               <button id="insert-math-btn" title="Math">∑</button>
               <button id="insert-footnote-btn" title="Footnote">_🖋</button>
               <button id="toc-btn" title="TOC">☰</button>
+              <button id="page-number-btn" title="Page Number">#️⃣</button>
               <button id="page-break-btn" title="Break">✂</button>
             </div>
 
@@ -350,32 +374,78 @@ export class WordToolbar {
 
     q('#bullet-list-btn')?.addEventListener('click', () => ed.format.bulletList());
     q('#ordered-list-btn')?.addEventListener('click', () => ed.format.orderedList());
+    q('#nepali-list-btn')?.addEventListener('click', () => ed.format.setListStyle('nepali'));
+    q('#task-list-btn')?.addEventListener('click', () => (ed.instance.commands as any).toggleTaskList());
     q('#indent-btn')?.addEventListener('click', () => ed.format.indent());
     q('#outdent-btn')?.addEventListener('click', () => ed.format.outdent());
 
     q('#text-color')?.addEventListener('input', (e: any) => ed.format.setColor(e.target.value));
     q('#highlight-color')?.addEventListener('input', (e: any) => ed.format.setHighlight(e.target.value));
 
-    q('#insert-table-btn')?.addEventListener('click', () => ed.format.insertTable({ rows: 3, cols: 3 }));
-    q('#upload-image-btn')?.addEventListener('click', () => (q('#rk-import-input') as HTMLInputElement)?.click());
+    q('#insert-table-btn')?.addEventListener('click', () => {
+      new Modal({
+        title: 'Insert Table',
+        fields: [
+          { id: 'rows', label: 'Rows', type: 'number', value: 3 },
+          { id: 'cols', label: 'Columns', type: 'number', value: 3 },
+        ],
+        onConfirm: (data) => ed.format.insertTable({ rows: parseInt(data.rows), cols: parseInt(data.cols) }),
+      }).show();
+    });
 
     q('#insert-link-btn')?.addEventListener('click', () => {
-      const u = prompt('Enter URL:');
-      if (u) (ed.instance.chain().focus() as any).setLink({ href: u }).run();
+      new Modal({
+        title: 'Insert Link',
+        fields: [
+          { id: 'url', label: 'URL', type: 'text', value: 'https://' },
+          { id: 'text', label: 'Display Text (Optional)', type: 'text' },
+        ],
+        onConfirm: (data) => {
+          if (data.url) {
+            (ed.instance.chain().focus() as any).setLink({ href: data.url }).run();
+          }
+        },
+      }).show();
     });
 
     q('#insert-math-btn')?.addEventListener('click', () => {
-      const l = prompt('Enter LaTeX:');
-      if (l) ed.format.insertMathInline(l);
+      new Modal({
+        title: 'Insert Math (LaTeX)',
+        fields: [
+          { id: 'latex', label: 'LaTeX Expression', type: 'text', value: 'E=mc^2' },
+        ],
+        onConfirm: (data) => ed.format.insertMathInline(data.latex),
+      }).show();
     });
 
-    q('#insert-footnote-btn')?.addEventListener('click', () => ed.format.footnote());
-    q('#toc-btn')?.addEventListener('click', () => (ed as any).insertTableOfContents?.());
+    q('#insert-footnote-btn')?.addEventListener('click', () => {
+      new Modal({
+        title: 'Insert Footnote',
+        fields: [
+          { id: 'text', label: 'Footnote Text', type: 'text' },
+        ],
+        onConfirm: (data) => ed.format.footnote(data.text),
+      }).show();
+    });
+
+    q('#insert-citation-btn')?.addEventListener('click', () => {
+      new Modal({
+        title: 'Insert Citation',
+        fields: [
+          { id: 'key', label: 'Citation Key', type: 'text' },
+          { id: 'label', label: 'Label (Optional)', type: 'text' },
+        ],
+        onConfirm: (data) => ed.format.insertCitation(data.key, data.label || undefined),
+      }).show();
+    });
+
+    q('#toc-btn')?.addEventListener('click', () => ed.format.insertTableOfContents());
+    q('#page-number-btn')?.addEventListener('click', () => ed.format.insertFooter());
     q('#page-break-btn')?.addEventListener('click', () => ed.format.pageBreak());
     q('#clear-format-btn')?.addEventListener('click', () => ed.format.clearFormatting());
 
     q('#track-changes-btn')?.addEventListener('click', () => {
-      (ed as any).toggleTrackChanges();
+      ed.toggleTrackChanges();
       this.updateActiveStates();
     });
 
@@ -426,9 +496,14 @@ export class WordToolbar {
       case 'trackChanges': (ed as any).toggleTrackChanges(); break;
       case 'insertTable': ed.format.insertTable({ rows: 3, cols: 3 }); break;
       case 'insertLink': q('#insert-link-btn')?.click(); break;
-      case 'insertToc': (ed as any).insertTableOfContents(); break;
+      case 'insertToc': ed.format.insertTableOfContents(); break;
+      case 'insertMath': q('#insert-math-btn')?.click(); break;
+      case 'insertFootnote': q('#insert-footnote-btn')?.click(); break;
+      case 'insertCitation': q('#insert-citation-btn')?.click(); break;
       case 'insertImage': (q('#rk-import-input') as HTMLInputElement)?.click(); break;
       case 'pageBreak': ed.format.pageBreak(); break;
+      case 'hr': ed.format.horizontalRule(); break;
+      case 'blockquote': ed.format.blockquote(); break;
       case 'addRowBefore': ed.format.addRowBefore(); break;
       case 'addRowAfter': ed.format.addRowAfter(); break;
       case 'delRow': ed.format.deleteRow(); break;

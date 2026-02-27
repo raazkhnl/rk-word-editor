@@ -1,69 +1,56 @@
-# RK-Word-Editor
+# RK Word Editor Monorepo
+A modern, high-performance rich-text editor monorepo built with Tiptap, ProseMirror, and TypeScript. Optimized for professional documentation, Microsoft Word-like experience, and customizability.
 
-A high-performance, modern, and extensible rich-text editor built on Tiptap and ProseMirror. Designed for speed, flexibility, and beautiful typography.
+## ✨ Latest Features (v3.2.1)
+- **Interactive Image Resizing**: Professional drag handles on images.
+- **Robust DOCX Export**: Industry-standard Docx generation with multilevel lists.
+- **Nepali Numbering**: Native Devanagari numbering support (१. २. ३...).
+- **SVG Toolbar Icons**: Clean, premium iconography.
+- **Advanced Layout**: Page breaks, margins, and custom typography.
+- **Track Changes**: Built-in review system with textual visual insertion/deletion tracking and Accept/Reject APIs.
 
-## ✨ Features
-
-- **Modern Core**: Built on Tiptap 2 and ProseMirror for industry-leading reliability.
-- **Modular Architecture**: Monorepo design with separated `@rk-editor/core` and `@rk-editor/ui`.
-- **Advanced Layouts**: Native support for page breaks, margins, and flexible page structures.
-- **Rich Table System**: Cell merging, row/column management, and advanced styling.
-- **Media Support**: Seamlessly integrate images and other media types.
-- **Extensible**: Easily add custom Tiptap extensions and UI components.
-- **Developer First**: Fully typed with TypeScript, ESM ready, and zero-config builds.
+## 📦 Project Structure
+- `packages/core`: The main editor engine logic and extensions.
+- `packages/ui`: Pre-built toolbar, shell, and premium UI components.
+- `apps/demo`: Sample application for testing and integration.
 
 ## 🚀 Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- [npm](https://www.npmjs.com/)
-
 ### Installation
-
+To install the complete package in your project:
 ```bash
-git clone https://github.com/your-username/rk-word-editor.git
-cd rk-word-editor
-npm install
+npm install @raazkhnl/rk-editor-ui @raazkhnl/rk-editor-core
 ```
 
-### Usage
+For development (cloning the monorepo):
+```bash
+git clone https://github.com/raazkhnl/rk-word-editor.git
+cd rk-word-editor
+npm install
+npm run build
+```
 
-To start the demo application in development mode:
+### Development
 ```bash
 npm run dev
 ```
 
-To build all packages (`core`, `ui`, `demo`):
+## 📦 Packages
+### [@raazkhnl/rk-editor-core](https://www.npmjs.com/package/@raazkhnl/rk-editor-core)
+The high-performance core engine. Use this for a headless editor or a custom UI.
 ```bash
-npm run build
+npm install @raazkhnl/rk-editor-core
 ```
 
-The demo application will be available at `http://localhost:3000`.
+### [@raazkhnl/rk-editor-ui](https://www.npmjs.com/package/@raazkhnl/rk-editor-ui)
+The full Word-like interface including the premium toolbar and shell.
+```bash
+npm install @raazkhnl/rk-editor-ui
+```
 
-## 📦 Project Structure
-
-- `packages/core`: The core editor engine and Tiptap extensions.
-- `packages/ui`: Reusable UI components and the editor toolbar.
-- `apps/demo`: A sample application showcasing the editor's capabilities.
-
-## 🛠️ Built With
-
-- [Tiptap](https://tiptap.dev/) - The headless editor framework.
-- [ProseMirror](https://prosemirror.net/) - The toolkit for building rich-text editors.
-- [Vite](https://vitejs.dev/) - Next generation frontend tooling.
-- [TypeScript](https://www.typescriptlang.org/) - Typed JavaScript.
+## 🛠️ Build & CI/CD
+This monorepo uses Vite for building and GitHub Actions for automated publishing.
+- `npm run build`: Build all packages.
+- `npm publish:packages`: Publish workspaces to NPM.
 
 ## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information. All features are free and open-source.
-
-## 🤝 Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+MIT

@@ -37,10 +37,13 @@ export function createImageResizeView(node: any, view: any, getPos: any) {
     const img = document.createElement('img');
     img.src = node.attrs.src;
     img.alt = node.attrs.alt || '';
-    img.className = 'rk-image';
+    img.style.display = 'block';
+    img.style.maxWidth = '100%';
+    img.style.height = 'auto';
+
     if (node.attrs.width) img.style.width = node.attrs.width;
     if (node.attrs.height) img.style.height = node.attrs.height;
-    if (node.attrs.float) img.style.float = node.attrs.float;
+    if (node.attrs.float) wrapper.style.float = node.attrs.float;
 
     wrapper.appendChild(img);
 

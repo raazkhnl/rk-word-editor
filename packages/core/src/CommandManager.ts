@@ -37,8 +37,18 @@ export class CommandManager {
     public lineHeight = (height: string) => this.execute(c => c.setLineHeight(height));
     public spacing = (top: string, bottom: string) => this.execute(c => c.setParagraphSpacing({ top, bottom }));
     public paragraphLayout = (attrs: any) => (this.editor.chain().focus() as any).setParagraphLayout(attrs).run();
-    public indent = () => this.execute(c => c.indent());
-    public outdent = () => this.execute(c => c.outdent());
+    public indent = () => {
+        if (this.editor.isActive('listItem')) {
+            return (this.editor.chain().focus() as any).sinkListItem('listItem').run();
+        }
+        return this.execute(c => c.indent());
+    };
+    public outdent = () => {
+        if (this.editor.isActive('listItem')) {
+            return (this.editor.chain().focus() as any).liftListItem('listItem').run();
+        }
+        return this.execute(c => c.outdent());
+    };
 
     public heading = (level: any) => this.execute(c => c.toggleHeading({ level }));
     public paragraph = () => this.execute(c => c.setParagraph());
@@ -71,7 +81,7 @@ export class CommandManager {
     public setTableCellAttribute = (name: string, value: any) => this.execute(c => c.setTableCellAttribute(name, value));
     public setTableStyle = (style: string) => (this.editor.chain().focus() as any).setTableStyle(style).run();
 
-    // ---- Insert Commands ----
+    public openImageUpload = () => (this.editor.commands as any).openImageUpload();
     public insertImage = (src: string) => this.execute(c => c.setImage({ src }));
     public setImageSize = (width: string, height?: string) => (this.editor.chain().focus() as any).setImageSize(width, height).run();
     public setImageFloat = (float: 'left' | 'right' | 'none') => (this.editor.chain().focus() as any).setImageFloat(float).run();
@@ -79,9 +89,11 @@ export class CommandManager {
     public insertMathInline = (latex: string) => (this.editor.chain().focus() as any).insertMathInline(latex).run();
     public insertMathBlock = (latex: string) => (this.editor.chain().focus() as any).insertMathBlock(latex).run();
     public pageBreak = () => (this.editor.commands as any).setPageBreak();
-    public footnote = () => (this.editor.commands as any).setFootnote();
+    public footnote = (content?: string) => (this.editor.commands as any).setFootnote(content);
     public sectionBreak = () => (this.editor.commands as any).insertSectionBreak();
     public pageLayout = (options: any) => (this.editor.commands as any).setPageLayout(options);
+    public insertPageNumber = () => this.execute(c => c.insertContent({ type: 'pageNumber' }));
+    public insertFooter = () => this.execute(c => c.insertContent({ type: 'footer', content: [{ type: 'paragraph', attrs: { textAlign: 'right' }, content: [{ type: 'pageNumber' }] }] }));
 
     // ---- Style Commands (Phase 2) ----
     public applyStyle = (name: string) => (this.editor.chain().focus() as any).applyNamedStyle(name).run();

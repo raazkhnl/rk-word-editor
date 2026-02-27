@@ -47,11 +47,24 @@ export const MultilevelList = Extension.create({
 
     addCommands() {
         return {
-            setListStyle: (listStyle: string) => ({ commands }: { commands: any }) => {
-                return (
-                    commands.updateAttributes('orderedList', { listStyle }) ||
-                    commands.updateAttributes('bulletList', { listStyle })
-                );
+            setListStyle: (listStyle: string) => ({ state, dispatch }: { state: any, dispatch?: any }) => {
+                const { selection } = state;
+                let tr = state.tr;
+                let found = false;
+
+                state.doc.nodesBetween(selection.from, selection.to, (node: any, pos: number) => {
+                    if (node.type.name === 'orderedList' || node.type.name === 'bulletList') {
+                        tr = tr.setNodeMarkup(pos, undefined, { ...node.attrs, listStyle });
+                        found = true;
+                    }
+                });
+
+                if (found) {
+                    if (dispatch) dispatch(tr);
+                    return true;
+                }
+
+                return false;
             },
             setListStartNumber: (startNumber: number) => ({ commands }: { commands: any }) => {
                 return commands.updateAttributes('orderedList', { startNumber });

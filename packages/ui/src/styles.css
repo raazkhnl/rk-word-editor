@@ -755,6 +755,7 @@
 
 .rk-list-nepali {
     list-style-type: none !important;
+    counter-reset: nepali-counter;
 }
 
 .rk-list-nepali li {
@@ -768,6 +769,40 @@
     margin-right: 8px;
     font-family: inherit;
     min-width: 1.5em;
+}
+
+/* Print Styles - Fix PDF Export Scrollbars */
+@media print {
+
+    .rk-toolbar,
+    .rk-menubar,
+    .rk-menubar-spacer,
+    .rk-wordcount-display {
+        display: none !important;
+    }
+
+    .rk-editor {
+        overflow: visible !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+
+    .ProseMirror {
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        min-height: auto !important;
+    }
+
+    body,
+    html {
+        overflow: visible !important;
+    }
+
+    ::-webkit-scrollbar {
+        display: none !important;
+    }
 }
 
 .rk-numbered-headings.rk-nepali-headings h1 {
@@ -1137,4 +1172,341 @@
     border-radius: var(--rk-radius-sm);
     padding: 8px 16px;
     cursor: pointer;
+}
+
+/* ---- Image Resize Handles ---- */
+.rk-image-resize-wrapper {
+    position: relative;
+    display: inline-block;
+    transition: box-shadow 0.2s;
+    margin: 5px;
+    min-width: 50px;
+    min-height: 50px;
+    vertical-align: middle;
+}
+
+.rk-image-resize-wrapper.is-selected {
+    outline: 2px solid #0078d4;
+    box-shadow: 0 0 10px rgba(0, 120, 212, 0.3);
+}
+
+.rk-image-resize-wrapper .rk-resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #0078d4;
+    border: 1px solid white;
+    z-index: 100;
+    display: none;
+}
+
+.rk-image-resize-wrapper.is-selected .rk-resize-handle {
+    display: block;
+}
+
+.rk-resize-handle-nw {
+    top: -5px;
+    left: -5px;
+    cursor: nw-resize;
+}
+
+.rk-resize-handle-n {
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: n-resize;
+}
+
+.rk-resize-handle-ne {
+    top: -5px;
+    right: -5px;
+    cursor: ne-resize;
+}
+
+.rk-resize-handle-e {
+    top: 50%;
+    right: -5px;
+    transform: translateY(-50%);
+    cursor: e-resize;
+}
+
+.rk-resize-handle-se {
+    bottom: -5px;
+    right: -5px;
+    cursor: se-resize;
+}
+
+.rk-resize-handle-s {
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: s-resize;
+}
+
+.rk-resize-handle-sw {
+    bottom: -5px;
+    left: -5px;
+    cursor: sw-resize;
+}
+
+.rk-resize-handle-w {
+    top: 50%;
+    left: -5px;
+    transform: translateY(-50%);
+    cursor: w-resize;
+}
+
+.rk-image-resize-wrapper.is-resizing img {
+    opacity: 0.8;
+}
+
+/* ---- Image Resize Wrapper Stability ---- */
+.rk-image-resize-wrapper {
+    display: inline-block !important;
+    position: relative;
+    line-height: 0;
+    max-width: 100%;
+}
+
+.rk-image-resize-wrapper img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.rk-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px auto;
+}
+
+/* ---- Nepali Numbering System ---- */
+.rk-list-nepali {
+    list-style: none !important;
+    counter-reset: rk-counter;
+    padding-left: 2.5rem;
+}
+
+.rk-list-nepali li {
+    position: relative;
+    counter-increment: rk-counter;
+}
+
+.rk-list-nepali li::before {
+    content: counter(rk-counter, devanagari) ". ";
+    position: absolute;
+    left: -2rem;
+    width: 1.8rem;
+    text-align: right;
+    font-weight: 500;
+    color: var(--rk-primary);
+}
+
+.rk-list-nepali li p {
+    margin: 0;
+}
+
+/* ---- Table of Contents Leaders ---- */
+.rk-toc-item {
+    display: flex !important;
+    align-items: baseline;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.rk-toc-item .rk-toc-leader {
+    flex-grow: 1;
+    border-bottom: 1px dotted #888;
+    margin: 0 10px;
+    min-width: 20px;
+}
+
+.rk-toc-item a,
+.rk-toc-item span {
+    white-space: nowrap;
+}
+
+.rk-toc-item .rk-toc-leader {
+    flex-grow: 1;
+    border-bottom: 2px dotted #aaa;
+    margin: 0 8px;
+    align-self: flex-end;
+    margin-bottom: 4px;
+}
+
+/* ---- Print Styles (for PDF Export) ---- */
+@media print {
+    @page {
+        margin: 1.5cm;
+        size: auto;
+    }
+
+    body {
+        background: white;
+    }
+
+    .rk-editor-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+
+    .rk-toolbar,
+    .rk-menubar,
+    .rk-statusbar {
+        display: none !important;
+    }
+
+    .rk-editor-content {
+        padding: 0 !important;
+    }
+
+    /* Page numbering via CSS counters */
+    body {
+        counter-reset: page;
+    }
+
+    .rk-footer {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        font-size: 10pt;
+        color: #666;
+    }
+
+    .rk-footer::after {
+        counter-increment: page;
+        content: "Page " counter(page);
+    }
+}
+
+/* ---- Modal System ---- */
+.rk-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease-in-out;
+    z-index: 9999;
+}
+
+.rk-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.rk-modal-content {
+    background: #fff;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(20px);
+    transition: transform 0.2s ease-out;
+    padding: 20px;
+    color: #333;
+}
+
+.rk-modal-overlay.active .rk-modal-content {
+    transform: translateY(0);
+}
+
+.rk-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.rk-modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #1a73e8;
+}
+
+.rk-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.rk-modal-body {
+    margin-bottom: 20px;
+}
+
+.rk-modal-field {
+    margin-bottom: 15px;
+}
+
+.rk-modal-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.rk-modal-field input,
+.rk-modal-field select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    color: #333 !important;
+}
+
+.rk-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.rk-modal-footer button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+    border: none;
+}
+
+.rk-btn-secondary {
+    background: #eee;
+    color: #333;
+}
+
+.rk-btn-primary {
+    background: #1a73e8;
+    color: white;
+}
+
+.rk-btn-primary:hover {
+    background: #1557b0;
+}
+
+/* ---- Track Changes Styles ---- */
+.rk-track-insert {
+    color: #1a73e8;
+    background-color: rgba(26, 115, 232, 0.1);
+    text-decoration: underline;
+    text-decoration-color: #1a73e8;
+}
+
+.rk-track-delete {
+    color: #d32f2f;
+    background-color: rgba(211, 47, 47, 0.1);
+    text-decoration: line-through;
+    text-decoration-color: #d32f2f;
 }
