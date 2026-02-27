@@ -95,9 +95,9 @@ export class ImportEngine {
             // Using a template literal to avoid Vite static analysis if missing
             const pluginName = 'turndown-plugin-gfm';
             const gfm = await import(/* @vite-ignore */ pluginName);
-            service.use(gfm.gfm);
-        } catch {
-            // GFM plugin optional
+            service.use(gfm.gfm || gfm.default || gfm);
+        } catch (e) {
+            console.warn('[ImportEngine] turndown-plugin-gfm not loaded, skipping tables in markdown export.', e);
         }
 
         return service.turndown(html);

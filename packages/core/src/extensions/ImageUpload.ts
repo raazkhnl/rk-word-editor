@@ -19,21 +19,20 @@ export const ImageUpload = Extension.create({
 
     addCommands() {
         return {
-            uploadImage: (file: File) => ({ commands }: { commands: any }) => {
-                return this.options.onUpload
-                    ? this.options.onUpload(file).then((src: string) =>
-                        commands.setImage({ src, alt: file.name })
-                    )
-                    : new Promise<boolean>(resolve => {
-                        const reader = new FileReader();
-                        reader.onload = e => {
-                            const src = e.target?.result as string;
-                            commands.setImage({ src, alt: file.name });
-                            resolve(true);
-                        };
-                        reader.onerror = () => resolve(false);
-                        reader.readAsDataURL(file);
+            uploadImage: (file: File) => ({ editor }: { editor: any }) => {
+                if (this.options.onUpload) {
+                    this.options.onUpload(file).then((src: string) => {
+                        editor.chain().focus().setImage({ src, alt: file.name }).run();
                     });
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const src = e.target?.result as string;
+                        editor.chain().focus().setImage({ src, alt: file.name }).run();
+                    };
+                    reader.readAsDataURL(file);
+                }
+                return true;
             },
             openImageUpload: () => () => {
                 const input = document.createElement('input');

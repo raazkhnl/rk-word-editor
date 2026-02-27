@@ -1,6 +1,7 @@
 import { WordEditor } from '@rk-editor/core';
 import { Modal } from './Modal';
 import './styles.css';
+import logoSrc from './assets/logo.png';
 
 const FONT_FAMILIES = [
   // Web-safe
@@ -97,6 +98,9 @@ export class WordToolbar {
       <div class="rk-editor-shell">
         <!-- === MENU BAR === -->
         <nav class="rk-menubar" role="menubar" aria-label="Menu Bar">
+          <div class="rk-brand-logo" style="display: flex; align-items: center; padding: 0 16px;">
+            <img src="${logoSrc}" alt="RK Editor" style="height: 24px; object-fit: contain; margin-right: 8px;">
+          </div>
           ${this.buildMenu('File', [
       { label: '📄 New Document', action: 'newDoc' },
       { label: '📂 Open / Import...', action: 'openImport' },
@@ -150,6 +154,12 @@ export class WordToolbar {
       { label: '• Bullet List', action: 'bulletList' },
       { label: '1. Numbered List', action: 'orderedList' },
       { label: '☑ Task List', action: 'taskList' },
+    ])}
+          ${this.buildMenu('Help', [
+      { label: '⌨️ Keyboard Shortcuts', action: 'showShortcuts' },
+      { label: 'ℹ️ About', action: 'showAbout' },
+      { sep: true },
+      { label: '⭐ GitHub Repository', action: 'openGithub' },
     ])}
           <div class="rk-menubar-spacer"></div>
           <div class="rk-wordcount-display" id="rk-wc-display">0 words</div>
@@ -478,6 +488,7 @@ export class WordToolbar {
       case 'openImport': (this.container.querySelector('#rk-import-input') as HTMLInputElement)?.click(); break;
       case 'exportDocx': ed.exportDocx(); break;
       case 'exportMd': (ed as any).exportMarkdown(); break;
+      case 'exportHtml': (ed as any).export('html'); break;
       case 'printDoc': ed.format.printDoc(); break;
       case 'undo': ed.format.undo(); break;
       case 'redo': ed.format.redo(); break;
@@ -516,6 +527,21 @@ export class WordToolbar {
       case 'splitCell': ed.format.splitCell(); break;
       case 'toggleHeaderRow': ed.format.toggleHeaderRow(); break;
       case 'toggleHeaderCol': ed.format.toggleHeaderColumn(); break;
+      case 'showShortcuts':
+        new Modal({
+          title: 'Keyboard Shortcuts',
+          description: `<strong>Ctrl+B</strong>: Bold\n<strong>Ctrl+I</strong>: Italic\n<strong>Ctrl+U</strong>: Underline\n<strong>Ctrl+Z</strong>: Undo\n<strong>Ctrl+Y</strong>: Redo\n<strong>Ctrl+K</strong>: Insert Link\n<strong>Ctrl+Enter</strong>: Insert Page Break`
+        }).show();
+        break;
+      case 'showAbout':
+        new Modal({
+          title: 'About RK Word Editor',
+          description: `A powerful, modern rich-text editor built with Tiptap. Includes DOCX and Markdown integration, print-ready layouts, and track changes.\n\n<strong>Author:</strong> Raaz Khanal (@raazkhnl)\n<strong>Version:</strong> 3.2.1`
+        }).show();
+        break;
+      case 'openGithub':
+        window.open('https://github.com/raazkhnl/rk-word-editor', '_blank');
+        break;
     }
     this.updateActiveStates();
   }

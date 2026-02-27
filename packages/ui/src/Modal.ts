@@ -2,14 +2,15 @@ import { Editor } from '@tiptap/core';
 
 export interface ModalOptions {
     title: string;
-    fields: {
+    description?: string;
+    fields?: {
         label: string;
         id: string;
         type: 'text' | 'number' | 'select' | 'color';
         value?: any;
         options?: { label: string; value: any }[];
     }[];
-    onConfirm: (data: Record<string, any>) => void;
+    onConfirm?: (data: Record<string, any>) => void;
 }
 
 /**
@@ -33,38 +34,48 @@ export class Modal {
         const body = document.createElement('div');
         body.className = 'rk-modal-body';
 
+        if (options.description) {
+            const desc = document.createElement('div');
+            desc.innerHTML = options.description.replace(/\n/g, '<br/>');
+            desc.style.marginBottom = '16px';
+            desc.style.lineHeight = '1.5';
+            body.appendChild(desc);
+        }
+
         const fields: Record<string, HTMLInputElement | HTMLSelectElement> = {};
 
-        options.fields.forEach(field => {
-            const fieldGroup = document.createElement('div');
-            fieldGroup.className = 'rk-modal-field';
+        if (options.fields) {
+            options.fields.forEach(field => {
+                const fieldGroup = document.createElement('div');
+                fieldGroup.className = 'rk-modal-field';
 
-            const label = document.createElement('label');
-            label.innerText = field.label;
-            label.setAttribute('for', field.id);
+                const label = document.createElement('label');
+                label.innerText = field.label;
+                label.setAttribute('for', field.id);
 
-            let input: HTMLInputElement | HTMLSelectElement;
-            if (field.type === 'select') {
-                input = document.createElement('select');
-                field.options?.forEach(opt => {
-                    const o = document.createElement('option');
-                    o.value = opt.value;
-                    o.innerText = opt.label;
-                    input.appendChild(o);
-                });
-            } else {
-                input = document.createElement('input');
-                input.type = field.type;
-            }
+                let input: HTMLInputElement | HTMLSelectElement;
+                if (field.type === 'select') {
+                    input = document.createElement('select');
+                    field.options?.forEach(opt => {
+                        const o = document.createElement('option');
+                        o.value = opt.value;
+                        o.innerText = opt.label;
+                        input.appendChild(o);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.type = field.type;
+                }
 
-            input.id = field.id;
-            if (field.value !== undefined) input.value = field.value;
+                input.id = field.id;
+                if (field.value !== undefined) input.value = field.value;
 
-            fieldGroup.appendChild(label);
-            fieldGroup.appendChild(input);
-            body.appendChild(fieldGroup);
-            fields[field.id] = input;
-        });
+                fieldGroup.appendChild(label);
+                fieldGroup.appendChild(input);
+                body.appendChild(fieldGroup);
+                fields[field.id] = input;
+            });
+        }
 
         const footer = document.createElement('div');
         footer.className = 'rk-modal-footer';
@@ -75,9 +86,11 @@ export class Modal {
 
         const confirmBtn = document.createElement('button');
         confirmBtn.className = 'rk-btn-primary';
-        confirmBtn.innerText = 'Confirm';
+        confirmBtn.innerText = options.fields && options.fields.length > 0 ? 'Confirm' : 'Close';
 
-        footer.appendChild(cancelBtn);
+        if (options.fields && options.fields.length > 0) {
+            footer.appendChild(cancelBtn);
+        }
         footer.appendChild(confirmBtn);
 
         content.appendChild(header);
@@ -94,11 +107,13 @@ export class Modal {
         cancelBtn.addEventListener('click', close);
 
         confirmBtn.addEventListener('click', () => {
-            const data: Record<string, any> = {};
-            Object.keys(fields).forEach(key => {
-                data[key] = fields[key].value;
-            });
-            options.onConfirm(data);
+            if (options.onConfirm && options.fields) {
+                const data: Record<string, any> = {};
+                Object.keys(fields).forEach(key => {
+                    data[key] = fields[key].value;
+                });
+                options.onConfirm(data);
+            }
             close();
         });
     }

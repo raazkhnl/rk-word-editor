@@ -1302,7 +1302,7 @@
 .rk-modal-header h3 {
     margin: 0;
     font-size: 1.2rem;
-    color: #1a73e8;
+    color: #666;
 }
 
 .rk-modal-close {
@@ -1359,12 +1359,12 @@
 }
 
 .rk-btn-primary {
-    background: #1a73e8;
+    background: #666;
     color: white;
 }
 
 .rk-btn-primary:hover {
-    background: #1557b0;
+    background: #555;
 }
 
 /* ---- Track Changes Styles ---- */
