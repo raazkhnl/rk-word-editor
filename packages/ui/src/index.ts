@@ -122,10 +122,10 @@ export class WordToolbar {
           ${this.buildMenu('Insert', [
       { label: '⊞ Table...', action: 'insertTable' },
       { label: '🏞 Image from PC', action: 'insertImage' },
-      { label: '🔗 Link...', action: 'insertLink' },
+      { label: '🔗 Link...', action: 'insertLink', shortcut: 'Ctrl+K' },
       { sep: true },
       { label: '∑ Math (LaTeX)...', action: 'insertMath' },
-      { label: '✂ Page Break', action: 'pageBreak' },
+      { label: '✂ Page Break', action: 'pageBreak', shortcut: 'Ctrl+Enter' },
       { label: '— Horizontal Rule', action: 'hr' },
       { label: '" Blockquote', action: 'blockquote' },
       { sep: true },
@@ -443,6 +443,7 @@ export class WordToolbar {
     q('#page-number-btn')?.addEventListener('click', () => ed.format.insertFooter());
     q('#page-break-btn')?.addEventListener('click', () => ed.format.pageBreak());
     q('#clear-format-btn')?.addEventListener('click', () => ed.format.clearFormatting());
+    q('#upload-image-btn')?.addEventListener('click', () => ed.format.openImageUpload());
 
     q('#track-changes-btn')?.addEventListener('click', () => {
       ed.toggleTrackChanges();
@@ -500,7 +501,7 @@ export class WordToolbar {
       case 'insertMath': q('#insert-math-btn')?.click(); break;
       case 'insertFootnote': q('#insert-footnote-btn')?.click(); break;
       case 'insertCitation': q('#insert-citation-btn')?.click(); break;
-      case 'insertImage': (q('#rk-import-input') as HTMLInputElement)?.click(); break;
+      case 'insertImage': ed.format.openImageUpload(); break;
       case 'pageBreak': ed.format.pageBreak(); break;
       case 'hr': ed.format.horizontalRule(); break;
       case 'blockquote': ed.format.blockquote(); break;

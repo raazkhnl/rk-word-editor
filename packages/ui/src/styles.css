@@ -542,6 +542,7 @@
 /* ---- Page Break ---- */
 .rk-page-break {
     display: block;
+    break-after: page;
     page-break-after: always;
     border-top: 2px dashed #c8ccd0;
     margin: 16px 0;
@@ -771,39 +772,7 @@
     min-width: 1.5em;
 }
 
-/* Print Styles - Fix PDF Export Scrollbars */
-@media print {
-
-    .rk-toolbar,
-    .rk-menubar,
-    .rk-menubar-spacer,
-    .rk-wordcount-display {
-        display: none !important;
-    }
-
-    .rk-editor {
-        overflow: visible !important;
-        padding: 0 !important;
-        background: white !important;
-    }
-
-    .ProseMirror {
-        box-shadow: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        min-height: auto !important;
-    }
-
-    body,
-    html {
-        overflow: visible !important;
-    }
-
-    ::-webkit-scrollbar {
-        display: none !important;
-    }
-}
+/* Print styles consolidated at bottom */
 
 .rk-numbered-headings.rk-nepali-headings h1 {
     counter-reset: h2;
@@ -969,61 +938,7 @@
     font-size: 14px;
 }
 
-/* ---- Print / PDF (High-Fidelity) ---- */
-@media print {
-
-    body,
-    .rk-word-editor {
-        background: #fff !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
-
-    .rk-editor-shell,
-    .rk-toolbar,
-    .rk-menubar,
-    .rk-cmd-palette,
-    .rk-drag-handle,
-    .rk-modal-overlay,
-    .rk-toolbar-container {
-        display: none !important;
-    }
-
-    .rk-editor-container {
-        padding: 0 !important;
-        margin: 0 !important;
-        box-shadow: none !important;
-        background: transparent !important;
-        border: none !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
-
-    /* Ensure outer containers don't show scrollbars */
-    html,
-    body {
-        overflow: hidden !important;
-    }
-
-    .rk-page-view {
-        margin: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-        background: #fff !important;
-        width: 100% !important;
-        height: auto !important;
-        page-break-after: always;
-    }
-
-    .ProseMirror {
-        box-shadow: none !important;
-        width: 100% !important;
-        min-height: unset !important;
-        padding: 0 !important;
-        background: white !important;
-    }
-}
+/* Print styles consolidated at bottom */
 
 /* ==================================================
    MODAL SYSTEM (Update 3.0)
@@ -1335,51 +1250,7 @@
     margin-bottom: 4px;
 }
 
-/* ---- Print Styles (for PDF Export) ---- */
-@media print {
-    @page {
-        margin: 1.5cm;
-        size: auto;
-    }
-
-    body {
-        background: white;
-    }
-
-    .rk-editor-container {
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-    }
-
-    .rk-toolbar,
-    .rk-menubar,
-    .rk-statusbar {
-        display: none !important;
-    }
-
-    .rk-editor-content {
-        padding: 0 !important;
-    }
-
-    /* Page numbering via CSS counters */
-    body {
-        counter-reset: page;
-    }
-
-    .rk-footer {
-        position: fixed;
-        bottom: 0;
-        right: 0;
-        font-size: 10pt;
-        color: #666;
-    }
-
-    .rk-footer::after {
-        counter-increment: page;
-        content: "Page " counter(page);
-    }
-}
+/* Print styles consolidated at bottom */
 
 /* ---- Modal System ---- */
 .rk-modal-overlay {
@@ -1509,4 +1380,88 @@
     background-color: rgba(211, 47, 47, 0.1);
     text-decoration: line-through;
     text-decoration-color: #d32f2f;
+}
+
+/* ==================================================
+   UNIFIED PRINT STYLES
+   ================================================== */
+@media print {
+    @page {
+        margin: 1.5cm;
+        size: auto;
+    }
+
+    html,
+    body,
+    .rk-word-editor {
+        background: #fff !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    body {
+        counter-reset: page;
+    }
+
+    /* Hide UI elements */
+    .rk-editor-shell,
+    .rk-toolbar,
+    .rk-menubar,
+    .rk-menubar-spacer,
+    .rk-wordcount-display,
+    .rk-cmd-palette,
+    .rk-drag-handle,
+    .rk-modal-overlay,
+    .rk-statusbar,
+    .rk-toolbar-container {
+        display: none !important;
+    }
+
+    ::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .rk-editor,
+    .rk-editor-container,
+    .rk-editor-content {
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
+        border: none !important;
+        box-shadow: none !important;
+        height: auto !important;
+    }
+
+    /* ProseMirror editor paper */
+    .ProseMirror {
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        min-height: auto !important;
+        background: white !important;
+    }
+
+    /* Ensure page breaks work */
+    .rk-page-break {
+        display: block !important;
+        border: none !important;
+        break-after: page !important;
+        page-break-after: always !important;
+        visibility: hidden;
+    }
+
+    .rk-footer {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        font-size: 10pt;
+        color: #666;
+    }
+
+    .rk-footer::after {
+        counter-increment: page;
+        content: "Page " counter(page);
+    }
 }

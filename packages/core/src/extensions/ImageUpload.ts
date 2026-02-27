@@ -78,35 +78,35 @@ export const ImageUpload = Extension.create({
                             });
                             return true;
                         },
-                        paste(_view: any, event: ClipboardEvent) {
-                            console.log('[ImageUpload] Paste event detected');
-                            const items = event.clipboardData?.items;
-                            if (!items) return false;
+                    },
+                    handlePaste: (_view: any, event: ClipboardEvent) => {
+                        console.log('[ImageUpload] Paste event detected');
+                        const items = event.clipboardData?.items;
+                        if (!items) return false;
 
-                            let handled = false;
-                            Array.from(items).forEach(item => {
-                                if (item.type.startsWith('image/')) {
-                                    const file = item.getAsFile();
-                                    if (file) {
-                                        // Validate file size and type
-                                        if (options.maxFileSizeMB && file.size > options.maxFileSizeMB * 1024 * 1024) {
-                                            console.warn(`[ImageUpload] File too large: ${file.name}`);
-                                            return;
-                                        }
-                                        if (options.acceptedTypes && !options.acceptedTypes.includes(file.type)) {
-                                            console.warn(`[ImageUpload] Invalid file type: ${file.type}`);
-                                            return;
-                                        }
-
-                                        console.log('[ImageUpload] Uploading pasted image:', file.name);
-                                        event.preventDefault();
-                                        (editor.commands as any).uploadImage(file);
-                                        handled = true;
+                        let handled = false;
+                        Array.from(items).forEach(item => {
+                            if (item.type.startsWith('image/')) {
+                                const file = item.getAsFile();
+                                if (file) {
+                                    // Validate file size and type
+                                    if (options.maxFileSizeMB && file.size > options.maxFileSizeMB * 1024 * 1024) {
+                                        console.warn(`[ImageUpload] File too large: ${file.name}`);
+                                        return;
                                     }
+                                    if (options.acceptedTypes && !options.acceptedTypes.includes(file.type)) {
+                                        console.warn(`[ImageUpload] Invalid file type: ${file.type}`);
+                                        return;
+                                    }
+
+                                    console.log('[ImageUpload] Uploading pasted image:', file.name);
+                                    event.preventDefault();
+                                    (editor.commands as any).uploadImage(file);
+                                    handled = true;
                                 }
-                            });
-                            return handled;
-                        },
+                            }
+                        });
+                        return handled;
                     },
                 },
             }),

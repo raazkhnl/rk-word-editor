@@ -74,4 +74,23 @@ export const Indent = Extension.create<IndentOptions>({
             },
         };
     },
+
+    addKeyboardShortcuts() {
+        return {
+            'Tab': () => {
+                if (this.editor.isActive('listItem')) {
+                    return this.editor.commands.sinkListItem('listItem');
+                }
+
+                // If not in a list, insert 4 non-breaking spaces
+                return this.editor.commands.insertContent('\u00A0\u00A0\u00A0\u00A0');
+            },
+            'Shift-Tab': () => {
+                if (this.editor.isActive('listItem')) {
+                    return this.editor.commands.liftListItem('listItem');
+                }
+                return false;
+            },
+        };
+    },
 });
