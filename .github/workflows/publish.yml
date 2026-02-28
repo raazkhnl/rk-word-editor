@@ -1,12 +1,13 @@
+# filepath: c:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\.github\workflows\publish.yml
 name: CI/CD - Build and Publish
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
@@ -15,19 +16,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          
+          node-version: "20"
+          cache: "npm"
+
       - name: Install Dependencies
         run: npm ci
-        
+
       - name: Lint and Type Check
         run: npm run build
-        
+
       - name: Run Tests
         run: npm test --workspaces --if-present
 
@@ -41,24 +42,24 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-          
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
       - name: Install Dependencies
         run: npm ci
-        
+
       - name: Build Packages
         run: npm run build
-        
+
       - name: Publish @raazkhnl/rk-editor-core
         run: npm publish ./packages/core --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          
+
       - name: Publish @raazkhnl/rk-editor-ui
         run: npm publish ./packages/ui --access public --provenance
         env:
@@ -74,10 +75,41 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - name: Install and Build Demo
         run: |
           npm ci
           npm run build:all
       # Tip: Add your deployment provider here (Vercel, GH Pages, etc.)
       # Example: npx vercel --token ${{ secrets.VERCEL_TOKEN }} --prod
+
+  deploy-ghpages:
+    name: Deploy to GitHub Pages
+    needs: build-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Static Site
+        run: npm run build:all
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          # Optional: add custom domain if needed
