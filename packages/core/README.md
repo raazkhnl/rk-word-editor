@@ -12,6 +12,8 @@ The high-performance core engine for RK Word Editor, built on top of Tiptap and 
 - **Media**: Image upload with resizing and drag-and-drop support.
 - **Export/Import**: Support for DOCX, Markdown, and HTML formats.
 - **Productivity**: Track changes, slash commands, and table of contents.
+- **A11y**: Enhanced accessibility with ARIA roles and keyboard navigation.
+- **Dual Packaging**: Ships with ESM and CJS formats.
 
 ## Installation
 

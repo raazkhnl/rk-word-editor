@@ -1,6 +1,7 @@
 {
     "name": "@raazkhnl/rk-editor-ui",
-    "version": "3.2.1",
+    "version": "3.5.0",
+    "type": "module",
     "description": "UI components for RK Word Editor",
     "author": {
         "name": "RaaZ Khanal",
@@ -25,8 +26,8 @@
     "scripts": {
         "build": "vite build && tsc --project tsconfig.json"
     },
-    "main": "./dist/rk-editor-ui.umd.js",
-    "module": "./dist/rk-editor-ui.es.js",
+    "main": "./dist/rk-editor-ui.cjs",
+    "module": "./dist/rk-editor-ui.mjs",
     "types": "./dist/index.d.ts",
     "files": [
         "dist"
@@ -34,8 +35,8 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/rk-editor-ui.es.js",
-            "require": "./dist/rk-editor-ui.umd.js"
+            "import": "./dist/rk-editor-ui.mjs",
+            "require": "./dist/rk-editor-ui.cjs"
         },
         "./styles.css": "./dist/style.css"
     },

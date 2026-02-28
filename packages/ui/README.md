@@ -8,7 +8,8 @@ A feature-rich, Microsoft Word-inspired User Interface for the RK Word Editor.
 - **Dynamic Toolbar**: Real-time formatting controls for text, paragraphs, and tables.
 - **Command Palette**: Quickly search and access all commands via `Ctrl+K`.
 - **Professional Shell**: A complete editor environment with word count, print styles, and dark mode support.
-- **Customizable**: Easily integrable into any web application.
+- **Web Component**: Framework-agnostic usage via `<rk-word-editor>` element.
+- **A11y**: Screen reader friendly with full ARIA support.
 
 ## Installation
 
@@ -36,6 +37,10 @@ const editor = new WordEditor({
 
 // 2. Attach the UI Toolbar/Shell
 const toolbar = new WordToolbar(editor, document.getElementById('toolbar-container'));
+
+// OR use as a Web Component
+import '@raazkhnl/rk-editor-ui';
+// In your HTML: <rk-word-editor></rk-word-editor>
 ```
 
 ## Styling

@@ -6,8 +6,8 @@ export default defineConfig({
         lib: {
             entry: resolve(__dirname, 'src/index.ts'),
             name: 'RkEditorUI',
-            fileName: (format) => `rk-editor-ui.${format}.js`,
-            formats: ['es', 'umd'],
+            fileName: (format) => `rk-editor-ui.${format === 'es' ? 'mjs' : 'cjs'}`,
+            formats: ['es', 'cjs'],
         },
         rollupOptions: {
             external: ['@rk-editor/core', '@tiptap/core'],

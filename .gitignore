@@ -8,6 +8,8 @@ dist-ssr/
 *.local
 out/
 build/
+*.tgz
+bin/
 
 # IDE files
 .vscode/
@@ -27,11 +29,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-dev-test.log
-build-full.log
-build-output.txt
-build-demo.log
-demo-error.log
+*.log
+*.txt
+!LICENSE
+!README.md
+!CONTRIBUTING.md
 
 # TypeScript
 *.tsbuildinfo

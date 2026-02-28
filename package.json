@@ -1,6 +1,6 @@
 {
   "name": "rk-word-editor-monorepo",
-  "version": "3.2.1",
+  "version": "3.5.0",
   "description": "A high-performance, modern rich-text editor monorepo built with Tiptap and ProseMirror",
   "private": true,
   "author": {
@@ -24,8 +24,9 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace=@raazkhnl/rk-editor-demo",
-    "build": "npm run build --workspace=@raazkhnl/rk-editor-core && npm run build --workspace=@raazkhnl/rk-editor-ui",
-    "build:all": "npm run build && npm run build --workspace=@raazkhnl/rk-editor-demo",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
     "clean": "rimraf node_modules packages/*/node_modules packages/*/dist apps/*/node_modules apps/*/dist",
     "publish:packages": "npm publish --workspaces --access public"
   },

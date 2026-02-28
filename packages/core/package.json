@@ -1,6 +1,7 @@
 {
     "name": "@raazkhnl/rk-editor-core",
-    "version": "3.2.1",
+    "version": "3.5.0",
+    "type": "module",
     "description": "Core engine for RK Word Editor built with Tiptap and ProseMirror",
     "author": {
         "name": "RaaZ Khanal",
@@ -28,8 +29,8 @@
         "test:watch": "vitest",
         "coverage": "vitest run --coverage"
     },
-    "main": "./dist/rk-editor-core.umd.js",
-    "module": "./dist/rk-editor-core.es.js",
+    "main": "./dist/rk-editor-core.cjs",
+    "module": "./dist/rk-editor-core.mjs",
     "types": "./dist/index.d.ts",
     "files": [
         "dist"
@@ -37,8 +38,8 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/rk-editor-core.es.js",
-            "require": "./dist/rk-editor-core.umd.js"
+            "import": "./dist/rk-editor-core.mjs",
+            "require": "./dist/rk-editor-core.cjs"
         }
     },
     "dependencies": {

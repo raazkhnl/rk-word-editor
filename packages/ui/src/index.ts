@@ -170,8 +170,8 @@ export class WordToolbar {
           <!-- Row 1: Core Formatting & Typography -->
           <div class="rk-toolbar-row">
             <div class="rk-toolbar-group" data-label="Nav">
-              <button id="undo-btn" title="Undo (Ctrl+Z)">↺</button>
-              <button id="redo-btn" title="Redo (Ctrl+Y)">↻</button>
+              <button id="undo-btn" title="Undo (Ctrl+Z)" aria-label="Undo">↺</button>
+              <button id="redo-btn" title="Redo (Ctrl+Y)" aria-label="Redo">↻</button>
             </div>
 
             <div class="rk-toolbar-group" data-label="Font">
@@ -191,38 +191,38 @@ export class WordToolbar {
             </div>
 
             <div class="rk-toolbar-group" data-label="Basic">
-              <button id="bold-btn" title="Bold (Ctrl+B)"><b>B</b></button>
-              <button id="italic-btn" title="Italic (Ctrl+I)"><i>I</i></button>
-              <button id="underline-btn" title="Underline (Ctrl+U)"><u>U</u></button>
-              <button id="strike-btn" title="Strike">S</button>
+              <button id="bold-btn" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button>
+              <button id="italic-btn" title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button>
+              <button id="underline-btn" title="Underline (Ctrl+U)" aria-label="Underline"><u>U</u></button>
+              <button id="strike-btn" title="Strike" aria-label="Strikethrough">S</button>
             </div>
 
             <div class="rk-toolbar-group" data-label="Scripts">
-              <button id="sup-btn" title="Superscript">x²</button>
-              <button id="sub-btn" title="Subscript">x₂</button>
+              <button id="sup-btn" title="Superscript" aria-label="Superscript">x²</button>
+              <button id="sub-btn" title="Subscript" aria-label="Subscript">x₂</button>
             </div>
             
             <div class="rk-toolbar-group" data-label="Para">
-              <button id="align-left-btn" title="Left">${ICONS.alignLeft}</button>
-              <button id="align-center-btn" title="Center">${ICONS.alignCenter}</button>
-              <button id="align-right-btn" title="Right">${ICONS.alignRight}</button>
-              <button id="align-justify-btn" title="Justify">${ICONS.alignJustify}</button>
+              <button id="align-left-btn" title="Left" aria-label="Align Left">${ICONS.alignLeft}</button>
+              <button id="align-center-btn" title="Center" aria-label="Align Center">${ICONS.alignCenter}</button>
+              <button id="align-right-btn" title="Right" aria-label="Align Right">${ICONS.alignRight}</button>
+              <button id="align-justify-btn" title="Justify" aria-label="Align Justify">${ICONS.alignJustify}</button>
             </div>
 
             <div class="rk-toolbar-group" data-label="Lists">
-              <button id="bullet-list-btn" title="Bullets">${ICONS.bulletList}</button>
-              <button id="ordered-list-btn" title="Numbers">${ICONS.orderedList}</button>
-              <button id="nepali-list-btn" title="Nepali">${ICONS.nepaliList}</button>
-              <button id="task-list-btn" title="Tasks">${ICONS.taskList}</button>
-              <button id="indent-btn" title="Indent">${ICONS.indent}</button>
-              <button id="outdent-btn" title="Outdent">${ICONS.outdent}</button>
+              <button id="bullet-list-btn" title="Bullets" aria-label="Bullet List">${ICONS.bulletList}</button>
+              <button id="ordered-list-btn" title="Numbers" aria-label="Numbered List">${ICONS.orderedList}</button>
+              <button id="nepali-list-btn" title="Nepali" aria-label="Nepali Numbered List">${ICONS.nepaliList}</button>
+              <button id="task-list-btn" title="Tasks" aria-label="Task List">${ICONS.taskList}</button>
+              <button id="indent-btn" title="Indent" aria-label="Increase Indent">${ICONS.indent}</button>
+              <button id="outdent-btn" title="Outdent" aria-label="Decrease Indent">${ICONS.outdent}</button>
             </div>
           </div>
 
           <!-- Row 2: Tables, Colors, Inserts & Exports -->
           <div class="rk-toolbar-row">
             <div class="rk-toolbar-group" data-label="Table">
-              <button id="insert-table-btn" title="Insert Table">⊞</button>
+              <button id="insert-table-btn" title="Insert Table" aria-label="Insert Table">⊞</button>
               ${this.buildToolbarMenu('Props', [
       { label: 'Row Before', action: 'addRowBefore' },
       { label: 'Row After', action: 'addRowAfter' },
@@ -315,13 +315,13 @@ export class WordToolbar {
   private buildToolbarMenu(label: string, items: any[]): string {
     const itemsHtml = items.map(item => {
       if (item.sep) return `<div class="rk-menu-sep"></div>`;
-      return `<button class="rk-toolbar-menu-item" data-action="${item.action}">${item.label}</button>`;
+      return `<button class="rk-toolbar-menu-item" data-action="${item.action}" role="menuitem">${item.label}</button>`;
     }).join('');
 
     return `
       <div class="rk-toolbar-menu">
-        <button class="rk-toolbar-menu-trigger">${label} ▾</button>
-        <div class="rk-toolbar-menu-dropdown">${itemsHtml}</div>
+        <button class="rk-toolbar-menu-trigger" aria-haspopup="true" aria-expanded="false">${label} ▾</button>
+        <div class="rk-toolbar-menu-dropdown" role="menu">${itemsHtml}</div>
       </div>
     `;
   }
@@ -604,3 +604,5 @@ export class WordToolbar {
     }
   }
 }
+
+export * from './web-component';
