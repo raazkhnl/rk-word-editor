@@ -2,7 +2,7 @@
   "name": "rk-word-editor-monorepo",
   "version": "3.5.0",
   "description": "A high-performance, modern rich-text editor monorepo built with Tiptap and ProseMirror",
-  "private": true,
+  "private": false,
   "author": {
     "name": "RaaZ Khanal",
     "email": "raazkhnl@gmail.com",
