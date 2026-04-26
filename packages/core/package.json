@@ -1,8 +1,8 @@
 {
     "name": "@raazkhnl/rk-editor-core",
-    "version": "3.5.0",
+    "version": "4.1.3",
     "type": "module",
-    "description": "Core engine for RK Word Editor built with Tiptap and ProseMirror",
+    "description": "Free open-source headless rich-text Word editor for the web. Built on Tiptap & ProseMirror with first-class DOCX export, true PDF/print, page layout, find & replace, track changes, draggable text boxes, image resize, and Markdown/HTML import-export. Framework-agnostic — works with Vanilla JS, React, Vue, Svelte, Angular, Next.js.",
     "author": {
         "name": "RaaZ Khanal",
         "email": "raazkhnl@gmail.com",
@@ -15,16 +15,87 @@
         "directory": "packages/core"
     },
     "homepage": "https://github.com/raazkhnl/rk-word-editor#readme",
+    "bugs": {
+        "url": "https://github.com/raazkhnl/rk-word-editor/issues"
+    },
+    "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/raazkhnl"
+    },
+    "engines": {
+        "node": ">=18"
+    },
     "keywords": [
         "editor",
-        "tiptap",
-        "prosemirror",
         "rich-text",
+        "rich-text-editor",
         "wysiwyg",
-        "react"
+        "wysiwyg-editor",
+        "word",
+        "word-editor",
+        "ms-word",
+        "microsoft-word",
+        "google-docs",
+        "google-docs-clone",
+        "tiptap",
+        "tiptap-extension",
+        "prosemirror",
+        "headless",
+        "headless-editor",
+        "docx",
+        "docx-export",
+        "docx-import",
+        "pdf",
+        "pdf-export",
+        "print",
+        "markdown",
+        "markdown-editor",
+        "html",
+        "javascript",
+        "typescript",
+        "vanilla-js",
+        "react",
+        "vue",
+        "svelte",
+        "angular",
+        "nextjs",
+        "web-component",
+        "custom-element",
+        "find-replace",
+        "find-and-replace",
+        "track-changes",
+        "page-layout",
+        "page-numbers",
+        "table-editor",
+        "image-editor",
+        "image-resize",
+        "image-upload",
+        "drag-and-drop",
+        "draggable",
+        "resizable",
+        "text-box",
+        "textbox",
+        "footnotes",
+        "table-of-contents",
+        "toc",
+        "citations",
+        "bibliography",
+        "math",
+        "latex",
+        "slash-commands",
+        "format-painter",
+        "open-source",
+        "free",
+        "mit-license",
+        "a11y",
+        "accessibility",
+        "i18n",
+        "dark-mode",
+        "collaboration",
+        "auto-save"
     ],
     "scripts": {
-        "build": "vite build && tsc --project tsconfig.json",
+        "build": "vite build && tsc --project tsconfig.build.json",
         "test": "vitest run",
         "test:watch": "vitest",
         "coverage": "vitest run --coverage"
@@ -33,8 +104,14 @@
     "module": "./dist/rk-editor-core.mjs",
     "types": "./dist/index.d.ts",
     "files": [
-        "dist"
+        "dist",
+        "README.md",
+        "LICENSE"
     ],
+    "sideEffects": false,
+    "publishConfig": {
+        "access": "public"
+    },
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -48,6 +125,7 @@
         "@tiptap/extension-font-family": "^2.27.0",
         "@tiptap/extension-highlight": "^2.27.0",
         "@tiptap/extension-image": "^2.27.0",
+        "@tiptap/extension-placeholder": "^2.27.2",
         "@tiptap/extension-subscript": "^2.27.0",
         "@tiptap/extension-superscript": "^2.27.0",
         "@tiptap/extension-table": "^2.27.0",
@@ -69,15 +147,14 @@
         "turndown-plugin-gfm": "^1.0.2"
     },
     "devDependencies": {
+        "@types/file-saver": "^2.0.7",
         "@types/marked": "^5.0.2",
         "@types/node": "^20.11.0",
         "@types/turndown": "^5.0.6",
-        "@vitest/coverage-v8": "^4.0.18",
-        "@vitest/ui": "^2.1.9",
-        "jsdom": "^27.0.1",
-        "typescript": "^5.0.0",
-        "vite": "^5.0.0",
-        "vite-plugin-dts": "^3.7.3",
+        "jsdom": "^25.0.1",
+        "typescript": "^5.3.3",
+        "vite": "^5.4.10",
+        "vite-plugin-dts": "^4.5.4",
         "vitest": "^2.1.9"
     }
 }

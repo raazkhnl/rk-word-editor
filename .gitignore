@@ -37,6 +37,12 @@ pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+*.d.ts.map
+
+# Generated declarations next to source (only allowed in dist)
+packages/*/src/**/*.d.ts
+!packages/*/src/**/env.d.ts
+!packages/*/src/**/shims.d.ts
 
 # Env files
 .env

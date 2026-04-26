@@ -1,12 +1,14 @@
 import { Extension } from '@tiptap/core';
 
-export type PageSize = 'A4' | 'Letter' | 'Custom';
+export type PageSize = 'A3' | 'A4' | 'A5' | 'Letter' | 'Legal' | 'Tabloid' | 'Custom';
 export type Orientation = 'portrait' | 'landscape';
 
 export interface PageLayoutOptions {
     pageSize: PageSize;
     orientation: Orientation;
+    /** Custom width when pageSize is 'Custom' (e.g. '210mm'). */
     width?: string;
+    /** Custom height when pageSize is 'Custom' (e.g. '297mm'). */
     height?: string;
     margins: {
         top: string;
@@ -16,12 +18,20 @@ export interface PageLayoutOptions {
     };
 }
 
+export const DEFAULT_PAGE_LAYOUT: PageLayoutOptions = {
+    pageSize: 'A4',
+    orientation: 'portrait',
+    margins: {
+        top: '1in',
+        bottom: '1in',
+        left: '1in',
+        right: '1in',
+    },
+};
+
 declare module '@tiptap/core' {
     interface Commands<ReturnType> {
         pageLayout: {
-            /**
-             * Set page size configuration
-             */
             setPageLayout: (options: Partial<PageLayoutOptions>) => ReturnType;
         };
     }
@@ -31,48 +41,29 @@ export const PageLayout = Extension.create<PageLayoutOptions>({
     name: 'pageLayout',
 
     addOptions() {
-        return {
-            pageSize: 'A4',
-            orientation: 'portrait',
-            margins: {
-                top: '1in',
-                bottom: '1in',
-                left: '1in',
-                right: '1in',
-            },
-        };
+        return { ...DEFAULT_PAGE_LAYOUT };
     },
 
-    addGlobalAttributes() {
-        return [
-            {
-                types: ['paragraph', 'heading', 'bulletList', 'orderedList', 'taskList'],
-                attributes: {
-                    // This allows us to track which page layout applies to which block
-                    // In a complex document, this might be linked to a Section ID
-                    pageLayoutId: {
-                        default: 'default',
-                        parseHTML: element => element.getAttribute('data-page-layout-id') || 'default',
-                        renderHTML: attributes => {
-                            if (attributes.pageLayoutId === 'default') return {};
-                            return { 'data-page-layout-id': attributes.pageLayoutId };
-                        },
-                    },
-                },
-            },
-        ];
+    addStorage() {
+        return { ...DEFAULT_PAGE_LAYOUT };
+    },
+
+    onCreate() {
+        Object.assign(this.storage, this.options);
     },
 
     addCommands() {
         return {
             setPageLayout: (options) => ({ editor }) => {
-                // In a real implementation, this would update a document-wide metadata
-                // For now, we update the extension options and trigger a style update
                 Object.assign(this.options, options);
-
-                // We emit a custom event that the UI can listen to for updating the CSS variables
-                (editor as any).emit('pageLayoutUpdate', this.options);
-
+                if (options.margins) {
+                    this.options.margins = { ...this.options.margins, ...options.margins };
+                }
+                Object.assign(this.storage, this.options);
+                const parent = (editor as any).options.parent;
+                if (parent && typeof parent.setPageLayout === 'function') {
+                    parent.setPageLayout(this.options);
+                }
                 return true;
             },
         };

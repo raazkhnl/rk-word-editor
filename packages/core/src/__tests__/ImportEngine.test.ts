@@ -23,14 +23,17 @@ describe('ImportEngine', () => {
 
     describe('downloadMarkdown', () => {
         it('creates and clicks a download link', () => {
-            const engine = new ImportEngine();
-            const createSpy = vi.spyOn(document, 'createElement');
-            const clickSpy = vi.fn();
+            // Polyfill URL methods missing from jsdom
+            (URL as any).createObjectURL = vi.fn(() => 'blob://test');
+            (URL as any).revokeObjectURL = vi.fn();
 
-            createSpy.mockImplementationOnce(() => {
-                const a = document.createElement('a');
-                a.click = clickSpy;
-                return a;
+            const engine = new ImportEngine();
+            const clickSpy = vi.fn();
+            const realCreate = document.createElement.bind(document);
+            const createSpy = vi.spyOn(document, 'createElement').mockImplementationOnce((tag: any) => {
+                const el = realCreate(tag);
+                if (tag === 'a') (el as any).click = clickSpy;
+                return el;
             });
 
             engine.downloadMarkdown('# Hello\n\nWorld', 'test.md');

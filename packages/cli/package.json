@@ -1,11 +1,62 @@
 {
     "name": "@raazkhnl/rk-editor-cli",
-    "version": "3.5.0",
-    "description": "CLI tool for RK Word Editor project scaffolding",
+    "version": "4.1.3",
+    "description": "CLI scaffolder for RK Word Editor — `npx @raazkhnl/rk-editor-cli init` to bootstrap a new free, open-source Word/Google-Docs-style rich-text editor project (Vanilla JS, React, Vue, Svelte, Next.js).",
+    "author": {
+        "name": "RaaZ Khanal",
+        "email": "raazkhnl@gmail.com",
+        "url": "https://github.com/raazkhnl"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/raazkhnl/rk-word-editor.git",
+        "directory": "packages/cli"
+    },
+    "homepage": "https://github.com/raazkhnl/rk-word-editor#readme",
+    "bugs": {
+        "url": "https://github.com/raazkhnl/rk-word-editor/issues"
+    },
+    "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/raazkhnl"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "keywords": [
+        "cli",
+        "scaffolding",
+        "scaffolder",
+        "create-app",
+        "create-rk-editor",
+        "rk-word-editor",
+        "rk-editor",
+        "tiptap",
+        "tiptap-cli",
+        "rich-text-editor",
+        "wysiwyg",
+        "word-editor",
+        "starter",
+        "starter-template",
+        "boilerplate",
+        "init",
+        "generator"
+    ],
     "bin": {
-        "rk-editor": "./bin/index.js"
+        "rk-editor": "./bin/index.js",
+        "create-rk-editor": "./bin/index.js"
     },
     "type": "module",
+    "files": [
+        "bin",
+        "templates",
+        "README.md",
+        "LICENSE"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
     "scripts": {
         "build": "tsc"
     },

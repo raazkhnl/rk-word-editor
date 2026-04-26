@@ -10,7 +10,10 @@ export const ImageResize = Extension.create({
                 attributes: {
                     width: {
                         default: null,
-                        parseHTML: (element: HTMLElement) => element.getAttribute('width') || element.style.width,
+                        parseHTML: (element: HTMLElement) => {
+                            const w = element.getAttribute('width') || element.style.width;
+                            return w || null;
+                        },
                         renderHTML: (attributes: any) => {
                             if (!attributes.width) return {};
                             return { style: `width: ${attributes.width}; max-width: 100%;` };
@@ -18,7 +21,7 @@ export const ImageResize = Extension.create({
                     },
                     height: {
                         default: null,
-                        parseHTML: (element: HTMLElement) => element.getAttribute('height') || element.style.height,
+                        parseHTML: (element: HTMLElement) => element.getAttribute('height') || element.style.height || null,
                         renderHTML: (attributes: any) => {
                             if (!attributes.height) return {};
                             return { style: `height: ${attributes.height};` };
@@ -30,6 +33,14 @@ export const ImageResize = Extension.create({
                         renderHTML: (attributes: any) => {
                             if (!attributes.float) return {};
                             return { style: `float: ${attributes.float}; margin: 0.5em;` };
+                        },
+                    },
+                    align: {
+                        default: null,
+                        parseHTML: (element: HTMLElement) => element.getAttribute('data-align'),
+                        renderHTML: (attributes: any) => {
+                            if (!attributes.align) return {};
+                            return { 'data-align': attributes.align };
                         },
                     },
                 },

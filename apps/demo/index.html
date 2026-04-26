@@ -1,58 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RK-Word-Editor Demo</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RK Word Editor — Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Calibri:wght@400;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-color: #f0f2f5;
-        }
-
-        #app {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            max-width: 1200px;
-            margin: 40px auto;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        #toolbar-container {}
-
-        #editor-container {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-        }
-
-        .ProseMirror {
-            outline: none;
-            min-height: 500px;
-            line-height: 1.6;
-        }
-
-        .ProseMirror p {
-            margin-bottom: 1em;
-        }
+        html, body, #app { height: 100%; margin: 0; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #f3f4f6; }
+        #app { display: flex; flex-direction: column; }
     </style>
 </head>
-
 <body>
-    <div id="app">
-        <div id="toolbar-container"></div>
-        <div id="editor-container"></div>
-    </div>
+    <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
 </body>
-
 </html>

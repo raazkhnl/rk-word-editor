@@ -1,8 +1,8 @@
 {
     "name": "@raazkhnl/rk-editor-ui",
-    "version": "3.5.0",
+    "version": "4.1.3",
     "type": "module",
-    "description": "UI components for RK Word Editor",
+    "description": "Free open-source Word-style UI layer for RK Word Editor — toolbar, menubar, modals, find-and-replace, document outline, status bar, dark mode, page layout dialog, and a <rk-word-editor> custom element. Drop-in rich-text editor for any web app.",
     "author": {
         "name": "RaaZ Khanal",
         "email": "raazkhnl@gmail.com",
@@ -15,38 +15,100 @@
         "directory": "packages/ui"
     },
     "homepage": "https://github.com/raazkhnl/rk-word-editor#readme",
+    "bugs": {
+        "url": "https://github.com/raazkhnl/rk-word-editor/issues"
+    },
+    "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/raazkhnl"
+    },
+    "engines": {
+        "node": ">=18"
+    },
     "keywords": [
         "editor",
+        "rich-text",
+        "rich-text-editor",
+        "wysiwyg",
+        "wysiwyg-editor",
+        "word",
+        "word-editor",
+        "ms-word",
+        "microsoft-word",
+        "google-docs",
         "tiptap",
+        "tiptap-ui",
         "prosemirror",
+        "toolbar",
+        "menubar",
         "ui",
+        "ui-kit",
         "components",
-        "react"
+        "modal",
+        "dialog",
+        "find-replace",
+        "find-and-replace",
+        "outline",
+        "document-outline",
+        "page-layout",
+        "dark-mode",
+        "dark-theme",
+        "themeable",
+        "customizable",
+        "web-component",
+        "custom-element",
+        "vanilla-js",
+        "react",
+        "vue",
+        "svelte",
+        "angular",
+        "nextjs",
+        "javascript",
+        "typescript",
+        "open-source",
+        "free",
+        "mit-license",
+        "a11y",
+        "accessibility",
+        "draggable",
+        "resizable",
+        "text-box",
+        "textbox"
     ],
     "scripts": {
-        "build": "vite build && tsc --project tsconfig.json"
+        "build": "vite build && tsc --project tsconfig.build.json"
     },
     "main": "./dist/rk-editor-ui.cjs",
     "module": "./dist/rk-editor-ui.mjs",
     "types": "./dist/index.d.ts",
     "files": [
-        "dist"
+        "dist",
+        "README.md",
+        "LICENSE"
     ],
+    "sideEffects": [
+        "**/*.css"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
             "import": "./dist/rk-editor-ui.mjs",
             "require": "./dist/rk-editor-ui.cjs"
         },
-        "./styles.css": "./dist/style.css"
+        "./styles.css": "./dist/style.css",
+        "./styles": "./dist/style.css"
     },
     "peerDependencies": {
-        "@raazkhnl/rk-editor-core": "*"
+        "@raazkhnl/rk-editor-core": "^4.0.0"
     },
     "devDependencies": {
-        "@tiptap/extension-underline": "^2.27.0",
-        "@tiptap/pm": "^2.27.0",
-        "vite-plugin-dts": "^3.7.3",
-        "@types/node": "^20.11.0"
+        "@raazkhnl/rk-editor-core": "^4.1.0",
+        "@types/node": "^20.11.0",
+        "typescript": "^5.3.3",
+        "vite": "^5.4.10",
+        "vite-plugin-dts": "^4.5.4"
     }
 }

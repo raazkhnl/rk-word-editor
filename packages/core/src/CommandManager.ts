@@ -1,5 +1,9 @@
-import { Editor } from '@tiptap/core';
+import type { Editor } from '@tiptap/core';
 
+/**
+ * CommandManager — high-level, friendly façade over the underlying Tiptap chain.
+ * All formatting commands focus the editor first and then run.
+ */
 export class CommandManager {
     private editor: Editor;
 
@@ -7,14 +11,13 @@ export class CommandManager {
         this.editor = editor;
     }
 
-    /**
-     * Executes a command with focused state.
-     */
     public execute(fn: (chain: any) => any) {
         return fn(this.editor.chain().focus()).run();
     }
 
-    // ---- Character Formatting (Phase 1) ----
+    private get parent(): any { return (this.editor as any).options.parent; }
+
+    // ---- Character formatting ----
     public bold = () => this.execute(c => c.toggleBold());
     public italic = () => this.execute(c => c.toggleItalic());
     public underline = () => this.execute(c => c.toggleUnderline());
@@ -26,17 +29,22 @@ export class CommandManager {
     public fontFamily = (font: string) => this.execute(c => c.setFontFamily(font));
     public fontSize = (size: string) => this.execute(c => c.setFontSize(size));
     public setColor = (color: string) => this.execute(c => c.setColor(color));
+    public unsetColor = () => this.execute(c => c.unsetColor());
     public setHighlight = (color: string) => this.execute(c => c.setHighlight({ color }));
-    public transform = (type: string) => this.execute(c => c.setTextTransform(type));
+    public unsetHighlight = () => this.execute(c => c.unsetHighlight());
+    public transform = (type: string) => (this.editor.chain().focus() as any).setTextTransform(type).run();
     public toggleSmallCaps = () => (this.editor.chain().focus() as any).toggleSmallCaps().run();
     public letterSpacing = (spacing: string) => (this.editor.chain().focus() as any).setLetterSpacing(spacing).run();
     public wordSpacing = (spacing: string) => (this.editor.chain().focus() as any).setWordSpacing(spacing).run();
 
-    // ---- Block Formatting (Phase 1) ----
-    public align = (alignment: any) => this.execute(c => c.setTextAlign(alignment));
+    // ---- Block formatting ----
+    public align = (alignment: 'left' | 'center' | 'right' | 'justify') =>
+        this.execute(c => c.setTextAlign(alignment));
     public lineHeight = (height: string) => this.execute(c => c.setLineHeight(height));
-    public spacing = (top: string, bottom: string) => this.execute(c => c.setParagraphSpacing({ top, bottom }));
-    public paragraphLayout = (attrs: any) => (this.editor.chain().focus() as any).setParagraphLayout(attrs).run();
+    public spacing = (top: string, bottom: string) =>
+        this.execute(c => c.setParagraphSpacing({ top, bottom }));
+    public paragraphLayout = (attrs: any) =>
+        (this.editor.chain().focus() as any).setParagraphLayout(attrs).run();
     public indent = () => {
         if (this.editor.isActive('listItem')) {
             return (this.editor.chain().focus() as any).sinkListItem('listItem').run();
@@ -50,21 +58,27 @@ export class CommandManager {
         return this.execute(c => c.outdent());
     };
 
-    public heading = (level: any) => this.execute(c => c.toggleHeading({ level }));
+    public heading = (level: 1 | 2 | 3 | 4 | 5 | 6) =>
+        this.execute(c => c.toggleHeading({ level }));
     public paragraph = () => this.execute(c => c.setParagraph());
+    public title = () => (this.editor.chain().focus() as any).setTitle().run();
+    public subtitle = () => (this.editor.chain().focus() as any).setSubtitle().run();
     public blockquote = () => this.execute(c => c.toggleBlockquote());
     public codeBlock = () => this.execute(c => c.toggleCodeBlock());
     public horizontalRule = () => this.execute(c => c.setHorizontalRule());
 
-    // ---- List Commands (Phase 6) ----
+    // ---- Lists ----
     public bulletList = () => this.execute(c => c.toggleBulletList());
     public orderedList = () => this.execute(c => c.toggleOrderedList());
     public taskList = () => (this.editor.chain().focus() as any).toggleTaskList().run();
-    public setListStyle = (style: string) => (this.editor.chain().focus() as any).setListStyle(style).run();
-    public setListStartNumber = (n: number) => (this.editor.chain().focus() as any).setListStartNumber(n).run();
+    public setListStyle = (style: string) =>
+        (this.editor.chain().focus() as any).setListStyle(style).run();
+    public setListStartNumber = (n: number) =>
+        (this.editor.chain().focus() as any).setListStartNumber(n).run();
 
-    // ---- Table Commands (Phase 5) ----
-    public insertTable = (options: any) => this.execute(c => c.insertTable(options));
+    // ---- Tables ----
+    public insertTable = (options: { rows: number; cols: number; withHeaderRow?: boolean }) =>
+        this.execute(c => c.insertTable(options));
     public addColumnBefore = () => this.execute(c => c.addColumnBefore());
     public addColumnAfter = () => this.execute(c => c.addColumnAfter());
     public deleteColumn = () => this.execute(c => c.deleteColumn());
@@ -78,42 +92,85 @@ export class CommandManager {
     public toggleHeaderRow = () => this.execute(c => c.toggleHeaderRow());
     public toggleHeaderCell = () => this.execute(c => c.toggleHeaderCell());
     public mergeOrSplit = () => this.execute(c => c.mergeOrSplit());
-    public setTableCellAttribute = (name: string, value: any) => this.execute(c => c.setTableCellAttribute(name, value));
-    public setTableStyle = (style: string) => (this.editor.chain().focus() as any).setTableStyle(style).run();
+    public setCellAttribute = (name: string, value: any) =>
+        this.execute(c => c.setCellAttribute(name, value));
+    public setTableStyle = (style: string) =>
+        (this.editor.chain().focus() as any).setTableStyle(style).run();
 
+    // ---- Media & inserts ----
     public openImageUpload = () => (this.editor.commands as any).openImageUpload();
-    public insertImage = (src: string) => this.execute(c => c.setImage({ src }));
-    public setImageSize = (width: string, height?: string) => (this.editor.chain().focus() as any).setImageSize(width, height).run();
-    public setImageFloat = (float: 'left' | 'right' | 'none') => (this.editor.chain().focus() as any).setImageFloat(float).run();
-    public insertCaption = (type?: string) => (this.editor.chain().focus() as any).insertCaption(type).run();
-    public insertMathInline = (latex: string) => (this.editor.chain().focus() as any).insertMathInline(latex).run();
-    public insertMathBlock = (latex: string) => (this.editor.chain().focus() as any).insertMathBlock(latex).run();
+    public insertImage = (src: string, alt?: string) =>
+        this.execute(c => c.setImage({ src, alt: alt || '' }));
+    public setImageSize = (width: string, height?: string) =>
+        (this.editor.chain().focus() as any).setImageSize(width, height).run();
+    public setImageFloat = (float: 'left' | 'right' | 'none') =>
+        (this.editor.chain().focus() as any).setImageFloat(float).run();
+    public insertCaption = (type?: string) =>
+        (this.editor.chain().focus() as any).insertCaption(type).run();
+    public insertTextBox = (attrs?: { width?: number; height?: number; backgroundColor?: string; borderColor?: string }) =>
+        (this.editor.chain().focus() as any).insertTextBox(attrs).run();
+    public insertMathInline = (latex: string) =>
+        (this.editor.chain().focus() as any).insertMathInline(latex).run();
+    public insertMathBlock = (latex: string) =>
+        (this.editor.chain().focus() as any).insertMathBlock(latex).run();
     public pageBreak = () => (this.editor.commands as any).setPageBreak();
     public footnote = (content?: string) => (this.editor.commands as any).setFootnote(content);
     public sectionBreak = () => (this.editor.commands as any).insertSectionBreak();
     public pageLayout = (options: any) => (this.editor.commands as any).setPageLayout(options);
-    public insertPageNumber = () => this.execute(c => c.insertContent({ type: 'pageNumber' }));
-    public insertFooter = () => this.execute(c => c.insertContent({ type: 'footer', content: [{ type: 'paragraph', attrs: { textAlign: 'right' }, content: [{ type: 'pageNumber' }] }] }));
+    public insertPageNumber = () =>
+        this.execute(c => c.insertContent({ type: 'pageNumber' }));
+    public insertLink = (href: string) =>
+        (this.editor.chain().focus() as any).setLink({ href }).run();
+    public unsetLink = () => (this.editor.chain().focus() as any).unsetLink().run();
 
-    // ---- Style Commands (Phase 2) ----
-    public applyStyle = (name: string) => (this.editor.chain().focus() as any).applyNamedStyle(name).run();
-    public updateStyle = (name: string, attrs: any) => (this.editor.chain().focus() as any).updateNamedStyle(name, attrs).run();
+    // ---- Styles & references ----
+    public applyStyle = (name: string) =>
+        (this.editor.chain().focus() as any).applyNamedStyle(name).run();
+    public updateStyle = (name: string, attrs: any) =>
+        (this.editor.chain().focus() as any).updateNamedStyle(name, attrs).run();
+    public insertTableOfContents = (attrs?: { minLevel?: number; maxLevel?: number; title?: string; showLeader?: boolean; showPageNumbers?: boolean }) =>
+        (this.editor.chain().focus() as any).insertTableOfContents(attrs).run();
+    public refreshTableOfContents = () =>
+        (this.editor.chain().focus() as any).refreshTableOfContents().run();
+    public setTocLevels = (minLevel: number, maxLevel: number) =>
+        (this.editor.chain().focus() as any).setTocLevels(minLevel, maxLevel).run();
+    public insertCitation = (key: string, label?: string) =>
+        (this.editor.chain().focus() as any).insertCitation(key, label).run();
+    public insertBibliography = () =>
+        (this.editor.chain().focus() as any).insertBibliography().run();
 
-    // ---- References (Phase 8) ----
-    public insertTableOfContents = () => (this.editor.chain().focus() as any).insertTableOfContents().run();
-    public insertCitation = (key: string, label?: string) => (this.editor.chain().focus() as any).insertCitation(key, label).run();
-    public insertBibliography = () => (this.editor.chain().focus() as any).insertBibliography().run();
-
-    // ---- Slash Commands (Phase 10) ----
-    public executeSlashCommand = (title: string) => (this.editor.chain().focus() as any).executeSlashCommand(title).run();
-
-    // ---- Utility Commands ----
-    public clearFormatting = () => this.execute(c => c.unsetAllMarks().clearNodes());
+    // ---- Misc ----
+    public clearFormatting = () =>
+        this.execute(c => c.unsetAllMarks().clearNodes());
     public undo = () => this.execute(c => c.undo());
     public redo = () => this.execute(c => c.redo());
     public selectAll = () => this.execute(c => c.selectAll());
 
-    // ---- Export Commands (Phase 4) ----
-    public exportDocx = () => (this.editor as any).options.parent.exportDocx();
-    public printDoc = () => window.print();
+    // ---- Format Painter ----
+    public startFormatPaint = () =>
+        (this.editor.chain().focus() as any).startFormatPaint().run();
+    public cancelFormatPaint = () =>
+        (this.editor.chain().focus() as any).cancelFormatPaint().run();
+
+    // ---- Find & Replace passthroughs ----
+    public find = (query: string, options?: { caseSensitive?: boolean; regex?: boolean }) =>
+        (this.editor.commands as any).findText(query, options);
+    public findNext = () => (this.editor.commands as any).goToNextMatch();
+    public findPrev = () => (this.editor.commands as any).goToPreviousMatch();
+    public replace = (q: string, r: string, opts?: any) =>
+        (this.editor.commands as any).replaceText(q, r, opts);
+    public replaceAll = (q: string, r: string, opts?: any) =>
+        (this.editor.commands as any).replaceAllText(q, r, opts);
+    public clearSearch = () => (this.editor.commands as any).clearSearch();
+
+    // ---- Slash commands ----
+    public executeSlashCommand = (title: string) =>
+        (this.editor.chain().focus() as any).executeSlashCommand(title).run();
+
+    // ---- Export shortcuts (delegate to parent WordEditor) ----
+    public exportDocx = (filename?: string) => this.parent?.exportDocx?.(filename);
+    public exportMarkdown = (filename?: string) => this.parent?.exportMarkdown?.(filename);
+    public exportHtml = (filename?: string) => this.parent?.exportHtml?.(filename);
+    public exportJson = (filename?: string) => this.parent?.exportJson?.(filename);
+    public printDoc = (options?: any) => this.parent?.printPdf?.(options);
 }

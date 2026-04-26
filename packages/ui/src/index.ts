@@ -1,608 +1,745 @@
-import { WordEditor } from '@rk-editor/core';
+import { WordEditor, type WordEditorOptions } from '@raazkhnl/rk-editor-core';
 import { Modal } from './Modal';
+import { icon, Icons, type IconName } from './icons';
+import {
+    showLinkDialog, showImageDialog, showTableDialog, showMathDialog, showFootnoteDialog,
+    showCitationDialog, showPageLayoutDialog, showShortcutsDialog, showAboutDialog, showTocDialog,
+} from './dialogs';
+import { FindReplaceBar } from './FindReplaceBar';
+import { StatusBar } from './StatusBar';
+import { Outline } from './Outline';
+import { PropertyPanel } from './PropertyPanel';
 import './styles.css';
-import logoSrc from './assets/logo.png';
+
+export { Modal, icon, Icons, type IconName };
+export { FindReplaceBar, StatusBar, Outline, PropertyPanel };
+export {
+    showLinkDialog, showImageDialog, showTableDialog, showMathDialog, showFootnoteDialog,
+    showCitationDialog, showPageLayoutDialog, showShortcutsDialog, showAboutDialog, showTocDialog,
+};
 
 const FONT_FAMILIES = [
-  // Web-safe
-  { label: 'Arial', value: 'Arial, sans-serif' },
-  { label: 'Georgia', value: 'Georgia, serif' },
-  { label: 'Times New Roman', value: '"Times New Roman", Times, serif' },
-  { label: 'Courier New', value: '"Courier New", Courier, monospace' },
-  { label: 'Verdana', value: 'Verdana, Geneva, sans-serif' },
-  { label: 'Trebuchet MS', value: '"Trebuchet MS", Helvetica, sans-serif' },
-  { label: 'Impact', value: 'Impact, Charcoal, sans-serif' },
-  // Modern / Google
-  { label: 'Inter', value: 'Inter, sans-serif' },
-  { label: 'Roboto', value: 'Roboto, sans-serif' },
-  { label: 'Open Sans', value: '"Open Sans", sans-serif' },
-  { label: 'Lato', value: 'Lato, sans-serif' },
-  { label: 'Montserrat', value: 'Montserrat, sans-serif' },
-  // Devanagari / South Asian
-  { label: 'Noto Sans Devanagari', value: '"Noto Sans Devanagari", sans-serif' },
-  { label: 'Kalimati', value: 'Kalimati, sans-serif' },
-  { label: 'Mangal', value: 'Mangal, sans-serif' },
+    { label: 'Default', value: '' },
+    { label: 'Arial', value: 'Arial, sans-serif' },
+    { label: 'Calibri', value: 'Calibri, sans-serif' },
+    { label: 'Cambria', value: 'Cambria, serif' },
+    { label: 'Georgia', value: 'Georgia, serif' },
+    { label: 'Times New Roman', value: '"Times New Roman", Times, serif' },
+    { label: 'Courier New', value: '"Courier New", Courier, monospace' },
+    { label: 'Verdana', value: 'Verdana, sans-serif' },
+    { label: 'Tahoma', value: 'Tahoma, sans-serif' },
+    { label: 'Trebuchet MS', value: '"Trebuchet MS", sans-serif' },
+    { label: 'Inter', value: 'Inter, sans-serif' },
+    { label: 'Roboto', value: 'Roboto, sans-serif' },
+    { label: 'Open Sans', value: '"Open Sans", sans-serif' },
+    { label: 'Lato', value: 'Lato, sans-serif' },
+    { label: 'Montserrat', value: 'Montserrat, sans-serif' },
+    { label: 'Source Sans 3', value: '"Source Sans 3", sans-serif' },
+    { label: 'Noto Sans Devanagari', value: '"Noto Sans Devanagari", sans-serif' },
+    { label: 'Mangal', value: 'Mangal, sans-serif' },
+    { label: 'Kalimati', value: 'Kalimati, sans-serif' },
 ];
 
 const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 56, 64, 72, 96];
 
-// All commands for the command palette
-const ALL_COMMANDS: { label: string; shortcut?: string; action: (editor: any) => void }[] = [
-  { label: 'Bold', shortcut: 'Ctrl+B', action: e => e.format.bold() },
-  { label: 'Italic', shortcut: 'Ctrl+I', action: e => e.format.italic() },
-  { label: 'Underline', shortcut: 'Ctrl+U', action: e => e.format.underline() },
-  { label: 'Heading 1', shortcut: 'Ctrl+Alt+1', action: e => e.format.heading(1) },
-  { label: 'Heading 2', shortcut: 'Ctrl+Alt+2', action: e => e.format.heading(2) },
-  { label: 'Heading 3', shortcut: 'Ctrl+Alt+3', action: e => e.format.heading(3) },
-  { label: 'Bullet List', action: e => e.format.bulletList() },
-  { label: 'Numbered List', action: e => e.format.orderedList() },
-  { label: 'Nepali Numbering', action: e => e.format.setListStyle('nepali') },
-  { label: 'Task List', action: e => (e.instance.commands as any).toggleTaskList() },
-  { label: 'Insert Table (3x3)', action: e => e.format.insertTable({ rows: 3, cols: 3, withHeaderRow: true }) },
-  { label: 'Insert Image from PC', action: e => e.format.openImageUpload() },
-  { label: 'Insert Math', action: e => { const l = prompt('LaTeX:'); if (l) e.format.insertMathInline(l); } },
-  { label: 'Insert Table of Contents', action: e => e.format.insertTableOfContents() },
-  { label: 'Insert Page Break', action: e => e.format.pageBreak() },
-  { label: 'Insert Blockquote', action: e => e.format.blockquote() },
-  { label: 'Insert Horizontal Rule', action: e => e.format.horizontalRule() },
-  { label: 'Align Left', action: e => e.format.align('left') },
-  { label: 'Align Center', action: e => e.format.align('center') },
-  { label: 'Align Right', action: e => e.format.align('right') },
-  { label: 'Align Justify', action: e => e.format.align('justify') },
-  { label: 'Undo', shortcut: 'Ctrl+Z', action: e => e.format.undo() },
-  { label: 'Redo', shortcut: 'Ctrl+Y', action: e => e.format.redo() },
-  { label: 'Clear Formatting', action: e => e.format.clearFormatting() },
-  { label: 'Format Painter', action: e => e.format.startFormatPaint() },
-  { label: 'Toggle Track Changes', action: e => e.toggleTrackChanges() },
-  { label: 'Export as DOCX', action: e => e.exportDocx() },
-  { label: 'Export as Markdown', action: e => e.exportMarkdown() },
-  { label: 'Export as HTML', action: e => e.export('html') },
-  { label: 'Export PDF (Print)', action: e => e.format.printDoc() },
-  { label: 'Import File (DOCX/MD)...', action: e => (document.getElementById('rk-import-input') as HTMLInputElement)?.click() },
-  { label: 'Word Count', action: e => { const s = e.getWordCount(); alert(`Words: ${s.words}\nChars: ${s.characters}\nParagraphs: ${s.paragraphs}`); } },
+const PARAGRAPH_STYLES = [
+    { label: 'Title', value: 'title' },
+    { label: 'Subtitle', value: 'subtitle' },
+    { label: 'Heading 1', value: '1' },
+    { label: 'Heading 2', value: '2' },
+    { label: 'Heading 3', value: '3' },
+    { label: 'Heading 4', value: '4' },
+    { label: 'Heading 5', value: '5' },
+    { label: 'Heading 6', value: '6' },
+    { label: 'Normal text', value: 'p' },
 ];
 
-const ICONS = {
-  bold: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10.5 6.5h2.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-2.5v-3zm3.5 11h-3.5v-3.5h3.5c.97 0 1.75.78 1.75 1.75s-.78 1.75-1.75 1.75z"/></svg>',
-  italic: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>',
-  underline: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>',
-  strike: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M10 19h4v-3h-4v3zM5 4v3h5v3H5v3h5v3H5v3h14v-3h-5v-3h5v-3h-5V7h5V4H5z"/></svg>',
-  alignLeft: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>',
-  alignCenter: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M7 15v2h10v-2H7zm-4-4v2h18v-2H3zm4-4v2h10V7H7zm-4-4v2h18V3H3zm0 16v2h18v-2H3z"/></svg>',
-  alignRight: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 15v2h12v-2H9zm-6-4v2h18v-2H3zM9 7v2h12V7H9zm-6-4v2h18V3H3zm0 16v2h18v-2H3z"/></svg>',
-  alignJustify: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V3H3v2z"/></svg>',
-  bulletList: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>',
-  orderedList: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>',
-  nepaliList: '<svg viewBox="0 0 24 24" width="16" height="16"><text x="2" y="18" fill="currentColor" style="font-size:16px; font-weight:bold">१</text><path fill="currentColor" d="M7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>',
-  taskList: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
-  indent: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 5h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zM3 13h18v-2H3v2z"/></svg>',
-  outdent: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M3 21h18v-2H3v2zm11-9l-4-4v8l4-4zm-3 1h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zM3 13h18v-2H3v2z"/></svg>',
-  image: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>',
-  table: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"/></svg>',
-};
-
-export class WordToolbar {
-  private container: HTMLElement;
-  private editor: WordEditor;
-  private paletteEl: HTMLElement | null = null;
-  private paletteQuery = '';
-
-  constructor(editor: WordEditor, container: HTMLElement) {
-    this.editor = editor;
-    this.container = container;
-    this.render();
-  }
-
-  private render() {
-    this.container.innerHTML = `
-      <div class="rk-editor-shell">
-        <!-- === MENU BAR === -->
-        <nav class="rk-menubar" role="menubar" aria-label="Menu Bar">
-          <div class="rk-brand-logo" style="display: flex; align-items: center; padding: 0 16px;">
-            <img src="${logoSrc}" alt="RK Editor" style="height: 24px; object-fit: contain; margin-right: 8px;">
-          </div>
-          ${this.buildMenu('File', [
-      { label: '📄 New Document', action: 'newDoc' },
-      { label: '📂 Open / Import...', action: 'openImport' },
-      { sep: true },
-      { label: '💾 Export as DOCX', action: 'exportDocx' },
-      { label: '📝 Export as Markdown', action: 'exportMd' },
-      { label: '🌐 Export as HTML', action: 'exportHtml' },
-      { label: '🖨️ Print / PDF', action: 'printDoc' },
-    ])}
-          ${this.buildMenu('Edit', [
-      { label: '↺ Undo', action: 'undo', shortcut: 'Ctrl+Z' },
-      { label: '↻ Redo', action: 'redo', shortcut: 'Ctrl+Y' },
-      { sep: true },
-      { label: '✂️ Cut', action: 'cut', shortcut: 'Ctrl+X' },
-      { label: '📋 Copy', action: 'copy', shortcut: 'Ctrl+C' },
-      { label: '📌 Paste', action: 'paste', shortcut: 'Ctrl+V' },
-      { sep: true },
-      { label: '🖌️ Format Painter', action: 'formatPainter' },
-      { label: '⊘ Clear Formatting', action: 'clearFormatting' },
-      { sep: true },
-      { label: '🔴 Track Changes', action: 'trackChanges' },
-    ])}
-          ${this.buildMenu('Insert', [
-      { label: '⊞ Table...', action: 'insertTable' },
-      { label: '🏞 Image from PC', action: 'insertImage' },
-      { label: '🔗 Link...', action: 'insertLink', shortcut: 'Ctrl+K' },
-      { sep: true },
-      { label: '∑ Math (LaTeX)...', action: 'insertMath' },
-      { label: '✂ Page Break', action: 'pageBreak', shortcut: 'Ctrl+Enter' },
-      { label: '— Horizontal Rule', action: 'hr' },
-      { label: '" Blockquote', action: 'blockquote' },
-      { sep: true },
-      { label: 'TOC Table of Contents', action: 'insertToc' },
-      { label: '[ref] Citation...', action: 'insertCitation' },
-      { label: '† Footnote', action: 'insertFootnote' },
-    ])}
-          ${this.buildMenu('Format', [
-      { label: '𝐁 Bold', action: 'bold', shortcut: 'Ctrl+B' },
-      { label: '𝐼 Italic', action: 'italic', shortcut: 'Ctrl+I' },
-      { label: 'U Underline', action: 'underline', shortcut: 'Ctrl+U' },
-      { label: 'S Strikethrough', action: 'strike' },
-      { sep: true },
-      { label: 'x² Superscript', action: 'superscript' },
-      { label: 'x₂ Subscript', action: 'subscript' },
-      { sep: true },
-      { label: '↔ Align Left', action: 'alignLeft' },
-      { label: '↔ Align Center', action: 'alignCenter' },
-      { label: '→ Align Right', action: 'alignRight' },
-      { label: '☰ Justify', action: 'alignJustify' },
-      { sep: true },
-      { label: '• Bullet List', action: 'bulletList' },
-      { label: '1. Numbered List', action: 'orderedList' },
-      { label: '☑ Task List', action: 'taskList' },
-    ])}
-          ${this.buildMenu('Help', [
-      { label: '⌨️ Keyboard Shortcuts', action: 'showShortcuts' },
-      { label: 'ℹ️ About', action: 'showAbout' },
-      { sep: true },
-      { label: '⭐ GitHub Repository', action: 'openGithub' },
-    ])}
-          <div class="rk-menubar-spacer"></div>
-          <div class="rk-wordcount-display" id="rk-wc-display">0 words</div>
-        </nav>
-
-        <!-- === TOOLBAR === -->
-        <div class="rk-toolbar" role="toolbar" aria-label="Formatting Toolbar">
-          <!-- Row 1: Core Formatting & Typography -->
-          <div class="rk-toolbar-row">
-            <div class="rk-toolbar-group" data-label="Nav">
-              <button id="undo-btn" title="Undo (Ctrl+Z)" aria-label="Undo">↺</button>
-              <button id="redo-btn" title="Redo (Ctrl+Y)" aria-label="Redo">↻</button>
-            </div>
-
-            <div class="rk-toolbar-group" data-label="Font">
-              <select id="font-family" title="Font Family" class="rk-select-wide">
-                <option value="">Font...</option>
-                ${FONT_FAMILIES.map(f => `<option value="${f.value}">${f.label}</option>`).join('')}
-              </select>
-              <select id="font-size" title="Size" class="rk-select-narrow">
-                ${FONT_SIZES.map(s => `<option value="${s}pt" ${s === 12 ? 'selected' : ''}>${s}</option>`).join('')}
-              </select>
-              <select id="heading-style" title="Style" class="rk-select-medium">
-                <option value="p">Normal</option>
-                <option value="1">H1</option>
-                <option value="2">H2</option>
-                <option value="3">H3</option>
-              </select>
-            </div>
-
-            <div class="rk-toolbar-group" data-label="Basic">
-              <button id="bold-btn" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button>
-              <button id="italic-btn" title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button>
-              <button id="underline-btn" title="Underline (Ctrl+U)" aria-label="Underline"><u>U</u></button>
-              <button id="strike-btn" title="Strike" aria-label="Strikethrough">S</button>
-            </div>
-
-            <div class="rk-toolbar-group" data-label="Scripts">
-              <button id="sup-btn" title="Superscript" aria-label="Superscript">x²</button>
-              <button id="sub-btn" title="Subscript" aria-label="Subscript">x₂</button>
-            </div>
-            
-            <div class="rk-toolbar-group" data-label="Para">
-              <button id="align-left-btn" title="Left" aria-label="Align Left">${ICONS.alignLeft}</button>
-              <button id="align-center-btn" title="Center" aria-label="Align Center">${ICONS.alignCenter}</button>
-              <button id="align-right-btn" title="Right" aria-label="Align Right">${ICONS.alignRight}</button>
-              <button id="align-justify-btn" title="Justify" aria-label="Align Justify">${ICONS.alignJustify}</button>
-            </div>
-
-            <div class="rk-toolbar-group" data-label="Lists">
-              <button id="bullet-list-btn" title="Bullets" aria-label="Bullet List">${ICONS.bulletList}</button>
-              <button id="ordered-list-btn" title="Numbers" aria-label="Numbered List">${ICONS.orderedList}</button>
-              <button id="nepali-list-btn" title="Nepali" aria-label="Nepali Numbered List">${ICONS.nepaliList}</button>
-              <button id="task-list-btn" title="Tasks" aria-label="Task List">${ICONS.taskList}</button>
-              <button id="indent-btn" title="Indent" aria-label="Increase Indent">${ICONS.indent}</button>
-              <button id="outdent-btn" title="Outdent" aria-label="Decrease Indent">${ICONS.outdent}</button>
-            </div>
-          </div>
-
-          <!-- Row 2: Tables, Colors, Inserts & Exports -->
-          <div class="rk-toolbar-row">
-            <div class="rk-toolbar-group" data-label="Table">
-              <button id="insert-table-btn" title="Insert Table" aria-label="Insert Table">⊞</button>
-              ${this.buildToolbarMenu('Props', [
-      { label: 'Row Before', action: 'addRowBefore' },
-      { label: 'Row After', action: 'addRowAfter' },
-      { sep: true },
-      { label: 'Col Before', action: 'addColBefore' },
-      { label: 'Col After', action: 'addColAfter' },
-      { sep: true },
-      { label: 'Delete Row', action: 'delRow' },
-      { label: 'Delete Col', action: 'delCol' },
-      { label: 'Delete Table', action: 'delTable' },
-      { sep: true },
-      { label: 'Merge Cells', action: 'mergeCells' },
-      { label: 'Split Cell', action: 'splitCell' },
-      { sep: true },
-      { label: 'Toggle Header Row', action: 'toggleHeaderRow' },
-      { label: 'Toggle Header Col', action: 'toggleHeaderCol' },
-    ])}
-            </div>
-
-            <div class="rk-toolbar-group" data-label="Color">
-              <input type="color" id="text-color" title="Color">
-              <input type="color" id="highlight-color" title="Highlight" value="#ffff00">
-            </div>
-
-            <div class="rk-toolbar-group" data-label="Insert">
-              <button id="upload-image-btn" title="Image">${ICONS.image}</button>
-              <button id="insert-link-btn" title="Link">🔗</button>
-              <button id="insert-citation-btn" title="Citation">[ref]</button>
-              <button id="insert-math-btn" title="Math">∑</button>
-              <button id="insert-footnote-btn" title="Footnote">_🖋</button>
-              <button id="toc-btn" title="TOC">☰</button>
-              <button id="page-number-btn" title="Page Number">#️⃣</button>
-              <button id="page-break-btn" title="Break">✂</button>
-            </div>
-
-            <div class="rk-toolbar-group" data-label="Track">
-              <button id="track-changes-btn" title="Track Changes">🔴</button>
-              <button id="clear-format-btn" title="Clear Formatting">⊘</button>
-            </div>
-
-            <div class="rk-toolbar-group" data-label="Export">
-              <select id="export-format" class="rk-select-narrow">
-                <option value="">Exp.</option>
-                <option value="docx">DOCX</option>
-                <option value="pdf">PDF</option>
-                <option value="markdown">MD</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hidden file input for import -->
-        <input type="file" id="rk-import-input" accept=".docx,.md,.markdown,.html,.htm" style="display:none">
-
-      </div>
-
-      <!-- Command Palette Overlay -->
-      <div class="rk-cmd-palette" id="rk-cmd-palette" role="dialog" aria-modal="true" style="display:none">
-        <div class="rk-cmd-palette-inner">
-          <input type="text" id="rk-cmd-query" placeholder="Type a command..." autocomplete="off">
-          <div class="rk-cmd-palette-results" id="rk-cmd-results" role="listbox"></div>
-        </div>
-      </div>
-    `;
-
-    this.setupEvents();
-    this.setupKeyboardShortcuts();
-    this.setupWordCountDisplay();
-  }
-
-  private buildMenu(label: string, items: any[]): string {
-    const itemsHtml = items.map(item => {
-      if (item.sep) return `<div class="rk-menu-sep"></div>`;
-      return `
-        <button class="rk-menu-item" data-action="${item.action}">
-          <span class="rk-menu-item-label">${item.label}</span>
-          ${item.shortcut ? `<span class="rk-menu-item-shortcut">${item.shortcut}</span>` : ''}
-        </button>
-      `;
-    }).join('');
-
-    return `
-      <div class="rk-menu" role="menuitem">
-        <button class="rk-menu-trigger" aria-haspopup="true" aria-expanded="false">${label}</button>
-        <div class="rk-menu-dropdown" role="menu">${itemsHtml}</div>
-      </div>
-    `;
-  }
-
-  private buildToolbarMenu(label: string, items: any[]): string {
-    const itemsHtml = items.map(item => {
-      if (item.sep) return `<div class="rk-menu-sep"></div>`;
-      return `<button class="rk-toolbar-menu-item" data-action="${item.action}" role="menuitem">${item.label}</button>`;
-    }).join('');
-
-    return `
-      <div class="rk-toolbar-menu">
-        <button class="rk-toolbar-menu-trigger" aria-haspopup="true" aria-expanded="false">${label} ▾</button>
-        <div class="rk-toolbar-menu-dropdown" role="menu">${itemsHtml}</div>
-      </div>
-    `;
-  }
-
-  private setupEvents() {
-    const ed = this.editor;
-    const q = (s: string): HTMLElement | null => this.container.querySelector(s) as HTMLElement | null;
-
-    // Menu trigger toggle
-    this.container.querySelectorAll('.rk-menu-trigger').forEach(trigger => {
-      trigger.addEventListener('click', (e: any) => {
-        const expanded = e.currentTarget.getAttribute('aria-expanded') === 'true';
-        this.container.querySelectorAll('.rk-menu-trigger').forEach(t => t.setAttribute('aria-expanded', 'false'));
-        e.currentTarget.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        e.stopPropagation();
-      });
-    });
-
-    this.container.querySelectorAll('.rk-menu-item, .rk-toolbar-menu-item').forEach(btn => {
-      btn.addEventListener('click', (e: any) => {
-        const action = e.currentTarget.dataset.action;
-        this.handleMenuAction(action);
-        btn.closest('.rk-menu, .rk-toolbar-menu')?.querySelectorAll('.rk-menu-trigger')?.forEach(t => t.setAttribute('aria-expanded', 'false'));
-      });
-    });
-
-    document.addEventListener('click', () => {
-      this.container.querySelectorAll('.rk-menu-trigger').forEach(t => t.setAttribute('aria-expanded', 'false'));
-    });
-
-    // Toolbar events
-    q('#undo-btn')?.addEventListener('click', () => ed.format.undo());
-    q('#redo-btn')?.addEventListener('click', () => ed.format.redo());
-
-    q('#font-family')?.addEventListener('change', (e: any) => {
-      if (e.target.value) ed.format.fontFamily(e.target.value);
-    });
-
-    q('#font-size')?.addEventListener('change', (e: any) => {
-      if (e.target.value) ed.format.fontSize(e.target.value);
-    });
-
-    q('#heading-style')?.addEventListener('change', (e: any) => {
-      const v = e.target.value;
-      if (v === 'p') ed.format.paragraph();
-      else ed.format.heading(parseInt(v) as any);
-    });
-
-    q('#bold-btn')?.addEventListener('click', () => ed.format.bold());
-    q('#italic-btn')?.addEventListener('click', () => ed.format.italic());
-    q('#underline-btn')?.addEventListener('click', () => ed.format.underline());
-    q('#strike-btn')?.addEventListener('click', () => ed.format.strike());
-    q('#sup-btn')?.addEventListener('click', () => ed.format.superscript());
-    q('#sub-btn')?.addEventListener('click', () => ed.format.subscript());
-
-    q('#align-left-btn')?.addEventListener('click', () => ed.format.align('left'));
-    q('#align-center-btn')?.addEventListener('click', () => ed.format.align('center'));
-    q('#align-right-btn')?.addEventListener('click', () => ed.format.align('right'));
-    q('#align-justify-btn')?.addEventListener('click', () => ed.format.align('justify'));
-
-    q('#bullet-list-btn')?.addEventListener('click', () => ed.format.bulletList());
-    q('#ordered-list-btn')?.addEventListener('click', () => ed.format.orderedList());
-    q('#nepali-list-btn')?.addEventListener('click', () => ed.format.setListStyle('nepali'));
-    q('#task-list-btn')?.addEventListener('click', () => (ed.instance.commands as any).toggleTaskList());
-    q('#indent-btn')?.addEventListener('click', () => ed.format.indent());
-    q('#outdent-btn')?.addEventListener('click', () => ed.format.outdent());
-
-    q('#text-color')?.addEventListener('input', (e: any) => ed.format.setColor(e.target.value));
-    q('#highlight-color')?.addEventListener('input', (e: any) => ed.format.setHighlight(e.target.value));
-
-    q('#insert-table-btn')?.addEventListener('click', () => {
-      new Modal({
-        title: 'Insert Table',
-        fields: [
-          { id: 'rows', label: 'Rows', type: 'number', value: 3 },
-          { id: 'cols', label: 'Columns', type: 'number', value: 3 },
-        ],
-        onConfirm: (data) => ed.format.insertTable({ rows: parseInt(data.rows), cols: parseInt(data.cols) }),
-      }).show();
-    });
-
-    q('#insert-link-btn')?.addEventListener('click', () => {
-      new Modal({
-        title: 'Insert Link',
-        fields: [
-          { id: 'url', label: 'URL', type: 'text', value: 'https://' },
-          { id: 'text', label: 'Display Text (Optional)', type: 'text' },
-        ],
-        onConfirm: (data) => {
-          if (data.url) {
-            (ed.instance.chain().focus() as any).setLink({ href: data.url }).run();
-          }
-        },
-      }).show();
-    });
-
-    q('#insert-math-btn')?.addEventListener('click', () => {
-      new Modal({
-        title: 'Insert Math (LaTeX)',
-        fields: [
-          { id: 'latex', label: 'LaTeX Expression', type: 'text', value: 'E=mc^2' },
-        ],
-        onConfirm: (data) => ed.format.insertMathInline(data.latex),
-      }).show();
-    });
-
-    q('#insert-footnote-btn')?.addEventListener('click', () => {
-      new Modal({
-        title: 'Insert Footnote',
-        fields: [
-          { id: 'text', label: 'Footnote Text', type: 'text' },
-        ],
-        onConfirm: (data) => ed.format.footnote(data.text),
-      }).show();
-    });
-
-    q('#insert-citation-btn')?.addEventListener('click', () => {
-      new Modal({
-        title: 'Insert Citation',
-        fields: [
-          { id: 'key', label: 'Citation Key', type: 'text' },
-          { id: 'label', label: 'Label (Optional)', type: 'text' },
-        ],
-        onConfirm: (data) => ed.format.insertCitation(data.key, data.label || undefined),
-      }).show();
-    });
-
-    q('#toc-btn')?.addEventListener('click', () => ed.format.insertTableOfContents());
-    q('#page-number-btn')?.addEventListener('click', () => ed.format.insertFooter());
-    q('#page-break-btn')?.addEventListener('click', () => ed.format.pageBreak());
-    q('#clear-format-btn')?.addEventListener('click', () => ed.format.clearFormatting());
-    q('#upload-image-btn')?.addEventListener('click', () => ed.format.openImageUpload());
-
-    q('#track-changes-btn')?.addEventListener('click', () => {
-      ed.toggleTrackChanges();
-      this.updateActiveStates();
-    });
-
-    q('#export-format')?.addEventListener('change', (e: any) => {
-      const format = e.target.value;
-      if (format === 'docx') ed.exportDocx();
-      else if (format === 'pdf') ed.format.printDoc();
-      else if (format === 'markdown') (ed as any).exportMarkdown();
-      e.target.value = '';
-    });
-
-    const importInput = this.container.querySelector('#rk-import-input') as HTMLInputElement;
-    importInput?.addEventListener('change', async (e: any) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        try { await (ed as any).importFromFile(file); } catch (err: any) { alert(`Import failed: ${err.message}`); }
-        importInput.value = '';
-      }
-    });
-
-    ed.instance.on('transaction', () => this.updateActiveStates());
-  }
-
-  private handleMenuAction(action: string) {
-    const ed = this.editor;
-    const q = (s: string): HTMLElement | null => this.container.querySelector(s) as HTMLElement | null;
-    switch (action) {
-      case 'newDoc': ed.instance.commands.setContent('<p></p>'); break;
-      case 'openImport': (this.container.querySelector('#rk-import-input') as HTMLInputElement)?.click(); break;
-      case 'exportDocx': ed.exportDocx(); break;
-      case 'exportMd': (ed as any).exportMarkdown(); break;
-      case 'exportHtml': (ed as any).export('html'); break;
-      case 'printDoc': ed.format.printDoc(); break;
-      case 'undo': ed.format.undo(); break;
-      case 'redo': ed.format.redo(); break;
-      case 'bold': ed.format.bold(); break;
-      case 'italic': ed.format.italic(); break;
-      case 'underline': ed.format.underline(); break;
-      case 'strike': ed.format.strike(); break;
-      case 'superscript': ed.format.superscript(); break;
-      case 'subscript': ed.format.subscript(); break;
-      case 'alignLeft': ed.format.align('left'); break;
-      case 'alignCenter': ed.format.align('center'); break;
-      case 'alignRight': ed.format.align('right'); break;
-      case 'alignJustify': ed.format.align('justify'); break;
-      case 'bulletList': ed.format.bulletList(); break;
-      case 'orderedList': ed.format.orderedList(); break;
-      case 'clearFormatting': ed.format.clearFormatting(); break;
-      case 'trackChanges': (ed as any).toggleTrackChanges(); break;
-      case 'insertTable': ed.format.insertTable({ rows: 3, cols: 3 }); break;
-      case 'insertLink': q('#insert-link-btn')?.click(); break;
-      case 'insertToc': ed.format.insertTableOfContents(); break;
-      case 'insertMath': q('#insert-math-btn')?.click(); break;
-      case 'insertFootnote': q('#insert-footnote-btn')?.click(); break;
-      case 'insertCitation': q('#insert-citation-btn')?.click(); break;
-      case 'insertImage': ed.format.openImageUpload(); break;
-      case 'pageBreak': ed.format.pageBreak(); break;
-      case 'hr': ed.format.horizontalRule(); break;
-      case 'blockquote': ed.format.blockquote(); break;
-      case 'addRowBefore': ed.format.addRowBefore(); break;
-      case 'addRowAfter': ed.format.addRowAfter(); break;
-      case 'delRow': ed.format.deleteRow(); break;
-      case 'addColBefore': ed.format.addColumnBefore(); break;
-      case 'addColAfter': ed.format.addColumnAfter(); break;
-      case 'delCol': ed.format.deleteColumn(); break;
-      case 'delTable': ed.format.deleteTable(); break;
-      case 'mergeCells': ed.format.mergeCells(); break;
-      case 'splitCell': ed.format.splitCell(); break;
-      case 'toggleHeaderRow': ed.format.toggleHeaderRow(); break;
-      case 'toggleHeaderCol': ed.format.toggleHeaderColumn(); break;
-      case 'showShortcuts':
-        new Modal({
-          title: 'Keyboard Shortcuts',
-          description: `<strong>Ctrl+B</strong>: Bold\n<strong>Ctrl+I</strong>: Italic\n<strong>Ctrl+U</strong>: Underline\n<strong>Ctrl+Z</strong>: Undo\n<strong>Ctrl+Y</strong>: Redo\n<strong>Ctrl+K</strong>: Insert Link\n<strong>Ctrl+Enter</strong>: Insert Page Break`
-        }).show();
-        break;
-      case 'showAbout':
-        new Modal({
-          title: 'About RK Word Editor',
-          description: `A powerful, modern rich-text editor built with Tiptap. Includes DOCX and Markdown integration, print-ready layouts, and track changes.\n\n<strong>Author:</strong> Raaz Khanal (@raazkhnl)\n<strong>Version:</strong> 3.2.1`
-        }).show();
-        break;
-      case 'openGithub':
-        window.open('https://github.com/raazkhnl/rk-word-editor', '_blank');
-        break;
-    }
-    this.updateActiveStates();
-  }
-
-  private openCommandPalette() {
-    const el = document.getElementById('rk-cmd-palette');
-    if (el) { el.style.display = 'flex'; document.getElementById('rk-cmd-query')?.focus(); }
-  }
-
-  private closeCommandPalette() {
-    const el = document.getElementById('rk-cmd-palette');
-    if (el) el.style.display = 'none';
-  }
-
-  private setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); this.openCommandPalette(); }
-      if (e.key === 'Escape') this.closeCommandPalette();
-    });
-  }
-
-  private setupWordCountDisplay() {
-    const updateWc = () => {
-      const stats = this.editor.getWordCount();
-      const el = document.getElementById('rk-wc-display');
-      if (el) el.textContent = `${stats.words} words`;
-    };
-    this.editor.instance.on('update', updateWc);
-    updateWc();
-  }
-
-  private updateActiveStates() {
-    const ed = this.editor.instance;
-    const q = (s: string) => this.container.querySelector(s);
-    const toggle = (s: string, active: boolean) => {
-      const btn = q(s);
-      if (btn) btn.classList.toggle('is-active', active);
-    };
-
-    toggle('#bold-btn', ed.isActive('bold'));
-    toggle('#italic-btn', ed.isActive('italic'));
-    toggle('#underline-btn', ed.isActive('underline'));
-    toggle('#strike-btn', ed.isActive('strike'));
-    toggle('#sup-btn', ed.isActive('superscript'));
-    toggle('#sub-btn', ed.isActive('subscript'));
-    toggle('#bullet-list-btn', ed.isActive('bulletList'));
-    toggle('#ordered-list-btn', ed.isActive('orderedList'));
-    toggle('#align-left-btn', ed.isActive({ textAlign: 'left' }));
-    toggle('#align-center-btn', ed.isActive({ textAlign: 'center' }));
-    toggle('#align-right-btn', ed.isActive({ textAlign: 'right' }));
-    toggle('#align-justify-btn', ed.isActive({ textAlign: 'justify' }));
-    toggle('#track-changes-btn', (this.editor as any).isTrackingChanges?.() || false);
-
-    const headingSel = q('#heading-style') as HTMLSelectElement;
-    if (headingSel) {
-      if (ed.isActive('heading', { level: 1 })) headingSel.value = '1';
-      else if (ed.isActive('heading', { level: 2 })) headingSel.value = '2';
-      else if (ed.isActive('heading', { level: 3 })) headingSel.value = '3';
-      else headingSel.value = 'p';
-    }
-  }
+interface MenuItem {
+    label?: string;
+    icon?: IconName;
+    action?: string;
+    shortcut?: string;
+    sep?: boolean;
 }
 
+export interface WordToolbarOptions {
+    /** Show the menubar (File / Edit / Insert / Format / View / Help). Defaults to `true`. */
+    menubar?: boolean;
+    /** Show the formatting toolbar. Defaults to `true`. */
+    toolbar?: boolean;
+    /** Show the status bar (page count, word count, zoom). Defaults to `true`. */
+    statusBar?: boolean;
+    /** Show the document outline sidebar. Defaults to `false`. */
+    outline?: boolean;
+    /** Show the right-side property panel. Defaults to `true`. */
+    propertyPanel?: boolean;
+    /** Initial theme. Defaults to `'light'`. */
+    theme?: 'light' | 'dark' | 'auto';
+    /** Brand label / logo HTML. */
+    brandHtml?: string;
+}
+
+export class WordToolbar {
+    public editor: WordEditor;
+    private container: HTMLElement;
+    private opts: WordToolbarOptions;
+    private root!: HTMLDivElement;
+    private findBar?: FindReplaceBar;
+    private statusBar?: StatusBar;
+    private outline?: Outline;
+    private propertyPanel?: PropertyPanel;
+    private surfaceWrap!: HTMLDivElement;
+
+    constructor(editor: WordEditor, container: HTMLElement, opts: WordToolbarOptions = {}) {
+        this.editor = editor;
+        this.container = container;
+        this.opts = {
+            menubar: true,
+            toolbar: true,
+            statusBar: true,
+            outline: false,
+            propertyPanel: true,
+            theme: 'light',
+            ...opts,
+        };
+        this.render();
+        this.applyTheme(this.opts.theme!);
+    }
+
+    private render() {
+        this.container.classList.add('rk-word-editor');
+        this.root = document.createElement('div');
+        this.root.className = 'rk-editor-shell';
+        this.container.appendChild(this.root);
+
+        if (this.opts.menubar) this.root.appendChild(this.buildMenubar());
+        if (this.opts.toolbar) this.root.appendChild(this.buildToolbar());
+
+        const main = document.createElement('div');
+        main.className = 'rk-editor-main';
+
+        if (this.opts.outline) {
+            this.outline = new Outline(this.editor, main);
+        }
+
+        const surfaceArea = document.createElement('div');
+        surfaceArea.className = 'rk-editor-surface-area';
+        this.surfaceWrap = surfaceArea;
+
+        // Move the existing ProseMirror surface here.
+        const editorEl = this.editor.instance.options.element as HTMLElement;
+        if (editorEl && editorEl.firstChild) {
+            surfaceArea.appendChild(editorEl);
+        }
+
+        main.appendChild(surfaceArea);
+
+        if (this.opts.propertyPanel) {
+            this.propertyPanel = new PropertyPanel(this.editor, main, 'end');
+        }
+
+        this.root.appendChild(main);
+
+        this.findBar = new FindReplaceBar(this.editor, surfaceArea);
+
+        if (this.opts.statusBar) this.statusBar = new StatusBar(this.editor, this.root);
+
+        const importInput = document.createElement('input');
+        importInput.type = 'file';
+        importInput.id = 'rk-import-input';
+        importInput.accept = '.docx,.md,.markdown,.html,.htm,.txt,.json';
+        importInput.style.display = 'none';
+        this.root.appendChild(importInput);
+
+        importInput.addEventListener('change', async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+            try {
+                await this.editor.importFromFile(file);
+            } catch (err: any) {
+                alert(`Import failed: ${err.message || err}`);
+            } finally {
+                importInput.value = '';
+            }
+        });
+
+        this.bindGlobalKeys();
+        // Single document-level click closes any open menubar dropdown.
+        document.addEventListener('click', this.handleDocClick);
+        this.editor.instance.on('selectionUpdate', () => this.updateActiveStates());
+        this.editor.instance.on('transaction', () => this.updateActiveStates());
+        this.updateActiveStates();
+    }
+
+    private handleDocClick = (e: MouseEvent) => {
+        const target = e.target as HTMLElement | null;
+        if (!target || !target.closest('.rk-menu-trigger,.rk-menu-dropdown')) {
+            this.closeMenus();
+        }
+    };
+
+    // ----- Menubar -----
+    private buildMenubar(): HTMLElement {
+        const nav = document.createElement('nav');
+        nav.className = 'rk-menubar';
+        nav.setAttribute('role', 'menubar');
+
+        if (this.opts.brandHtml) {
+            const brand = document.createElement('div');
+            brand.className = 'rk-brand';
+            brand.innerHTML = this.opts.brandHtml;
+            nav.appendChild(brand);
+        }
+
+        const menus: { label: string; items: MenuItem[] }[] = [
+            {
+                label: 'File',
+                items: [
+                    { label: 'New document', action: 'newDoc', icon: 'fileNew' },
+                    { label: 'Open / Import…', action: 'openImport', icon: 'fileOpen' },
+                    { sep: true },
+                    { label: 'Save copy as DOCX', action: 'exportDocx', icon: 'docx' },
+                    { label: 'Export as Markdown', action: 'exportMd' },
+                    { label: 'Export as HTML', action: 'exportHtml' },
+                    { label: 'Export as JSON', action: 'exportJson' },
+                    { sep: true },
+                    { label: 'Print / Save as PDF', action: 'printDoc', icon: 'print', shortcut: 'Ctrl+P' },
+                    { sep: true },
+                    { label: 'Page layout…', action: 'pageLayout', icon: 'pageSize' },
+                ],
+            },
+            {
+                label: 'Edit',
+                items: [
+                    { label: 'Undo', action: 'undo', icon: 'undo', shortcut: 'Ctrl+Z' },
+                    { label: 'Redo', action: 'redo', icon: 'redo', shortcut: 'Ctrl+Y' },
+                    { sep: true },
+                    { label: 'Cut', action: 'cut', icon: 'cut', shortcut: 'Ctrl+X' },
+                    { label: 'Copy', action: 'copy', icon: 'copy', shortcut: 'Ctrl+C' },
+                    { label: 'Paste', action: 'paste', icon: 'paste', shortcut: 'Ctrl+V' },
+                    { sep: true },
+                    { label: 'Find', action: 'find', icon: 'search', shortcut: 'Ctrl+F' },
+                    { label: 'Find & Replace', action: 'findReplace', icon: 'replace', shortcut: 'Ctrl+H' },
+                    { sep: true },
+                    { label: 'Format painter', action: 'formatPainter', icon: 'formatPainter' },
+                    { label: 'Clear formatting', action: 'clearFormatting', icon: 'eraser' },
+                    { label: 'Track changes', action: 'trackChanges', icon: 'track' },
+                ],
+            },
+            {
+                label: 'Insert',
+                items: [
+                    { label: 'Image', action: 'insertImage', icon: 'image' },
+                    { label: 'Image from URL', action: 'insertImageUrl', icon: 'image' },
+                    { label: 'Table…', action: 'insertTable', icon: 'table' },
+                    { label: 'Text box', action: 'insertTextBox', icon: 'textbox' },
+                    { label: 'Link…', action: 'insertLink', icon: 'link', shortcut: 'Ctrl+K' },
+                    { sep: true },
+                    { label: 'Math (LaTeX)…', action: 'insertMath', icon: 'math' },
+                    { label: 'Citation…', action: 'insertCitation', icon: 'citation' },
+                    { label: 'Footnote…', action: 'insertFootnote', icon: 'footnote' },
+                    { label: 'Table of contents', action: 'insertToc', icon: 'toc' },
+                    { sep: true },
+                    { label: 'Page break', action: 'pageBreak', icon: 'pageBreak', shortcut: 'Ctrl+Enter' },
+                    { label: 'Horizontal rule', action: 'hr', icon: 'horizontalRule' },
+                    { label: 'Blockquote', action: 'blockquote', icon: 'blockquote' },
+                    { label: 'Code block', action: 'codeBlock', icon: 'code' },
+                ],
+            },
+            {
+                label: 'Format',
+                items: [
+                    { label: 'Bold', action: 'bold', icon: 'bold', shortcut: 'Ctrl+B' },
+                    { label: 'Italic', action: 'italic', icon: 'italic', shortcut: 'Ctrl+I' },
+                    { label: 'Underline', action: 'underline', icon: 'underline', shortcut: 'Ctrl+U' },
+                    { label: 'Strikethrough', action: 'strike', icon: 'strike' },
+                    { sep: true },
+                    { label: 'Superscript', action: 'superscript', icon: 'superscript' },
+                    { label: 'Subscript', action: 'subscript', icon: 'subscript' },
+                    { sep: true },
+                    { label: 'Align left', action: 'alignLeft', icon: 'alignLeft' },
+                    { label: 'Align center', action: 'alignCenter', icon: 'alignCenter' },
+                    { label: 'Align right', action: 'alignRight', icon: 'alignRight' },
+                    { label: 'Justify', action: 'alignJustify', icon: 'alignJustify' },
+                    { sep: true },
+                    { label: 'Bullet list', action: 'bulletList', icon: 'bulletList' },
+                    { label: 'Numbered list', action: 'orderedList', icon: 'orderedList' },
+                    { label: 'Nepali numbering (१.)', action: 'nepaliList', icon: 'nepaliList' },
+                    { label: 'Task list', action: 'taskList', icon: 'taskList' },
+                ],
+            },
+            {
+                label: 'View',
+                items: [
+                    { label: 'Toggle outline', action: 'toggleOutline', icon: 'panelLeft' },
+                    { label: 'Toggle properties panel', action: 'toggleProperties', icon: 'panelRight' },
+                    { label: 'Read-only mode', action: 'toggleReadOnly', icon: 'eye' },
+                    { sep: true },
+                    { label: 'Light theme', action: 'themeLight', icon: 'sun' },
+                    { label: 'Dark theme', action: 'themeDark', icon: 'moon' },
+                    { sep: true },
+                    { label: 'Zoom in', action: 'zoomIn', icon: 'zoomIn', shortcut: 'Ctrl++' },
+                    { label: 'Zoom out', action: 'zoomOut', icon: 'zoomOut', shortcut: 'Ctrl+-' },
+                    { label: 'Reset zoom', action: 'zoomReset', shortcut: 'Ctrl+0' },
+                ],
+            },
+            {
+                label: 'Help',
+                items: [
+                    { label: 'Keyboard shortcuts', action: 'showShortcuts', icon: 'keyboard' },
+                    { label: 'About', action: 'showAbout', icon: 'info' },
+                    { label: 'GitHub repository', action: 'openGithub', icon: 'github' },
+                ],
+            },
+        ];
+
+        menus.forEach(menu => nav.appendChild(this.buildMenu(menu.label, menu.items)));
+
+        const spacer = document.createElement('div');
+        spacer.className = 'rk-menubar-spacer';
+        nav.appendChild(spacer);
+
+        const toolbarRight = document.createElement('div');
+        toolbarRight.className = 'rk-menubar-actions';
+        toolbarRight.innerHTML = `
+            <button class="rk-icon-btn rk-theme-toggle" title="Toggle dark mode" aria-label="Toggle theme">${icon('moon')}</button>
+            <button class="rk-icon-btn rk-find-toggle-btn" title="Find (Ctrl+F)" aria-label="Find">${icon('search')}</button>`;
+        nav.appendChild(toolbarRight);
+
+        toolbarRight.querySelector('.rk-theme-toggle')?.addEventListener('click', () => this.toggleTheme());
+        toolbarRight.querySelector('.rk-find-toggle-btn')?.addEventListener('click', () => this.findBar?.open(false));
+        return nav;
+    }
+
+    private buildMenu(label: string, items: MenuItem[]): HTMLElement {
+        const wrap = document.createElement('div');
+        wrap.className = 'rk-menu';
+        const trigger = document.createElement('button');
+        trigger.className = 'rk-menu-trigger';
+        trigger.textContent = label;
+        trigger.setAttribute('aria-haspopup', 'true');
+        trigger.setAttribute('aria-expanded', 'false');
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'rk-menu-dropdown';
+        dropdown.setAttribute('role', 'menu');
+        items.forEach(item => {
+            if (item.sep) {
+                const s = document.createElement('div');
+                s.className = 'rk-menu-sep';
+                dropdown.appendChild(s);
+                return;
+            }
+            const btn = document.createElement('button');
+            btn.className = 'rk-menu-item';
+            btn.dataset.action = item.action;
+            btn.innerHTML = `
+                <span class="rk-menu-icon">${item.icon ? icon(item.icon) : ''}</span>
+                <span class="rk-menu-label">${item.label}</span>
+                ${item.shortcut ? `<span class="rk-menu-shortcut">${item.shortcut}</span>` : ''}`;
+            btn.addEventListener('click', () => {
+                this.handleAction(item.action!);
+                this.closeMenus();
+            });
+            dropdown.appendChild(btn);
+        });
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const expanded = trigger.getAttribute('aria-expanded') === 'true';
+            this.closeMenus();
+            trigger.setAttribute('aria-expanded', String(!expanded));
+        });
+
+        wrap.appendChild(trigger);
+        wrap.appendChild(dropdown);
+        return wrap;
+    }
+
+    private closeMenus() {
+        this.container.querySelectorAll('.rk-menu-trigger').forEach(t => t.setAttribute('aria-expanded', 'false'));
+    }
+
+    // ----- Toolbar -----
+    private buildToolbar(): HTMLElement {
+        const tb = document.createElement('div');
+        tb.className = 'rk-toolbar';
+        tb.setAttribute('role', 'toolbar');
+
+        // Row 1
+        const row1 = document.createElement('div');
+        row1.className = 'rk-toolbar-row';
+        row1.appendChild(this.toolbarGroup([
+            { id: 'undo', icon: 'undo', title: 'Undo (Ctrl+Z)' },
+            { id: 'redo', icon: 'redo', title: 'Redo (Ctrl+Y)' },
+        ]));
+
+        const styleGroup = document.createElement('div');
+        styleGroup.className = 'rk-toolbar-group';
+        styleGroup.innerHTML = `
+            <select class="rk-select rk-select-medium" id="rk-style">
+                ${PARAGRAPH_STYLES.map(s => `<option value="${s.value}">${s.label}</option>`).join('')}
+            </select>
+            <select class="rk-select rk-select-wide" id="rk-font">
+                ${FONT_FAMILIES.map(f => `<option value="${f.value}">${f.label}</option>`).join('')}
+            </select>
+            <select class="rk-select rk-select-narrow" id="rk-size">
+                ${FONT_SIZES.map(s => `<option value="${s}pt"${s === 12 ? ' selected' : ''}>${s}</option>`).join('')}
+            </select>`;
+        row1.appendChild(styleGroup);
+
+        row1.appendChild(this.toolbarGroup([
+            { id: 'bold', icon: 'bold', title: 'Bold (Ctrl+B)' },
+            { id: 'italic', icon: 'italic', title: 'Italic (Ctrl+I)' },
+            { id: 'underline', icon: 'underline', title: 'Underline (Ctrl+U)' },
+            { id: 'strike', icon: 'strike', title: 'Strikethrough' },
+            { id: 'sup', icon: 'superscript', title: 'Superscript' },
+            { id: 'sub', icon: 'subscript', title: 'Subscript' },
+        ]));
+
+        const colorGroup = document.createElement('div');
+        colorGroup.className = 'rk-toolbar-group';
+        colorGroup.innerHTML = `
+            <label class="rk-color-pick" title="Text color" data-color="#1a1a1a">
+                <span class="rk-color-pick-icon">${icon('fontColor')}<span class="rk-color-pick-bar" style="background:#1a1a1a"></span></span>
+                <input type="color" class="rk-color-input" id="rk-text-color" value="#1a1a1a" />
+            </label>
+            <label class="rk-color-pick" title="Highlight color" data-color="#fff59d">
+                <span class="rk-color-pick-icon">${icon('highlight')}<span class="rk-color-pick-bar" style="background:#fff59d"></span></span>
+                <input type="color" class="rk-color-input" id="rk-hl-color" value="#fff59d" />
+            </label>`;
+        row1.appendChild(colorGroup);
+
+        row1.appendChild(this.toolbarGroup([
+            { id: 'alignLeft', icon: 'alignLeft', title: 'Align left' },
+            { id: 'alignCenter', icon: 'alignCenter', title: 'Align center' },
+            { id: 'alignRight', icon: 'alignRight', title: 'Align right' },
+            { id: 'alignJustify', icon: 'alignJustify', title: 'Justify' },
+        ]));
+
+        row1.appendChild(this.toolbarGroup([
+            { id: 'bulletList', icon: 'bulletList', title: 'Bullet list' },
+            { id: 'orderedList', icon: 'orderedList', title: 'Numbered list' },
+            { id: 'nepaliList', icon: 'nepaliList', title: 'Nepali numbering (१.)' },
+            { id: 'taskList', icon: 'taskList', title: 'Task list' },
+            { id: 'indent', icon: 'indentRight', title: 'Increase indent' },
+            { id: 'outdent', icon: 'indentLeft', title: 'Decrease indent' },
+        ]));
+
+        tb.appendChild(row1);
+
+        // Row 2
+        const row2 = document.createElement('div');
+        row2.className = 'rk-toolbar-row';
+        row2.appendChild(this.toolbarGroup([
+            { id: 'insertLink', icon: 'link', title: 'Insert link (Ctrl+K)' },
+            { id: 'insertImage', icon: 'image', title: 'Insert image' },
+            { id: 'insertTable', icon: 'table', title: 'Insert table' },
+            { id: 'insertTextBox', icon: 'textbox', title: 'Insert text box' },
+            { id: 'insertMath', icon: 'math', title: 'Insert math' },
+            { id: 'insertFootnote', icon: 'footnote', title: 'Insert footnote' },
+            { id: 'insertCitation', icon: 'citation', title: 'Insert citation' },
+            { id: 'insertToc', icon: 'toc', title: 'Insert table of contents' },
+        ]));
+
+        row2.appendChild(this.toolbarGroup([
+            { id: 'blockquote', icon: 'blockquote', title: 'Blockquote' },
+            { id: 'codeBlock', icon: 'code', title: 'Code block' },
+            { id: 'hr', icon: 'horizontalRule', title: 'Horizontal rule' },
+            { id: 'pageBreak', icon: 'pageBreak', title: 'Page break (Ctrl+Enter)' },
+        ]));
+
+        row2.appendChild(this.toolbarGroup([
+            { id: 'formatPainter', icon: 'formatPainter', title: 'Format painter' },
+            { id: 'clearFormatting', icon: 'eraser', title: 'Clear formatting' },
+            { id: 'trackChanges', icon: 'track', title: 'Track changes' },
+        ]));
+
+        row2.appendChild(this.toolbarGroup([
+            { id: 'find', icon: 'search', title: 'Find (Ctrl+F)' },
+            { id: 'findReplace', icon: 'replace', title: 'Find & replace (Ctrl+H)' },
+            { id: 'pageLayout', icon: 'pageSize', title: 'Page layout' },
+        ]));
+
+        row2.appendChild(this.toolbarGroup([
+            { id: 'exportDocx', icon: 'docx', title: 'Export DOCX' },
+            { id: 'printDoc', icon: 'print', title: 'Print / Save as PDF' },
+        ]));
+
+        tb.appendChild(row2);
+
+        this.bindToolbarEvents(tb);
+        return tb;
+    }
+
+    private toolbarGroup(items: { id: string; icon: IconName; title: string }[]): HTMLElement {
+        const g = document.createElement('div');
+        g.className = 'rk-toolbar-group';
+        items.forEach(it => {
+            const btn = document.createElement('button');
+            btn.className = 'rk-icon-btn';
+            btn.dataset.action = it.id;
+            btn.title = it.title;
+            btn.setAttribute('aria-label', it.title);
+            btn.innerHTML = icon(it.icon);
+            btn.addEventListener('click', () => this.handleAction(it.id));
+            g.appendChild(btn);
+        });
+        return g;
+    }
+
+    private bindToolbarEvents(tb: HTMLElement) {
+        const $ = (s: string) => tb.querySelector(s) as HTMLElement | null;
+
+        ($('#rk-font') as HTMLSelectElement | null)?.addEventListener('change', (e) => {
+            const v = (e.target as HTMLSelectElement).value;
+            if (v) this.editor.format.fontFamily(v);
+        });
+        ($('#rk-size') as HTMLSelectElement | null)?.addEventListener('change', (e) => {
+            const v = (e.target as HTMLSelectElement).value;
+            if (v) this.editor.format.fontSize(v);
+        });
+        ($('#rk-style') as HTMLSelectElement | null)?.addEventListener('change', (e) => {
+            const v = (e.target as HTMLSelectElement).value;
+            if (v === 'p') this.editor.format.paragraph();
+            else if (v === 'title') this.editor.format.title();
+            else if (v === 'subtitle') this.editor.format.subtitle();
+            else this.editor.format.heading(parseInt(v) as any);
+        });
+        const txtColor = $('#rk-text-color') as HTMLInputElement | null;
+        txtColor?.addEventListener('input', (e) => {
+            const v = (e.target as HTMLInputElement).value;
+            this.editor.format.setColor(v);
+            const bar = txtColor.parentElement?.querySelector('.rk-color-pick-bar') as HTMLElement | null;
+            if (bar) bar.style.background = v;
+        });
+        const hlColor = $('#rk-hl-color') as HTMLInputElement | null;
+        hlColor?.addEventListener('input', (e) => {
+            const v = (e.target as HTMLInputElement).value;
+            this.editor.format.setHighlight(v);
+            const bar = hlColor.parentElement?.querySelector('.rk-color-pick-bar') as HTMLElement | null;
+            if (bar) bar.style.background = v;
+        });
+    }
+
+    // ----- Action dispatcher -----
+    private handleAction(action: string) {
+        const ed = this.editor;
+        const importInput = () => (this.container.querySelector('#rk-import-input') as HTMLInputElement | null)?.click();
+        switch (action) {
+            // File
+            case 'newDoc':
+                if (!ed.isEmpty() && !confirm('Discard current document and start a new one?')) return;
+                ed.clear(); ed.focus(); break;
+            case 'openImport': importInput(); break;
+            case 'exportDocx': ed.exportDocx(); break;
+            case 'exportMd': ed.exportMarkdown(); break;
+            case 'exportHtml': ed.exportHtml(); break;
+            case 'exportJson': ed.exportJson(); break;
+            case 'printDoc': ed.printPdf(); break;
+            case 'pageLayout': showPageLayoutDialog(ed); break;
+
+            // Edit
+            case 'undo': ed.format.undo(); break;
+            case 'redo': ed.format.redo(); break;
+            case 'cut': document.execCommand('cut'); break;
+            case 'copy': document.execCommand('copy'); break;
+            case 'paste': document.execCommand('paste'); break;
+            case 'find': this.findBar?.open(false); break;
+            case 'findReplace': this.findBar?.open(true); break;
+            case 'formatPainter': ed.format.startFormatPaint(); break;
+            case 'clearFormatting': ed.format.clearFormatting(); break;
+            case 'trackChanges': ed.toggleTrackChanges(); this.updateActiveStates(); break;
+
+            // Insert
+            case 'insertImage': ed.format.openImageUpload(); break;
+            case 'insertImageUrl': showImageDialog(ed); break;
+            case 'insertTable': showTableDialog(ed); break;
+            case 'insertTextBox': ed.format.insertTextBox(); break;
+            case 'insertLink': showLinkDialog(ed); break;
+            case 'insertMath': showMathDialog(ed); break;
+            case 'insertFootnote': showFootnoteDialog(ed); break;
+            case 'insertCitation': showCitationDialog(ed); break;
+            case 'insertToc': showTocDialog(ed); break;
+            case 'refreshToc': ed.format.refreshTableOfContents(); break;
+            case 'pageBreak': ed.format.pageBreak(); break;
+            case 'hr': ed.format.horizontalRule(); break;
+            case 'blockquote': ed.format.blockquote(); break;
+            case 'codeBlock': ed.format.codeBlock(); break;
+
+            // Format
+            case 'bold': ed.format.bold(); break;
+            case 'italic': ed.format.italic(); break;
+            case 'underline': ed.format.underline(); break;
+            case 'strike': ed.format.strike(); break;
+            case 'sup':
+            case 'superscript': ed.format.superscript(); break;
+            case 'sub':
+            case 'subscript': ed.format.subscript(); break;
+            case 'alignLeft': ed.format.align('left'); break;
+            case 'alignCenter': ed.format.align('center'); break;
+            case 'alignRight': ed.format.align('right'); break;
+            case 'alignJustify': ed.format.align('justify'); break;
+            case 'bulletList': ed.format.bulletList(); break;
+            case 'orderedList': ed.format.orderedList(); break;
+            case 'nepaliList': ed.format.orderedList(); ed.format.setListStyle('nepali'); break;
+            case 'taskList': ed.format.taskList(); break;
+            case 'indent': ed.format.indent(); break;
+            case 'outdent': ed.format.outdent(); break;
+
+            // View
+            case 'toggleOutline':
+                if (this.outline) {
+                    this.outline.toggle();
+                } else {
+                    const main = this.root.querySelector('.rk-editor-main') as HTMLElement;
+                    this.outline = new Outline(ed, main, 'start');
+                }
+                break;
+            case 'toggleProperties':
+                if (this.propertyPanel) {
+                    this.propertyPanel.toggle();
+                } else {
+                    const main = this.root.querySelector('.rk-editor-main') as HTMLElement;
+                    this.propertyPanel = new PropertyPanel(ed, main, 'end');
+                }
+                break;
+            case 'toggleReadOnly':
+                ed.setEditable(!ed.isEditable());
+                this.root.classList.toggle('rk-readonly', !ed.isEditable());
+                break;
+            case 'themeLight': this.applyTheme('light'); break;
+            case 'themeDark': this.applyTheme('dark'); break;
+            case 'zoomIn': ed.setZoom(ed.getZoom() + 0.1); this.statusBar?.update(); break;
+            case 'zoomOut': ed.setZoom(ed.getZoom() - 0.1); this.statusBar?.update(); break;
+            case 'zoomReset': ed.setZoom(1); this.statusBar?.update(); break;
+
+            // Help
+            case 'showShortcuts': showShortcutsDialog(); break;
+            case 'showAbout': showAboutDialog(); break;
+            case 'openGithub': window.open('https://github.com/raazkhnl/rk-word-editor', '_blank', 'noopener'); break;
+        }
+    }
+
+    private bindGlobalKeys() {
+        document.addEventListener('keydown', (e) => {
+            const mod = e.ctrlKey || e.metaKey;
+            if (!mod) return;
+            const k = e.key.toLowerCase();
+            if (k === 'f') { e.preventDefault(); this.findBar?.open(false); }
+            else if (k === 'h') { e.preventDefault(); this.findBar?.open(true); }
+            else if (k === 'p') { e.preventDefault(); this.editor.printPdf(); }
+            else if (k === 's') { e.preventDefault(); this.editor.exportDocx(); }
+            else if (k === '=' || k === '+') { e.preventDefault(); this.handleAction('zoomIn'); }
+            else if (k === '-') { e.preventDefault(); this.handleAction('zoomOut'); }
+            else if (k === '0') { e.preventDefault(); this.handleAction('zoomReset'); }
+            else if (k === '/') { e.preventDefault(); /* future command palette */ }
+        });
+    }
+
+    // ----- Theme -----
+    public applyTheme(theme: 'light' | 'dark' | 'auto') {
+        this.opts.theme = theme;
+        let resolved: 'light' | 'dark' = theme === 'auto'
+            ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : theme;
+        this.container.dataset.rkTheme = resolved;
+        const btn = this.root.querySelector('.rk-theme-toggle') as HTMLElement | null;
+        if (btn) btn.innerHTML = resolved === 'dark' ? icon('sun') : icon('moon');
+    }
+
+    public toggleTheme() {
+        const next = this.container.dataset.rkTheme === 'dark' ? 'light' : 'dark';
+        this.applyTheme(next as 'light' | 'dark');
+    }
+
+    // ----- Active states -----
+    private updateActiveStates() {
+        const ed = this.editor.instance;
+        const root = this.root;
+        const $btn = (id: string) => root.querySelector(`.rk-icon-btn[data-action="${id}"]`);
+        const setActive = (id: string, active: boolean) => $btn(id)?.classList.toggle('is-active', active);
+
+        setActive('bold', ed.isActive('bold'));
+        setActive('italic', ed.isActive('italic'));
+        setActive('underline', ed.isActive('underline'));
+        setActive('strike', ed.isActive('strike'));
+        setActive('sup', ed.isActive('superscript'));
+        setActive('sub', ed.isActive('subscript'));
+        setActive('bulletList', ed.isActive('bulletList'));
+        setActive('orderedList', ed.isActive('orderedList'));
+        setActive('taskList', ed.isActive('taskList'));
+        setActive('blockquote', ed.isActive('blockquote'));
+        setActive('codeBlock', ed.isActive('codeBlock'));
+        setActive('alignLeft', ed.isActive({ textAlign: 'left' }));
+        setActive('alignCenter', ed.isActive({ textAlign: 'center' }));
+        setActive('alignRight', ed.isActive({ textAlign: 'right' }));
+        setActive('alignJustify', ed.isActive({ textAlign: 'justify' }));
+        setActive('trackChanges', this.editor.isTrackingChanges?.() || false);
+
+        const styleSel = root.querySelector('#rk-style') as HTMLSelectElement | null;
+        if (styleSel) {
+            if (ed.isActive('title')) { styleSel.value = 'title'; return; }
+            if (ed.isActive('subtitle')) { styleSel.value = 'subtitle'; return; }
+            for (let l = 1; l <= 6; l++) {
+                if (ed.isActive('heading', { level: l })) { styleSel.value = String(l); return; }
+            }
+            styleSel.value = 'p';
+        }
+    }
+
+    public destroy() {
+        document.removeEventListener('click', this.handleDocClick);
+        this.findBar?.destroy();
+        this.statusBar?.destroy();
+        this.outline?.destroy();
+        this.propertyPanel?.destroy();
+        this.root.remove();
+    }
+}
+
+// ---- Convenience: bundled editor + shell ----
+
+export interface EditorShellOptions extends Omit<WordEditorOptions, 'element'>, WordToolbarOptions {
+    /** Where to mount the editor. Either `container` or `element` is accepted. */
+    container?: HTMLElement;
+    /** Same as `container` — kept for compatibility with the bare `WordEditor` API. */
+    element?: HTMLElement;
+}
+
+/**
+ * One-shot constructor that mounts a fully-featured editor (engine + UI shell)
+ * into a container. Returns both the engine and toolbar so consumers can wire
+ * up their own buttons, listeners, or commands.
+ */
+export class EditorShell {
+    public editor: WordEditor;
+    public toolbar: WordToolbar;
+    public container: HTMLElement;
+
+    constructor(opts: EditorShellOptions) {
+        const target = opts.container || opts.element;
+        if (!target) throw new Error('EditorShell requires `container` or `element`.');
+        this.container = target;
+
+        // We need a child element for the editor surface so we don't fight with the toolbar layout.
+        target.classList.add('rk-word-editor');
+        const surface = document.createElement('div');
+        surface.className = 'rk-editor-surface';
+        target.appendChild(surface);
+
+        this.editor = new WordEditor({
+            ...opts,
+            element: surface,
+        });
+        this.toolbar = new WordToolbar(this.editor, target, opts);
+    }
+
+    public destroy(): void {
+        this.toolbar.destroy();
+        this.editor.destroy();
+    }
+}
+
+// ---- Web component ----
 export * from './web-component';

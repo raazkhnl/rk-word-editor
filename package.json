@@ -1,8 +1,8 @@
 {
   "name": "rk-word-editor-monorepo",
-  "version": "3.5.0",
-  "description": "A high-performance, modern rich-text editor monorepo built with Tiptap and ProseMirror",
-  "private": false,
+  "version": "4.1.2",
+  "description": "A modern, customizable, open-source rich-text Word editor built with Tiptap and ProseMirror",
+  "private": true,
   "author": {
     "name": "RaaZ Khanal",
     "email": "raazkhnl@gmail.com",
@@ -11,10 +11,14 @@
   "license": "MIT",
   "keywords": [
     "editor",
-    "tiptap",
-    "prosemirror",
     "rich-text",
     "wysiwyg",
+    "word-editor",
+    "tiptap",
+    "prosemirror",
+    "docx",
+    "pdf",
+    "markdown",
     "monorepo",
     "typescript"
   ],
@@ -24,39 +28,18 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace=@raazkhnl/rk-editor-demo",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace=@raazkhnl/rk-editor-core && npm run build --workspace=@raazkhnl/rk-editor-ui && npm run build --workspace=@raazkhnl/rk-editor-cli && npm run build --workspace=@raazkhnl/rk-editor-demo",
+    "build:packages": "npm run build --workspace=@raazkhnl/rk-editor-core && npm run build --workspace=@raazkhnl/rk-editor-ui",
     "test": "npm test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "clean": "rimraf node_modules packages/*/node_modules packages/*/dist apps/*/node_modules apps/*/dist",
-    "publish:packages": "npm publish --workspaces --access public"
-  },
-  "dependencies": {
-    "@tiptap/core": "^2.27.0",
-    "@tiptap/extension-color": "^2.27.0",
-    "@tiptap/extension-font-family": "^2.27.0",
-    "@tiptap/extension-highlight": "^2.27.0",
-    "@tiptap/extension-image": "^2.27.0",
-    "@tiptap/extension-subscript": "^2.27.0",
-    "@tiptap/extension-superscript": "^2.27.0",
-    "@tiptap/extension-table": "^2.27.0",
-    "@tiptap/extension-table-cell": "^2.27.0",
-    "@tiptap/extension-table-header": "^2.27.0",
-    "@tiptap/extension-table-row": "^2.27.0",
-    "@tiptap/extension-task-item": "^2.27.0",
-    "@tiptap/extension-task-list": "^2.27.0",
-    "@tiptap/extension-text-align": "^2.27.0",
-    "@tiptap/extension-text-style": "^2.27.0",
-    "@tiptap/extension-underline": "^2.27.0",
-    "@tiptap/pm": "^2.27.0",
-    "@tiptap/starter-kit": "^2.27.0",
-    "docx": "^9.6.0",
-    "file-saver": "^2.0.5"
+    "clean": "rimraf packages/*/dist apps/*/dist packages/*/node_modules apps/*/node_modules node_modules",
+    "publish:packages": "npm publish --workspace=@raazkhnl/rk-editor-core --access public && npm publish --workspace=@raazkhnl/rk-editor-ui --access public && npm publish --workspace=@raazkhnl/rk-editor-cli --access public"
   },
   "devDependencies": {
-    "@types/file-saver": "^2.0.7",
     "@types/node": "^20.11.0",
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.3",
-    "vite": "^5.1.4",
-    "vite-plugin-dts": "^3.7.3"
+    "vite": "^5.4.10",
+    "vite-plugin-dts": "^4.5.4"
   }
 }

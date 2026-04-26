@@ -1,32 +1,11 @@
-import { Node } from '@tiptap/core';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { NodeSelection } from '@tiptap/pm/state';
 
 /**
- * ImageResizeHandle - Adds visual corner and side drag handles to images.
- * When an image is selected in the editor, handles appear for resizing.
- * Hold Shift to lock aspect ratio.
- */
-export const ImageResizeHandle = Node.create({
-    name: 'imageResizeHandle',
-
-    addProseMirrorPlugins() {
-        return [
-            new Plugin({
-                key: new PluginKey('imageResizeHandle'),
-                props: {
-                    decorations(state: any) {
-                        // Decorations handled via nodeViews below
-                        return null;
-                    },
-                },
-            }),
-        ];
-    },
-});
-
-/**
- * Creates an image node view with resize handles.
- * Used as a custom NodeView for the image extension.
+ * Creates an image NodeView with corner and side drag handles for resizing.
+ * Hold Shift while dragging to lock the aspect ratio.
+ *
+ * Wired up by the `Image` extension in `WordEditor`'s `addNodeView` so any
+ * `<img>` node in the document gets these handles when selected.
  */
 export function createImageResizeView(node: any, view: any, getPos: any) {
     const wrapper = document.createElement('div');
@@ -46,6 +25,20 @@ export function createImageResizeView(node: any, view: any, getPos: any) {
     if (node.attrs.float) wrapper.style.float = node.attrs.float;
 
     wrapper.appendChild(img);
+
+    // Click-to-select: makes the resize handles appear without keyboard nav.
+    img.addEventListener('mousedown', (e) => {
+        // Allow click-and-hold-to-drag (browser default for draggable=true) but
+        // also select the node so handles appear.
+        const pos = getPos();
+        if (typeof pos !== 'number') return;
+        try {
+            const tr = view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos));
+            view.dispatch(tr);
+        } catch { /* not a selectable node */ }
+        // Don't preventDefault — we want native drag to start when held.
+        e.stopPropagation();
+    });
 
     // Build resize handles: corners + sides
     const handlePositions = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];

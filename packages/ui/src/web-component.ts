@@ -1,62 +1,60 @@
-import { WordEditor } from '@raazkhnl/rk-editor-core';
-import { WordToolbar } from './index';
+import { EditorShell } from './index';
 
+/**
+ * Vanilla custom element: <rk-word-editor></rk-word-editor>
+ *
+ * Attributes:
+ *   - placeholder: initial placeholder text
+ *   - theme: "light" | "dark" | "auto"
+ *   - readonly: present means start in read-only mode
+ *   - outline: present means show document outline
+ *   - menubar / toolbar / statusbar: present (default) — set to "false" to hide.
+ */
 export class RKEditorElement extends HTMLElement {
-    private editor: WordEditor | null = null;
-    private toolbar: WordToolbar | null = null;
-
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-    }
+    private shell: EditorShell | null = null;
 
     connectedCallback() {
-        const container = document.createElement('div');
-        container.className = 'rk-editor-wc-container';
+        const host = document.createElement('div');
+        host.style.height = '100%';
+        host.style.display = 'flex';
+        host.style.flexDirection = 'column';
+        this.appendChild(host);
 
-        // Inject styles (in a real scenario, we'd bundle CSS into the JS or link it)
-        const style = document.createElement('style');
-        style.textContent = `
-      .rk-editor-wc-container {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        overflow: hidden;
-      }
-      .rk-toolbar-container {
-        background: #f9f9f9;
-        border-bottom: 1px solid #ddd;
-      }
-      .rk-editor-content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 20px;
-        background: white;
-      }
-    `;
+        const initial = this.innerHTML.trim();
+        if (initial) host.dataset.initialContent = initial;
 
-        const toolbarDiv = document.createElement('div');
-        toolbarDiv.className = 'rk-toolbar-container';
+        const theme = (this.getAttribute('theme') as 'light' | 'dark' | 'auto') || 'light';
+        const readonly = this.hasAttribute('readonly');
+        const outline = this.hasAttribute('outline');
 
-        const editorDiv = document.createElement('div');
-        editorDiv.className = 'rk-editor-content';
+        const flag = (attr: string, def: boolean) => {
+            const v = this.getAttribute(attr);
+            if (v === null) return def;
+            return v !== 'false';
+        };
 
-        container.appendChild(toolbarDiv);
-        container.appendChild(editorDiv);
-        this.shadowRoot?.appendChild(style);
-        this.shadowRoot?.appendChild(container);
-
-        this.editor = new WordEditor({ element: editorDiv });
-        this.toolbar = new WordToolbar(this.editor, toolbarDiv);
+        this.shell = new EditorShell({
+            element: host,
+            initialContent: initial || '<p></p>',
+            placeholder: this.getAttribute('placeholder') || undefined,
+            editable: !readonly,
+            menubar: flag('menubar', true),
+            toolbar: flag('toolbar', true),
+            statusBar: flag('statusbar', true),
+            outline,
+            theme,
+        });
     }
 
-    get editorInstance() {
-        return this.editor?.instance;
+    disconnectedCallback() {
+        this.shell?.destroy();
+        this.shell = null;
     }
+
+    public get editor() { return this.shell?.editor; }
+    public get toolbar() { return this.shell?.toolbar; }
 }
 
-if (!customElements.get('rk-word-editor')) {
+if (typeof customElements !== 'undefined' && !customElements.get('rk-word-editor')) {
     customElements.define('rk-word-editor', RKEditorElement);
 }

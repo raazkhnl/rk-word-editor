@@ -1,1186 +1,610 @@
-/* ==================================================
-   RK Word Editor - Comprehensive UI Styles
-   ================================================== */
+/* ==================================================================
+   RK Word Editor — UI styles (v4.0.0)
+   ------------------------------------------------------------------
+   Layout, theming, toolbar, menubar, modals, find/replace, outline,
+   status bar, status indicators, print styles. All scoped to
+   .rk-word-editor so they don't leak into the host page.
+   ================================================================== */
 
-/* ---- CSS Variables ---- */
-:root {
-    --rk-bg: #f0f2f5;
-    --rk-surface: #ffffff;
-    --rk-border: #e1e4e8;
-    --rk-border-strong: #c8ccd0;
-    --rk-text: #24292e;
-    --rk-text-muted: #6a737d;
-    --rk-primary: #1a73e8;
-    --rk-primary-hover: #1557b0;
-    --rk-active-bg: #e8f0fe;
-    --rk-active-text: #1a73e8;
-    --rk-hover-bg: #f6f8fa;
-    --rk-menu-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --rk-radius: 6px;
-    --rk-radius-sm: 3px;
-    --rk-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* ---- Shell Layout ---- */
 .rk-word-editor {
+    /* Light theme tokens */
+    --rk-bg: #f3f4f6;
+    --rk-surface: #ffffff;
+    --rk-surface-2: #f8fafc;
+    --rk-border: #e2e8f0;
+    --rk-border-strong: #cbd5e1;
+    --rk-text: #0f172a;
+    --rk-text-muted: #64748b;
+    --rk-primary: #2563eb;
+    --rk-primary-fg: #ffffff;
+    --rk-primary-hover: #1d4ed8;
+    --rk-primary-soft: #dbeafe;
+    --rk-active-bg: #e0e7ff;
+    --rk-hover-bg: #eef2f7;
+    --rk-danger: #dc2626;
+    --rk-success: #16a34a;
+    --rk-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --rk-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --rk-shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.18);
+    --rk-radius: 6px;
+    --rk-radius-sm: 4px;
+    --rk-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    --rk-font-doc: 'Calibri', 'Segoe UI', sans-serif;
+    --rk-page-width: 210mm;
+    --rk-page-height: 297mm;
+    --rk-page-margin-top: 1in;
+    --rk-page-margin-bottom: 1in;
+    --rk-page-margin-left: 1in;
+    --rk-page-margin-right: 1in;
+
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    background-color: var(--rk-bg);
+    min-height: 0;
+    height: 100%;
+    background: var(--rk-bg);
+    color: var(--rk-text);
     font-family: var(--rk-font-ui);
+    font-size: 13px;
+    line-height: 1.4;
 }
 
+.rk-word-editor[data-rk-theme='dark'] {
+    --rk-bg: #0f172a;
+    --rk-surface: #1e293b;
+    --rk-surface-2: #283549;
+    --rk-border: #334155;
+    --rk-border-strong: #475569;
+    --rk-text: #e2e8f0;
+    --rk-text-muted: #94a3b8;
+    --rk-primary: #3b82f6;
+    --rk-primary-fg: #ffffff;
+    --rk-primary-hover: #2563eb;
+    --rk-primary-soft: #1e3a8a;
+    --rk-active-bg: #1e3a8a;
+    --rk-hover-bg: #28354a;
+    --rk-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --rk-shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
+    --rk-shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* ---------------- Shell layout ---------------- */
 .rk-editor-shell {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
     background: var(--rk-surface);
-    border-bottom: 1px solid var(--rk-border);
-    user-select: none;
 }
 
-/* ---- Menu Bar ---- */
-.rk-menubar {
+.rk-editor-main {
     display: flex;
-    align-items: center;
-    padding: 0 8px;
-    height: 36px;
-    background: var(--rk-surface);
-    border-bottom: 1px solid var(--rk-border);
-    gap: 2px;
-    font-size: 13px;
+    flex: 1;
+    min-height: 0;
+    background: var(--rk-bg);
 }
 
-.rk-menu {
+.rk-editor-surface-area {
+    flex: 1;
+    overflow: auto;
+    padding: 32px 24px 64px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: var(--rk-bg);
     position: relative;
 }
 
+/* ---------------- Menubar ---------------- */
+.rk-menubar {
+    display: flex;
+    align-items: center;
+    height: 38px;
+    padding: 0 8px;
+    background: var(--rk-surface);
+    border-bottom: 1px solid var(--rk-border);
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.rk-brand {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-weight: 600;
+    color: var(--rk-text);
+}
+
+.rk-menubar-spacer { flex: 1; }
+.rk-menubar-actions { display: flex; gap: 4px; padding-right: 4px; }
+
+.rk-menu { position: relative; }
+
 .rk-menu-trigger {
-    background: none;
+    background: transparent;
     border: none;
-    padding: 4px 10px;
+    padding: 6px 12px;
     border-radius: var(--rk-radius-sm);
     cursor: pointer;
     font-size: 13px;
     color: var(--rk-text);
-    font-family: var(--rk-font-ui);
+    font-family: inherit;
     transition: background 0.12s;
 }
 
 .rk-menu-trigger:hover,
-.rk-menu-trigger[aria-expanded="true"] {
+.rk-menu-trigger[aria-expanded='true'] {
     background: var(--rk-hover-bg);
 }
 
 .rk-menu-dropdown {
     display: none;
     position: absolute;
-    top: calc(100% + 2px);
+    top: calc(100% + 4px);
     left: 0;
-    min-width: 220px;
+    min-width: 240px;
     background: var(--rk-surface);
     border: 1px solid var(--rk-border);
     border-radius: var(--rk-radius);
-    box-shadow: var(--rk-menu-shadow);
-    padding: 4px;
+    box-shadow: var(--rk-shadow-md);
+    padding: 6px;
     z-index: 1000;
 }
 
-.rk-menu-trigger[aria-expanded="true"]+.rk-menu-dropdown {
-    display: block;
-}
+.rk-menu-trigger[aria-expanded='true'] + .rk-menu-dropdown { display: block; }
 
 .rk-menu-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 22px 1fr auto;
     align-items: center;
-    justify-content: space-between;
     width: 100%;
     padding: 6px 10px;
-    background: none;
+    background: transparent;
     border: none;
     border-radius: var(--rk-radius-sm);
     cursor: pointer;
     font-size: 13px;
     text-align: left;
     color: var(--rk-text);
-    font-family: var(--rk-font-ui);
-    gap: 8px;
+    font-family: inherit;
+    gap: 10px;
     transition: background 0.1s;
 }
 
-.rk-menu-item:hover {
-    background: var(--rk-hover-bg);
-}
+.rk-menu-item:hover { background: var(--rk-hover-bg); }
+.rk-menu-icon { color: var(--rk-text-muted); display: inline-flex; }
+.rk-menu-shortcut { font-size: 11px; color: var(--rk-text-muted); white-space: nowrap; }
+.rk-menu-sep { height: 1px; background: var(--rk-border); margin: 6px 0; }
 
-.rk-menu-item-label {
-    flex: 1;
-}
-
-.rk-menu-item-shortcut {
-    font-size: 11px;
-    color: var(--rk-text-muted);
-    white-space: nowrap;
-}
-
-.rk-menu-sep {
-    height: 1px;
-    background: var(--rk-border);
-    margin: 4px 0;
-}
-
-.rk-menubar-spacer {
-    flex: 1;
-}
-
-.rk-wordcount-display {
-    font-size: 12px;
-    color: var(--rk-text-muted);
-    padding: 0 8px;
-    white-space: nowrap;
-}
-
-/* ---- Toolbar ---- */
+/* ---------------- Toolbar ---------------- */
 .rk-toolbar {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    padding: 2px 8px;
-    background: #ffffff;
-    border-bottom: 1px solid #a09e9e;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    background: var(--rk-surface);
+    border-bottom: 1px solid var(--rk-border);
+    box-shadow: var(--rk-shadow-sm);
+    flex-shrink: 0;
 }
 
 .rk-toolbar-row {
     display: flex;
-    flex-direction: row;
     align-items: center;
     gap: 4px;
-    height: 34px;
+    padding: 4px 8px;
     flex-wrap: wrap;
-    /* Responsive wrapping */
+    min-height: 36px;
 }
+
+.rk-toolbar-row + .rk-toolbar-row { border-top: 1px solid var(--rk-border); }
 
 .rk-toolbar-group {
     display: flex;
     align-items: center;
-    gap: 1px;
-    padding: 2px 6px;
-    border-right: 1px solid #f0f0f0;
-    height: 100%;
-    position: relative;
+    gap: 2px;
+    padding: 2px 6px 2px 0;
+    border-right: 1px solid var(--rk-border);
 }
 
-.rk-toolbar-group:last-child {
-    border-right: none;
-}
+.rk-toolbar-group:last-child { border-right: none; }
 
-/* Tooltip style labels using data-label */
-/* .rk-toolbar-group:hover::after {
-    content: attr(data-label);
-    position: absolute;
-    top: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #000;
-    color: #fff;
-    padding: 1px 4px;
-    font-size: 9px;
-    border-radius: 2px;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-    z-index: 200;
-} */
-
-.rk-toolbar-group:hover::after {
-    opacity: 1;
-}
-
-.rk-toolbar button,
-.rk-btn {
-    min-width: 24px;
-    height: 24px;
-    padding: 0 4px;
+.rk-icon-btn {
+    width: 28px;
+    height: 28px;
     background: transparent;
-    border: none;
-    border-radius: 3px;
+    border: 1px solid transparent;
+    border-radius: var(--rk-radius-sm);
     cursor: pointer;
-    font-size: 11px;
-    color: #000;
-    display: flex;
+    color: var(--rk-text);
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.1s ease;
+    transition: background 0.1s, border-color 0.1s, color 0.1s;
+    padding: 0;
 }
 
-.rk-toolbar button:hover,
-.rk-btn:hover {
-    background: #eee;
-    color: #333;
+.rk-icon-btn:hover {
+    background: var(--rk-hover-bg);
+    border-color: var(--rk-border);
 }
 
-.rk-toolbar button.is-active,
-.rk-btn.is-active {
-    background: #000;
-    color: #fff;
+.rk-icon-btn:active { background: var(--rk-active-bg); }
+.rk-icon-btn:focus-visible { outline: 2px solid var(--rk-primary); outline-offset: 1px; }
+
+.rk-icon-btn.is-active {
+    background: var(--rk-primary-soft);
+    color: var(--rk-primary);
+    border-color: transparent;
 }
 
-/* Toolbar Dropdowns (Standard UI feel) */
-.rk-toolbar-menu {
-    position: relative;
-    display: flex;
-    align-items: center;
+.rk-word-editor[data-rk-theme='dark'] .rk-icon-btn.is-active {
+    background: var(--rk-active-bg);
+    color: #cbd5e1;
 }
 
-.rk-toolbar-menu-trigger {
-    height: 24px;
-    padding: 0 6px;
-    background: transparent;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 11px;
-    color: #000;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-}
+.rk-icon-btn svg { display: block; }
 
-.rk-toolbar-menu-trigger:hover {
-    background: #eee;
-}
-
-.rk-toolbar-menu-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: #fff;
-    border: 1px solid #000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 300;
-    display: none;
-    flex-direction: column;
-    min-width: 140px;
-    padding: 4px 0;
-}
-
-.rk-toolbar-menu:hover .rk-toolbar-menu-dropdown {
-    display: flex;
-}
-
-.rk-toolbar-menu-item {
-    padding: 6px 12px;
-    font-size: 12px;
-    color: #000;
-    background: transparent;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    width: 100%;
-}
-
-.rk-toolbar-menu-item:hover {
-    background: #000;
-    color: #fff;
-}
-
-.rk-menu-sep {
-    height: 1px;
-    background: #eee;
-    margin: 4px 0;
-}
-
-.rk-toolbar button:focus-visible {
-    outline: 2px solid var(--rk-primary);
-    outline-offset: 1px;
-}
-
-.rk-select,
-.rk-select-wide,
-.rk-select-medium,
-.rk-select-narrow {
-    height: 30px;
-    padding: 0 8px;
+/* ---------------- Selects ---------------- */
+.rk-select {
+    height: 28px;
+    padding: 0 24px 0 8px;
     border: 1px solid var(--rk-border);
     border-radius: var(--rk-radius-sm);
     background: var(--rk-surface);
     font-size: 13px;
     color: var(--rk-text);
     cursor: pointer;
-    font-family: var(--rk-font-ui);
-    transition: border-color 0.2s;
+    font-family: inherit;
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 14px) 12px, calc(100% - 9px) 12px;
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+    transition: border-color 0.12s;
 }
 
-.rk-select:hover {
-    border-color: var(--rk-border-strong);
-}
+.rk-select:hover { border-color: var(--rk-border-strong); }
+.rk-select:focus { outline: none; border-color: var(--rk-primary); box-shadow: 0 0 0 3px var(--rk-primary-soft); }
+.rk-select-narrow { min-width: 64px; }
+.rk-select-medium { min-width: 110px; }
+.rk-select-wide { min-width: 150px; }
 
-.rk-select:focus {
-    outline: none;
-    border-color: var(--rk-primary);
-}
-
-.rk-select-wide {
-    min-width: 140px;
-}
-
-.rk-select-medium {
-    min-width: 100px;
-}
-
-.rk-select-narrow {
-    min-width: 60px;
-}
-
-/* ---- Color Picker Buttons ---- */
-.rk-color-btn {
-    display: flex;
+/* ---------------- Color picker buttons (Word-style: icon + colour bar) ---------------- */
+.rk-color-pick {
+    position: relative;
+    display: inline-flex;
     align-items: center;
-    cursor: pointer;
-    min-width: 28px;
     height: 28px;
-    padding: 0 6px;
+    padding: 2px 4px;
     border: 1px solid transparent;
     border-radius: var(--rk-radius-sm);
-    font-size: 13px;
-    gap: 3px;
-    transition: background 0.1s;
-}
-
-.rk-color-btn:hover {
-    background: var(--rk-hover-bg);
-    border-color: var(--rk-border);
-}
-
-.rk-color-btn input[type="color"] {
-    width: 14px;
-    height: 14px;
-    border: none;
-    background: none;
-    padding: 0;
     cursor: pointer;
+    color: var(--rk-text);
+    transition: background 0.1s, border-color 0.1s;
 }
 
-.rk-highlight-btn span {
-    background: #ffff00;
-    padding: 0 2px;
-    border-radius: 2px;
-}
+.rk-color-pick:hover { background: var(--rk-hover-bg); border-color: var(--rk-border); }
 
-/* ---- Editor Area ---- */
-.rk-editor {
-    flex: 1;
-    overflow-y: auto;
-    padding: 40px;
-    display: flex;
+.rk-color-pick-icon {
+    position: relative;
+    display: inline-flex;
     flex-direction: column;
     align-items: center;
-    background: var(--rk-bg);
+    line-height: 0;
 }
 
+.rk-color-pick-bar {
+    display: block;
+    width: 16px;
+    height: 3px;
+    margin-top: 1px;
+    border-radius: 1px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.rk-color-pick .rk-color-input {
+    /* Hide the native color picker but keep it functional and clickable.
+       It overlays the entire button so clicking anywhere opens the picker. */
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+/* ---------------- Page surface (ProseMirror) ----------------
+   Single continuous white canvas with shadow. Page boundaries are drawn as
+   subtle horizontal lines via a repeating background gradient — no separate
+   page sheets, no DOM measurements, no flicker, no content falling into gaps.
+   Content always lives inside the white canvas; the Pagination extension
+   inserts spacers so blocks that would cross a boundary start fresh on the
+   next page instead. */
 .ProseMirror {
-    background-color: white !important;
-    width: 210mm;
-    min-height: 297mm;
-    padding: 1in !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+    position: relative;
+    z-index: 1;
+    color: #111;
+    width: var(--rk-page-width);
+    min-height: var(--rk-page-height);
+    padding: var(--rk-page-margin-top) var(--rk-page-margin-right) var(--rk-page-margin-bottom) var(--rk-page-margin-left);
     border-radius: 2px;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 12pt;
-    line-height: 1.6;
-    color: #000;
-    outline: none !important;
+    font-family: var(--rk-font-doc);
+    font-size: 11pt;
+    line-height: 1.5;
+    outline: none;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
+    background-color: #ffffff;
+    /* Page boundary lines — subtle dashed rule every page-content height,
+       drawn with `background-attachment: local` so they scroll with content
+       and align to the editor's own coordinate system. */
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(var(--rk-page-content-height, 245mm) + var(--rk-page-margin-top) + var(--rk-page-margin-bottom) - 2px),
+        rgba(15, 23, 42, 0.10) calc(var(--rk-page-content-height, 245mm) + var(--rk-page-margin-top) + var(--rk-page-margin-bottom) - 2px),
+        rgba(15, 23, 42, 0.10) calc(var(--rk-page-content-height, 245mm) + var(--rk-page-margin-top) + var(--rk-page-margin-bottom))
+    );
+    background-attachment: local;
+    box-shadow: var(--rk-shadow-md);
 }
 
-.ProseMirror>*+* {
-    margin-top: 0.5em;
+.rk-word-editor[data-rk-theme='dark'] .ProseMirror {
+    color: #e5e7eb;
+    background-color: #1f2937;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(var(--rk-page-content-height, 245mm) + var(--rk-page-margin-top) + var(--rk-page-margin-bottom) - 2px),
+        rgba(255, 255, 255, 0.12) calc(var(--rk-page-content-height, 245mm) + var(--rk-page-margin-top) + var(--rk-page-margin-bottom) - 2px),
+        rgba(255, 255, 255, 0.12) calc(var(--rk-page-content-height, 245mm) + var(--rk-page-margin-top) + var(--rk-page-margin-bottom))
+    );
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
 }
 
-.ProseMirror p {
-    margin: 0 0 0.5em;
-    widows: 3;
-    orphans: 3;
-}
+.ProseMirror p { margin: 0 0 0.6em; }
 
-.ProseMirror h1,
-.ProseMirror h2,
-.ProseMirror h3,
-.ProseMirror h4,
-.ProseMirror h5,
-.ProseMirror h6 {
+/* Tiptap placeholder — only shown when the *entire editor* is empty. The
+   `is-editor-empty` class is added by the Placeholder extension to the root
+   ProseMirror element when the document has no content; we scope the rule to
+   the first empty child only so users don't see the hint on every new line. */
+.ProseMirror.is-editor-empty > .is-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--rk-text-muted, #94a3b8);
+    pointer-events: none;
+    height: 0;
+    font-style: italic;
+}
+.ProseMirror p:last-child { margin-bottom: 0; }
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3,
+.ProseMirror h4, .ProseMirror h5, .ProseMirror h6 {
     font-family: var(--rk-font-ui);
     font-weight: 700;
-    line-height: 1.2;
-    margin: 1.2em 0 0.4em;
+    line-height: 1.25;
+    margin: 1em 0 0.4em;
     break-after: avoid;
     page-break-after: avoid;
+    color: inherit;
+}
+.ProseMirror h1 { font-size: 22pt; font-weight: 700; }
+.ProseMirror h2 { font-size: 18pt; font-weight: 700; }
+.ProseMirror h3 { font-size: 14pt; font-weight: 700; }
+.ProseMirror h4 { font-size: 12pt; font-weight: 700; }
+.ProseMirror h5 { font-size: 11pt; font-weight: 700; }
+.ProseMirror h6 { font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Title / Subtitle (Word- / Google-Docs-style top-of-document styles). */
+.ProseMirror .rk-title {
+    font-family: var(--rk-font-ui);
+    font-size: 32pt;
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0 0 0.2em;
+    color: inherit;
+    letter-spacing: -0.01em;
+}
+.ProseMirror .rk-subtitle {
+    font-family: var(--rk-font-ui);
+    font-size: 16pt;
+    font-weight: 400;
+    line-height: 1.3;
+    margin: 0 0 1.2em;
+    color: var(--rk-text-muted, #64748b);
+    font-style: italic;
 }
 
-.ProseMirror h1 {
-    font-size: 2em;
+.ProseMirror a, .ProseMirror .rk-link { color: var(--rk-primary); text-decoration: underline; cursor: pointer; }
+
+.ProseMirror blockquote {
+    border-left: 3px solid var(--rk-border-strong);
+    padding-left: 1em;
+    margin: 1em 0;
+    color: var(--rk-text-muted);
+    font-style: italic;
 }
 
-.ProseMirror h2 {
-    font-size: 1.6em;
+.ProseMirror pre, .ProseMirror .rk-code-block {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: var(--rk-radius);
+    padding: 0.8em 1em;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.92em;
+    overflow-x: auto;
+    page-break-inside: avoid;
 }
 
-.ProseMirror h3 {
-    font-size: 1.3em;
+.ProseMirror code {
+    background: rgba(15, 23, 42, 0.06);
+    border: 1px solid var(--rk-border);
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.92em;
 }
 
-.ProseMirror h4 {
-    font-size: 1.1em;
-}
-
-/* ---- Tables ---- */
+/* ---- Tables ----
+   `table-layout: fixed` lets Tiptap's column-resize plugin honour the per-cell
+   `colwidth` attribute and prevents long words from blowing out the page width. */
 .ProseMirror table {
     border-collapse: collapse;
-    width: 100%;
     margin: 1em 0;
-    font-size: 10pt;
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.95em;
+    overflow: hidden;
 }
 
-.ProseMirror td,
-.ProseMirror th {
-    border: 1px solid #c0c0c0;
+.ProseMirror table td,
+.ProseMirror table th {
+    border: 1px solid #c7c7c7;
     padding: 6px 10px;
     min-width: 60px;
     vertical-align: top;
-    position: relative;
+    position: relative;          /* required for the resize handle to position */
+    box-sizing: border-box;
+    /* Wrap any long content so cells don't overflow the page width. */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
 }
 
-.ProseMirror th {
-    background: #f3f4f6;
+.ProseMirror table p { margin: 0; }
+
+.ProseMirror table th {
+    /* Theme-aware so dark mode keeps the header readable. */
+    background: var(--rk-table-header-bg, #f3f4f6);
+    color: var(--rk-table-header-text, inherit);
     font-weight: 700;
     text-align: left;
 }
 
-.ProseMirror .selectedCell:after {
-    z-index: 2;
-    position: absolute;
-    content: '';
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background: rgba(26, 115, 232, 0.12);
-    pointer-events: none;
+.rk-word-editor[data-rk-theme='dark'] .ProseMirror table th {
+    background: #283549;
+    color: #f1f5f9;
+}
+.rk-word-editor[data-rk-theme='dark'] .ProseMirror table td,
+.rk-word-editor[data-rk-theme='dark'] .ProseMirror table th {
+    border-color: #475569;
 }
 
-.column-resize-handle {
+/* Cell selection overlay */
+.ProseMirror .selectedCell:after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(37, 99, 235, 0.12);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Tiptap's column-resize handle (sits on the right edge of every cell). */
+.ProseMirror .column-resize-handle {
     position: absolute;
     right: -2px;
     top: 0;
-    bottom: 0;
+    bottom: -2px;
     width: 4px;
-    background-color: var(--rk-primary);
+    background: var(--rk-primary);
     pointer-events: none;
+    z-index: 20;
 }
 
-/* ---- Lists ---- */
-.ProseMirror ul {
-    list-style-type: disc;
+/* Make the resize cursor visible when hovering near the column edge. */
+.ProseMirror.resize-cursor {
+    cursor: col-resize;
 }
 
-.ProseMirror ol {
-    list-style-type: decimal;
-}
-
-.ProseMirror ul,
-.ProseMirror ol {
-    padding-left: 1.5em;
-    margin: 0.5em 0;
-}
-
-.ProseMirror ul[data-type="taskList"] {
-    list-style: none;
-    padding-left: 0.5em;
-}
-
-.ProseMirror ul[data-type="taskList"] li {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-}
-
-.ProseMirror ul[data-type="taskList"] li>label {
-    margin-top: 2px;
-    flex-shrink: 0;
-}
-
-/* ---- Blockquote / Code ---- */
-.ProseMirror blockquote {
-    border-left: 4px solid var(--rk-border-strong);
-    padding-left: 1em;
-    margin: 1em 0;
-    color: #555;
-    font-style: italic;
-}
-
-.ProseMirror pre {
-    background: #1e1e2e;
-    color: #cdd6f4;
-    border-radius: var(--rk-radius);
-    padding: 1em;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
+/* Wrap the table in a horizontally-scrolling container if the editor is
+   narrower than the table — keeps things tidy on small screens. */
+.ProseMirror .tableWrapper {
     overflow-x: auto;
+    margin: 1em 0;
 }
 
-.ProseMirror code {
-    background: #f0f2f5;
-    border: 1px solid var(--rk-border);
-    border-radius: var(--rk-radius-sm);
-    padding: 1px 4px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
-}
+.ProseMirror ul, .ProseMirror ol { padding-left: 1.5em; margin: 0.5em 0; }
+.ProseMirror ul { list-style: disc; }
+.ProseMirror ol { list-style: decimal; }
+.ProseMirror ul[data-type='taskList'] { list-style: none; padding-left: 0.5em; }
+.ProseMirror ul[data-type='taskList'] li { display: flex; align-items: flex-start; gap: 0.5em; }
+.ProseMirror ul[data-type='taskList'] li > label { margin-top: 2px; flex-shrink: 0; }
+.ProseMirror ul[data-type='taskList'] li > div { flex: 1; }
+.ProseMirror ul[data-type='taskList'] li > div > p { margin: 0; }
 
-/* ---- Page Break ---- */
-.rk-page-break {
-    display: block;
-    break-after: page;
-    page-break-after: always;
-    border-top: 2px dashed #c8ccd0;
-    margin: 16px 0;
-}
-
-/* ---- Image ---- */
-.rk-image {
+.ProseMirror img, .ProseMirror .rk-image {
     max-width: 100%;
     height: auto;
-    cursor: default;
-}
-
-/* ---- Image Resize Wrapper ---- */
-.rk-image-resize-wrapper {
-    display: inline-block;
-    position: relative;
-    line-height: 0;
-}
-
-.rk-image-resize-wrapper.is-selected img {
-    outline: 2px solid var(--rk-primary);
-    outline-offset: 2px;
-}
-
-.rk-resize-handle {
-    display: none;
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: var(--rk-primary);
-    border: 2px solid white;
-    border-radius: 50%;
-    z-index: 10;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.rk-image-resize-wrapper.is-selected .rk-resize-handle {
     display: block;
+    margin: 0.6em 0;
 }
 
-/* Handle positions */
-.rk-resize-handle-nw {
-    top: -5px;
-    left: -5px;
-    cursor: nw-resize;
-}
-
-.rk-resize-handle-n {
-    top: -5px;
-    left: calc(50% - 5px);
-    cursor: n-resize;
-}
-
-.rk-resize-handle-ne {
-    top: -5px;
-    right: -5px;
-    cursor: ne-resize;
-}
-
-.rk-resize-handle-e {
-    top: calc(50% - 5px);
-    right: -5px;
-    cursor: e-resize;
-}
-
-.rk-resize-handle-se {
-    bottom: -5px;
-    right: -5px;
-    cursor: se-resize;
-}
-
-.rk-resize-handle-s {
-    bottom: -5px;
-    left: calc(50% - 5px);
-    cursor: s-resize;
-}
-
-.rk-resize-handle-sw {
-    bottom: -5px;
-    left: -5px;
-    cursor: sw-resize;
-}
-
-.rk-resize-handle-w {
-    top: calc(50% - 5px);
-    left: -5px;
-    cursor: w-resize;
-}
-
-.rk-image-resize-wrapper.is-resizing {
-    cursor: move;
-}
-
-/* ---- Drag Handle ---- */
-.rk-drag-handle {
-    position: fixed;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border: 1px solid var(--rk-border);
-    border-radius: var(--rk-radius-sm);
-    cursor: grab;
-    color: var(--rk-text-muted);
-    font-size: 13px;
-    z-index: 100;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    user-select: none;
-}
-
-.rk-drag-handle:active {
-    cursor: grabbing;
-}
-
-/* ---- Format Painter cursor ---- */
-.rk-format-paint-mode,
-.rk-format-paint-mode * {
-    cursor: crosshair !important;
-}
-
-/* ---- Phase 6 - List Styles ---- */
-.ProseMirror ol[data-list-style] {
-    list-style-type: attr(data-list-style);
-}
-
-/* ---- Phase 7 - Captions & Math ---- */
-.rk-caption {
-    display: block;
+.ProseMirror figcaption, .ProseMirror .rk-caption {
     text-align: center;
+    color: var(--rk-text-muted);
     font-size: 0.875em;
-    color: #555;
     margin-top: 6px;
     margin-bottom: 12px;
     font-style: italic;
 }
 
-.rk-math-inline {
-    font-family: 'Courier New', monospace;
-    background: #f0f4ff;
-    border: 1px solid #d0d8ff;
-    border-radius: 3px;
-    padding: 1px 4px;
-    font-size: 0.95em;
-    color: #1a3c8f;
-}
-
-.rk-math-block {
+/* Hard page-break node — invisible in the editor (the spacer below pushes
+   content to the next page sheet). Still page-breaks when printed. */
+.ProseMirror .rk-page-break {
     display: block;
-    font-family: 'Courier New', monospace;
-    background: #f0f4ff;
-    border: 1px solid #d0d8ff;
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin: 16px 0;
-    font-size: 1.05em;
-    color: #1a3c8f;
-    text-align: center;
-    white-space: pre;
-}
-
-/* ---- Phase 8 - Citations & Bibliography ---- */
-.rk-citation {
-    font-style: normal;
-    color: var(--rk-primary);
-    cursor: pointer;
-    font-size: 0.9em;
-    vertical-align: super;
-    font-weight: 600;
-}
-
-.rk-bibliography p {
-    margin-bottom: 0.5em;
-    font-size: 0.9em;
-    color: #444;
-    padding-left: 1.5em;
-    text-indent: -1.5em;
-}
-
-/* ---- Table of Contents Refinements (Update 3.1) ---- */
-.rk-toc-item {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 4px;
-    text-decoration: none;
-    color: var(--rk-text);
-}
-
-.rk-toc-text {
-    flex-shrink: 0;
-}
-
-.rk-toc-filler {
-    flex-grow: 1;
-    border-bottom: 1px dotted var(--rk-border-strong);
-    height: 12px;
-}
-
-.rk-toc-page {
-    flex-shrink: 0;
-    font-weight: 500;
-}
-
-/* ---- Nepali Numbering System (Update 3.1) ---- */
-@counter-style nepali {
-    system: numeric;
-    symbols: '०' '१' '२' '३' '४' '५' '६' '७' '८' '९';
-}
-
-.rk-list-nepali {
-    list-style-type: none !important;
-    counter-reset: nepali-counter;
-}
-
-.rk-list-nepali li {
-    counter-increment: nepali-counter;
-    display: flex;
-    align-items: flex-start;
-}
-
-.rk-list-nepali li::before {
-    content: counter(nepali-counter, nepali) ". ";
-    margin-right: 8px;
-    font-family: inherit;
-    min-width: 1.5em;
-}
-
-/* Print styles consolidated at bottom */
-
-.rk-numbered-headings.rk-nepali-headings h1 {
-    counter-reset: h2;
-}
-
-.rk-numbered-headings.rk-nepali-headings h1::before {
-    counter-increment: h1;
-    content: counter(h1, nepali) ". ";
-}
-
-.rk-numbered-headings.rk-nepali-headings h2::before {
-    counter-increment: h2;
-    content: counter(h1, nepali) "." counter(h2, nepali) " ";
-}
-
-/* ---- Track Changes ---- */
-[data-change="insert"] {
-    background: rgba(0, 180, 0, 0.12);
-    text-decoration: underline;
-    text-decoration-color: #00a000;
-    border-radius: 2px;
-}
-
-[data-change="delete"] {
-    background: rgba(220, 0, 0, 0.1);
-    text-decoration: line-through;
-    text-decoration-color: #cc0000;
-    color: #cc0000;
-}
-
-/* ---- Phase 10 - Slash Command Palette ---- */
-.rk-slash-menu {
-    position: absolute;
-    background: white;
-    border: 1px solid var(--rk-border);
-    border-radius: var(--rk-radius);
-    box-shadow: var(--rk-menu-shadow);
-    min-width: 240px;
-    max-height: 360px;
-    overflow-y: auto;
-    z-index: 9999;
-}
-
-.rk-slash-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 14px;
-    cursor: pointer;
-    transition: background 0.15s;
-}
-
-.rk-slash-menu-item:hover,
-.rk-slash-menu-item.is-selected {
-    background: var(--rk-hover-bg);
-}
-
-.rk-slash-menu-item-icon {
-    font-size: 1.1em;
-    width: 28px;
-    text-align: center;
-    flex-shrink: 0;
-    background: #f0f2f5;
-    border-radius: 4px;
-    padding: 3px 0;
-}
-
-.rk-slash-menu-item-body {
-    display: flex;
-    flex-direction: column;
-}
-
-.rk-slash-menu-item-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--rk-text);
-}
-
-.rk-slash-menu-item-desc {
-    font-size: 0.75rem;
-    color: var(--rk-text-muted);
-}
-
-/* ---- Command Palette Overlay ---- */
-.rk-cmd-palette {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 9999;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 80px;
-}
-
-.rk-cmd-palette-inner {
-    background: white;
-    border-radius: var(--rk-radius);
-    box-shadow: var(--rk-menu-shadow);
-    width: 560px;
-    max-width: 95vw;
-    overflow: hidden;
-}
-
-#rk-cmd-query {
-    width: 100%;
-    padding: 14px 18px;
-    border: none;
-    border-bottom: 1px solid var(--rk-border);
-    font-size: 15px;
-    font-family: var(--rk-font-ui);
-    color: var(--rk-text);
-    outline: none;
-    background: white;
-}
-
-#rk-cmd-query::placeholder {
-    color: var(--rk-text-muted);
-}
-
-.rk-cmd-palette-results {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 4px;
-}
-
-.rk-cmd-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    border-radius: var(--rk-radius-sm);
-    cursor: pointer;
-    gap: 8px;
-    transition: background 0.1s;
-}
-
-.rk-cmd-item:hover {
-    background: var(--rk-hover-bg);
-}
-
-.rk-cmd-item-label {
-    font-size: 14px;
-    color: var(--rk-text);
-    flex: 1;
-}
-
-.rk-cmd-item-shortcut {
-    font-size: 11px;
-    color: var(--rk-text-muted);
-    background: var(--rk-hover-bg);
-    border: 1px solid var(--rk-border);
-    border-radius: 3px;
-    padding: 1px 5px;
-    white-space: nowrap;
-    font-family: monospace;
-}
-
-.rk-cmd-empty {
-    padding: 20px;
-    text-align: center;
-    color: var(--rk-text-muted);
-    font-size: 14px;
-}
-
-/* Print styles consolidated at bottom */
-
-/* ==================================================
-   MODAL SYSTEM (Update 3.0)
-   ================================================== */
-.rk-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rk-modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.rk-modal-content {
-    background: var(--rk-surface);
-    width: 100%;
-    max-width: 400px;
-    border-radius: var(--rk-radius);
-    box-shadow: var(--rk-menu-shadow);
-    transform: translateY(20px);
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-}
-
-.rk-modal-overlay.active .rk-modal-content {
-    transform: translateY(0);
-}
-
-.rk-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--rk-border);
-    background: var(--rk-hover-bg);
-}
-
-.rk-modal-header h3 {
+    height: 0;
     margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.rk-modal-close {
-    background: none;
     border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: var(--rk-text-muted);
+    page-break-after: always;
+    break-after: page;
 }
 
-.rk-modal-body {
-    padding: 16px;
-}
-
-.rk-modal-field {
-    margin-bottom: 12px;
-}
-
-.rk-modal-field label {
+/* Spacer decorations inserted by the Pagination extension. They consume the
+   remaining space on the current page so the next block of text starts at the
+   top of the next page (defined by the dashed page-boundary background line). */
+.ProseMirror .rk-page-spacer {
     display: block;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 4px;
-    color: var(--rk-text-muted);
-}
-
-.rk-modal-field input,
-.rk-modal-field select {
     width: 100%;
-    padding: 8px;
-    border: 1px solid var(--rk-border);
-    border-radius: var(--rk-radius-sm);
+    pointer-events: none;
+    user-select: none;
+}
+
+/* A subtle "↩ next page" hint after a hard page-break, centred on the spacer. */
+.ProseMirror .rk-page-spacer-hard {
+    position: relative;
+}
+.ProseMirror .rk-page-spacer-hard::after {
+    content: 'Page break';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--rk-bg, #f3f4f6);
+    color: var(--rk-text-muted, #94a3b8);
+    font-size: 9px;
     font-family: var(--rk-font-ui);
-    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 10px;
+    border: 1px dashed var(--rk-border, #e2e8f0);
+    border-radius: 999px;
+    white-space: nowrap;
+    opacity: 0.6;
 }
 
-.rk-modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    padding: 12px 16px;
-    background: var(--rk-hover-bg);
-    border-top: 1px solid var(--rk-border);
+@media print {
+    .ProseMirror .rk-page-spacer { display: none !important; }
+    .ProseMirror { background-image: none !important; box-shadow: none !important; }
 }
 
-/* ==================================================
-   HEADING NUMBERING (Update 3.0)
-   ================================================== */
-.rk-numbered-headings {
-    counter-reset: h1;
-}
-
-.rk-numbered-headings h1 {
-    counter-reset: h2;
-}
-
-.rk-numbered-headings h2 {
-    counter-reset: h3;
-}
-
-.rk-numbered-headings h3 {
-    counter-reset: h4;
-}
-
-.rk-numbered-headings h1::before {
-    counter-increment: h1;
-    content: counter(h1) ". ";
-}
-
-.rk-numbered-headings h2::before {
-    counter-increment: h2;
-    content: counter(h1) "." counter(h2) " ";
-}
-
-.rk-numbered-headings h3::before {
-    counter-increment: h3;
-    content: counter(h1) "." counter(h2) "." counter(h3) " ";
-}
-
-.rk-btn-primary {
-    background: var(--rk-primary);
-    color: white;
-    border-radius: var(--rk-radius-sm);
-    padding: 8px 16px;
-    cursor: pointer;
-    border: none;
-}
-
-.rk-btn-secondary {
-    background: white;
-    border: 1px solid var(--rk-border);
-    color: var(--rk-text);
-    border-radius: var(--rk-radius-sm);
-    padding: 8px 16px;
-    cursor: pointer;
-}
-
-/* ---- Image Resize Handles ---- */
+/* ---- Image Resize ---- */
 .rk-image-resize-wrapper {
     position: relative;
     display: inline-block;
-    transition: box-shadow 0.2s;
-    margin: 5px;
-    min-width: 50px;
-    min-height: 50px;
-    vertical-align: middle;
-}
-
-.rk-image-resize-wrapper.is-selected {
-    outline: 2px solid #0078d4;
-    box-shadow: 0 0 10px rgba(0, 120, 212, 0.3);
-}
-
-.rk-image-resize-wrapper .rk-resize-handle {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: #0078d4;
-    border: 1px solid white;
-    z-index: 100;
-    display: none;
-}
-
-.rk-image-resize-wrapper.is-selected .rk-resize-handle {
-    display: block;
-}
-
-.rk-resize-handle-nw {
-    top: -5px;
-    left: -5px;
-    cursor: nw-resize;
-}
-
-.rk-resize-handle-n {
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    cursor: n-resize;
-}
-
-.rk-resize-handle-ne {
-    top: -5px;
-    right: -5px;
-    cursor: ne-resize;
-}
-
-.rk-resize-handle-e {
-    top: 50%;
-    right: -5px;
-    transform: translateY(-50%);
-    cursor: e-resize;
-}
-
-.rk-resize-handle-se {
-    bottom: -5px;
-    right: -5px;
-    cursor: se-resize;
-}
-
-.rk-resize-handle-s {
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    cursor: s-resize;
-}
-
-.rk-resize-handle-sw {
-    bottom: -5px;
-    left: -5px;
-    cursor: sw-resize;
-}
-
-.rk-resize-handle-w {
-    top: 50%;
-    left: -5px;
-    transform: translateY(-50%);
-    cursor: w-resize;
-}
-
-.rk-image-resize-wrapper.is-resizing img {
-    opacity: 0.8;
-}
-
-/* ---- Image Resize Wrapper Stability ---- */
-.rk-image-resize-wrapper {
-    display: inline-block !important;
-    position: relative;
     line-height: 0;
     max-width: 100%;
+    margin: 4px 0;
 }
 
 .rk-image-resize-wrapper img {
@@ -1189,279 +613,1182 @@
     display: block;
 }
 
-.rk-image {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 10px auto;
+.rk-image-resize-wrapper.is-selected {
+    outline: 2px solid var(--rk-primary);
+    outline-offset: 2px;
 }
 
-/* ---- Nepali Numbering System ---- */
-.rk-list-nepali {
-    list-style: none !important;
-    counter-reset: rk-counter;
-    padding-left: 2.5rem;
-}
-
-.rk-list-nepali li {
-    position: relative;
-    counter-increment: rk-counter;
-}
-
-.rk-list-nepali li::before {
-    content: counter(rk-counter, devanagari) ". ";
+.rk-resize-handle {
     position: absolute;
-    left: -2rem;
-    width: 1.8rem;
+    width: 10px;
+    height: 10px;
+    background: var(--rk-primary);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+    display: none;
+}
+
+.rk-image-resize-wrapper.is-selected .rk-resize-handle { display: block; }
+.rk-resize-handle-nw { top: -5px; left: -5px; cursor: nw-resize; }
+.rk-resize-handle-n { top: -5px; left: calc(50% - 5px); cursor: n-resize; }
+.rk-resize-handle-ne { top: -5px; right: -5px; cursor: ne-resize; }
+.rk-resize-handle-e { top: calc(50% - 5px); right: -5px; cursor: e-resize; }
+.rk-resize-handle-se { bottom: -5px; right: -5px; cursor: se-resize; }
+.rk-resize-handle-s { bottom: -5px; left: calc(50% - 5px); cursor: s-resize; }
+.rk-resize-handle-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+.rk-resize-handle-w { top: calc(50% - 5px); left: -5px; cursor: w-resize; }
+
+/* ---- Drag handle ---- */
+.rk-drag-handle {
+    position: fixed;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: var(--rk-surface);
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    cursor: grab;
+    color: var(--rk-text-muted);
+    font-size: 16px;
+    z-index: 100;
+    box-shadow: var(--rk-shadow-sm);
+    user-select: none;
+}
+
+.rk-drag-handle:active { cursor: grabbing; }
+
+/* ---- Format painter cursor ---- */
+.rk-format-paint-mode,
+.rk-format-paint-mode * { cursor: crosshair !important; }
+
+/* ---- Nepali numbering ---- */
+@counter-style nepali {
+    system: numeric;
+    symbols: '०' '१' '२' '३' '४' '५' '६' '७' '८' '९';
+    suffix: '. ';
+}
+
+.ProseMirror ol[data-list-style='nepali'] {
+    list-style: none;
+    counter-reset: rk-nepali;
+}
+
+.ProseMirror ol[data-list-style='nepali'] > li {
+    counter-increment: rk-nepali;
+    position: relative;
+    padding-left: 0.4em;
+}
+
+.ProseMirror ol[data-list-style='nepali'] > li::before {
+    content: counter(rk-nepali, nepali);
+    position: absolute;
+    left: -1.6em;
+    width: 1.4em;
     text-align: right;
+    color: var(--rk-primary);
+    font-weight: 600;
+}
+
+/* ---- Slash menu ---- */
+.rk-slash-menu {
+    position: absolute;
+    background: var(--rk-surface);
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-shadow-md);
+    min-width: 240px;
+    max-height: 360px;
+    overflow-y: auto;
+    z-index: 9999;
+}
+.rk-slash-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+.rk-slash-menu-item:hover, .rk-slash-menu-item.is-selected { background: var(--rk-hover-bg); }
+.rk-slash-menu-item-icon {
+    font-size: 1.1em;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    background: var(--rk-surface-2);
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.rk-slash-menu-item-title { font-size: 0.9em; font-weight: 600; }
+.rk-slash-menu-item-desc { font-size: 0.75em; color: var(--rk-text-muted); }
+
+/* ---- Find & replace bar (floating, draggable) ---- */
+.rk-find-bar {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    width: 360px;
+    background: var(--rk-surface);
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-shadow-lg);
+    z-index: 50;
+    overflow: hidden;
+    user-select: none;
+}
+
+.rk-find-bar.is-dragging { cursor: grabbing; }
+
+.rk-find-handle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px 6px 12px;
+    background: var(--rk-surface-2);
+    border-bottom: 1px solid var(--rk-border);
+    cursor: grab;
+}
+.rk-find-handle:active { cursor: grabbing; }
+
+.rk-find-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--rk-text);
+}
+
+.rk-find-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+}
+.rk-find-row + .rk-find-row { padding-top: 0; }
+
+.rk-find-options-row {
+    padding-bottom: 6px;
+    padding-left: 38px;
+}
+
+.rk-find-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    padding: 0 10px;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    background: var(--rk-surface);
+    transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.rk-find-input-wrap:focus-within {
+    border-color: var(--rk-primary);
+    box-shadow: 0 0 0 3px var(--rk-primary-soft);
+}
+
+.rk-find-input, .rk-find-replace-input {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    border: none;
+    background: transparent;
+    color: var(--rk-text);
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+}
+
+.rk-find-status {
+    font-size: 11px;
+    color: var(--rk-text-muted);
+    min-width: 64px;
+    text-align: center;
+    user-select: text;
+}
+
+.rk-find-opt {
+    background: transparent;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    padding: 3px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--rk-text-muted);
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.rk-find-opt:hover { background: var(--rk-hover-bg); color: var(--rk-text); }
+.rk-find-opt.is-active {
+    background: var(--rk-primary-soft);
+    color: var(--rk-primary);
+    border-color: transparent;
+}
+
+.rk-find-match {
+    background: rgba(255, 213, 0, 0.45);
+    border-radius: 2px;
+}
+.rk-find-match-current {
+    background: rgba(255, 153, 0, 0.7);
+    outline: 1px solid rgba(255, 153, 0, 0.9);
+}
+
+/* ---- Status bar ---- */
+.rk-statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 12px;
+    background: var(--rk-surface);
+    border-top: 1px solid var(--rk-border);
+    color: var(--rk-text-muted);
+    font-size: 12px;
+    flex-shrink: 0;
+}
+.rk-statusbar-left, .rk-statusbar-right { display: flex; gap: 16px; align-items: center; }
+.rk-statusbar-right { gap: 4px; }
+.rk-zoom-label { min-width: 44px; text-align: center; }
+
+/* ---- Outline (compact, hierarchical, scroll-aware, collapsible) ---- */
+.rk-outline {
+    position: relative;
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--rk-surface);
+    border-right: 1px solid var(--rk-border);
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rk-outline-collapsed {
+    width: 0 !important;
+    border-right: none !important;
+}
+
+/* Reopen tab — only visible when the panel is collapsed. */
+.rk-outline-reopen {
+    display: none;
+    position: absolute;
+    top: 16px;
+    left: 0;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px 0 12px;
+    background: var(--rk-surface);
+    color: var(--rk-text);
+    border: 1px solid var(--rk-border);
+    border-left: none;
+    border-radius: 0 999px 999px 0;
+    box-shadow: var(--rk-shadow-sm);
+    cursor: pointer;
+    font-family: var(--rk-font-ui);
+    font-size: 12px;
     font-weight: 500;
+    transition: background 0.12s, color 0.12s, transform 0.12s;
+    z-index: 5;
+}
+.rk-outline-reopen:hover {
+    background: var(--rk-primary-soft);
+    color: var(--rk-primary);
+    transform: translateX(2px);
+}
+.rk-outline-collapsed > .rk-outline-reopen { display: inline-flex; }
+.rk-outline-collapsed > .rk-outline-header,
+.rk-outline-collapsed > .rk-outline-list { display: none; }
+.rk-outline-reopen-label { display: inline; }
+
+.rk-outline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px 8px 14px;
+    border-bottom: 1px solid var(--rk-border);
+    background: var(--rk-surface);
+    flex-shrink: 0;
+    gap: 6px;
+}
+
+.rk-outline-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--rk-text);
+}
+.rk-outline-title svg { color: var(--rk-text-muted); }
+
+.rk-outline-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px;
+    font-size: 13px;
+    color: var(--rk-text);
+}
+
+.rk-outline-empty {
+    color: var(--rk-text-muted);
+    font-size: 12px;
+    padding: 16px 12px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.rk-outline-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 3px 6px;
+    border-radius: var(--rk-radius-sm);
+    cursor: pointer;
+    color: var(--rk-text);
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.35;
+    transition: background 0.1s, color 0.1s;
+}
+.rk-outline-item:hover {
+    background: var(--rk-hover-bg);
+    color: var(--rk-primary);
+}
+.rk-outline-marker {
+    flex-shrink: 0;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--rk-text-muted);
+    background: var(--rk-surface-2);
+    padding: 1px 4px;
+    border-radius: 3px;
+    min-width: 18px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+}
+.rk-outline-text {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rk-outline-l1 { padding-left: 6px; font-weight: 600; font-size: 13px; }
+.rk-outline-l2 { padding-left: 18px; }
+.rk-outline-l3 { padding-left: 30px; }
+.rk-outline-l4 { padding-left: 42px; color: var(--rk-text-muted); }
+.rk-outline-l5 { padding-left: 54px; color: var(--rk-text-muted); font-size: 11px; }
+.rk-outline-l6 { padding-left: 66px; color: var(--rk-text-muted); font-size: 11px; }
+
+/* ---- Right-side context-aware Property Panel ----
+   Elegant, collapsible side panel that swaps body content based on what's
+   selected (image, table, text box, TOC, heading, paragraph). */
+.rk-properties {
+    position: relative;
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--rk-surface);
+    border-left: 1px solid var(--rk-border);
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 13px;
+    box-shadow: -2px 0 8px -8px rgba(15, 23, 42, 0.08);
+}
+
+.rk-properties-collapsed {
+    width: 0 !important;
+    border-left: none !important;
+    box-shadow: none;
+}
+
+/* Reopen tab — only visible when the panel is collapsed. */
+.rk-properties-reopen {
+    display: none;
+    position: absolute;
+    top: 16px;
+    right: 0;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px 0 10px;
+    background: var(--rk-surface);
+    color: var(--rk-text);
+    border: 1px solid var(--rk-border);
+    border-right: none;
+    border-radius: 999px 0 0 999px;
+    box-shadow: var(--rk-shadow-sm);
+    cursor: pointer;
+    font-family: var(--rk-font-ui);
+    font-size: 12px;
+    font-weight: 500;
+    transition: background 0.12s, color 0.12s, transform 0.12s;
+    z-index: 5;
+}
+.rk-properties-reopen:hover {
+    background: var(--rk-primary-soft);
+    color: var(--rk-primary);
+    transform: translateX(-2px);
+}
+.rk-properties-collapsed > .rk-properties-reopen { display: inline-flex; }
+.rk-properties-collapsed > .rk-properties-header,
+.rk-properties-collapsed > .rk-properties-body { display: none; }
+.rk-properties-reopen-label { display: inline; }
+
+.rk-properties-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 10px 10px 14px;
+    border-bottom: 1px solid var(--rk-border);
+    background: linear-gradient(180deg, var(--rk-surface) 0%, var(--rk-surface-2) 100%);
+    flex-shrink: 0;
+    gap: 6px;
+}
+
+.rk-properties-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--rk-text);
+}
+.rk-properties-title svg { color: var(--rk-primary); }
+
+.rk-properties-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 14px;
+    color: var(--rk-text);
+}
+
+.rk-properties-empty {
+    color: var(--rk-text-muted);
+    font-size: 12px;
+    line-height: 1.55;
+    margin: 24px 8px;
+    text-align: center;
+    padding: 16px;
+    border: 1px dashed var(--rk-border);
+    border-radius: var(--rk-radius);
+    background: var(--rk-surface-2);
+}
+
+/* Card-style sections so each group stands on its own. */
+.rk-properties-section {
+    background: var(--rk-surface-2);
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius);
+    padding: 12px;
+    margin-bottom: 12px;
+}
+.rk-properties-section h4 {
+    margin: 0 0 10px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--rk-text-muted);
+}
+
+.rk-properties-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.rk-properties-row .rk-btn {
+    padding: 6px 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.rk-properties-field {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.rk-properties-field > span {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--rk-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-align: right;
+}
+.rk-properties-field input[type='text'],
+.rk-properties-field input[type='number'],
+.rk-properties-field select,
+.rk-properties-field textarea {
+    padding: 6px 8px;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    background: var(--rk-surface);
+    color: var(--rk-text);
+    font-family: inherit;
+    font-size: 12px;
+    transition: border-color 0.12s, box-shadow 0.12s;
+}
+.rk-properties-field input[type='color'] {
+    width: 100%;
+    height: 28px;
+    padding: 2px;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    background: var(--rk-surface);
+    cursor: pointer;
+}
+.rk-properties-field input:focus,
+.rk-properties-field select:focus,
+.rk-properties-field textarea:focus {
+    outline: none;
+    border-color: var(--rk-primary);
+    box-shadow: 0 0 0 3px var(--rk-primary-soft);
+}
+
+.rk-properties-hint {
+    font-size: 11px;
+    color: var(--rk-text-muted);
+    line-height: 1.5;
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    background: var(--rk-primary-soft);
+    border-left: 3px solid var(--rk-primary);
+    border-radius: var(--rk-radius-sm);
+}
+
+.rk-properties-body > .rk-btn-danger,
+.rk-properties-body > .rk-btn-primary {
+    width: 100%;
+}
+
+.rk-properties-help {
+    margin: 0 0 10px;
+    font-size: 11px;
+    color: var(--rk-text-muted);
+    line-height: 1.4;
+}
+
+/* CTA at top of TOC properties */
+.rk-properties-cta {
+    width: 100%;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+}
+
+/* Heading level chip grid (Property panel → Heading) */
+.rk-heading-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+.rk-heading-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 8px 10px;
+    background: var(--rk-surface);
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius);
+    color: var(--rk-text);
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--rk-font-ui);
+    transition: background 0.1s, border-color 0.1s, transform 0.05s;
+}
+.rk-heading-chip:hover {
+    background: var(--rk-hover-bg);
+    border-color: var(--rk-border-strong);
+}
+.rk-heading-chip.is-active {
+    background: var(--rk-primary-soft);
+    border-color: var(--rk-primary);
+    color: var(--rk-primary);
+}
+.rk-heading-chip:active { transform: scale(0.98); }
+.rk-heading-chip-num {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--rk-text-muted);
+    font-family: 'JetBrains Mono', monospace;
+}
+.rk-heading-chip.is-active .rk-heading-chip-num { color: var(--rk-primary); }
+.rk-heading-chip-preview {
+    font-weight: 700;
+    line-height: 1.1;
+    color: inherit;
+}
+
+/* Alignment row */
+.rk-align-row, .rk-lh-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    background: var(--rk-surface);
+    padding: 4px;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius);
+}
+.rk-align-btn {
+    width: auto;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: var(--rk-radius-sm);
+    color: var(--rk-text);
+    cursor: pointer;
+    font-size: 16px;
+    font-family: var(--rk-font-ui);
+    transition: background 0.1s, color 0.1s;
+}
+.rk-align-btn:hover { background: var(--rk-hover-bg); }
+.rk-align-btn.is-active {
+    background: var(--rk-primary-soft);
     color: var(--rk-primary);
 }
 
-.rk-list-nepali li p {
-    margin: 0;
+/* Pill buttons (line height etc.) */
+.rk-pill-btn {
+    background: transparent;
+    border: none;
+    border-radius: var(--rk-radius-sm);
+    color: var(--rk-text);
+    cursor: pointer;
+    padding: 6px 4px;
+    font-size: 11px;
+    font-family: inherit;
+    font-weight: 500;
+    transition: background 0.1s, color 0.1s;
+}
+.rk-pill-btn:hover { background: var(--rk-hover-bg); }
+.rk-pill-btn.is-active {
+    background: var(--rk-primary-soft);
+    color: var(--rk-primary);
+    font-weight: 600;
 }
 
-/* ---- Table of Contents Leaders ---- */
-.rk-toc-item {
-    display: flex !important;
-    align-items: baseline;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.rk-toc-item .rk-toc-leader {
-    flex-grow: 1;
-    border-bottom: 1px dotted #888;
-    margin: 0 10px;
-    min-width: 20px;
-}
-
-.rk-toc-item a,
-.rk-toc-item span {
-    white-space: nowrap;
-}
-
-.rk-toc-item .rk-toc-leader {
-    flex-grow: 1;
-    border-bottom: 2px dotted #aaa;
-    margin: 0 8px;
-    align-self: flex-end;
-    margin-bottom: 4px;
-}
-
-/* Print styles consolidated at bottom */
-
-/* ---- Modal System ---- */
-.rk-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+/* TOC level "from … to" picker */
+.rk-toc-level-row {
     display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.rk-toc-level-pill {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.rk-toc-level-pill > span {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--rk-text-muted);
+}
+.rk-toc-level-pill > select {
+    padding: 6px 8px;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    background: var(--rk-surface);
+    color: var(--rk-text);
+    font-family: inherit;
+    font-size: 12px;
+}
+.rk-toc-level-arrow {
+    color: var(--rk-text-muted);
+    font-weight: 700;
+}
+
+/* Toggle switch (TOC display options) */
+.rk-properties-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 4px;
+    font-size: 12px;
+    color: var(--rk-text);
+    cursor: pointer;
+    border-radius: var(--rk-radius-sm);
+    transition: background 0.1s;
+}
+.rk-properties-toggle:hover { background: var(--rk-hover-bg); }
+.rk-properties-toggle + .rk-properties-toggle { border-top: 1px dashed var(--rk-border); }
+.rk-switch { position: relative; display: inline-flex; align-items: center; }
+.rk-switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.rk-switch-track {
+    width: 32px;
+    height: 18px;
+    background: var(--rk-border-strong);
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.18s;
+}
+.rk-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18);
+    transition: transform 0.18s;
+}
+.rk-switch.is-on .rk-switch-track { background: var(--rk-primary); }
+.rk-switch.is-on .rk-switch-thumb { transform: translateX(14px); }
+
+/* ---- Modal ----
+   Modals are rendered at <body> level. They carry `.rk-word-editor` so the
+   CSS variables resolve, but we need to override the flex/host layout that
+   normally applies to a full editor shell. */
+.rk-word-editor.rk-modal-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex !important;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.2s ease-in-out;
+    transition: opacity 0.18s ease, visibility 0.18s ease;
     z-index: 9999;
+    padding: 16px;
+    backdrop-filter: blur(2px);
+    /* Reset the editor host defaults so the overlay is just a centred container */
+    color: var(--rk-text);
+    font-family: var(--rk-font-ui);
 }
 
-.rk-modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
+.rk-modal-overlay.active { opacity: 1; visibility: visible; }
 
 .rk-modal-content {
-    background: #fff;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    transform: translateY(20px);
-    transition: transform 0.2s ease-out;
-    padding: 20px;
-    color: #333;
+    background: var(--rk-surface);
+    color: var(--rk-text);
+    width: 100%;
+    max-width: 440px;
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-shadow-lg);
+    transform: translateY(12px);
+    transition: transform 0.18s ease;
+    overflow: hidden;
+    border: 1px solid var(--rk-border);
 }
 
-.rk-modal-overlay.active .rk-modal-content {
-    transform: translateY(0);
-}
+.rk-modal-overlay.active .rk-modal-content { transform: translateY(0); }
 
 .rk-modal-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--rk-border);
+    background: var(--rk-surface-2);
 }
 
-.rk-modal-header h3 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: #666;
-}
-
+.rk-modal-header h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--rk-text); }
 .rk-modal-close {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 22px;
+    line-height: 1;
     cursor: pointer;
-    color: #666;
+    color: var(--rk-text-muted);
+    padding: 0 4px;
 }
+.rk-modal-close:hover { color: var(--rk-text); }
 
-.rk-modal-body {
-    margin-bottom: 20px;
-}
+.rk-modal-body { padding: 16px 18px; max-height: 60vh; overflow: auto; }
+.rk-modal-description { color: var(--rk-text-muted); margin-bottom: 14px; line-height: 1.5; }
 
-.rk-modal-field {
-    margin-bottom: 15px;
-}
-
+.rk-modal-field { margin-bottom: 12px; }
 .rk-modal-field label {
     display: block;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--rk-text);
 }
-
 .rk-modal-field input,
-.rk-modal-field select {
+.rk-modal-field select,
+.rk-modal-field textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #fff;
-    color: #333 !important;
+    padding: 8px 10px;
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius-sm);
+    background: var(--rk-surface);
+    color: var(--rk-text);
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+    transition: border-color 0.12s, box-shadow 0.12s;
+}
+.rk-modal-field input:focus,
+.rk-modal-field select:focus,
+.rk-modal-field textarea:focus {
+    outline: none;
+    border-color: var(--rk-primary);
+    box-shadow: 0 0 0 3px var(--rk-primary-soft);
 }
 
 .rk-modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 8px;
+    padding: 12px 18px;
+    background: var(--rk-surface-2);
+    border-top: 1px solid var(--rk-border);
 }
 
-.rk-modal-footer button {
-    padding: 8px 16px;
-    border-radius: 4px;
+.rk-btn {
+    padding: 7px 14px;
+    border-radius: var(--rk-radius-sm);
+    border: 1px solid var(--rk-border);
+    background: var(--rk-surface);
+    color: var(--rk-text);
     cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
     font-weight: 500;
-    transition: background 0.2s;
-    border: none;
+    transition: background 0.12s, border-color 0.12s;
 }
-
-.rk-btn-secondary {
-    background: #eee;
-    color: #333;
-}
-
+.rk-btn:hover { background: var(--rk-hover-bg); }
 .rk-btn-primary {
-    background: #666;
-    color: white;
+    background: var(--rk-primary);
+    color: var(--rk-primary-fg);
+    border-color: var(--rk-primary);
+}
+.rk-btn-primary:hover { background: var(--rk-primary-hover); border-color: var(--rk-primary-hover); }
+.rk-btn-danger { background: var(--rk-danger); color: #fff; border-color: var(--rk-danger); }
+
+.rk-shortcut-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.rk-shortcut-table td {
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--rk-border);
+    font-size: 13px;
+}
+.rk-shortcut-table td:last-child { text-align: right; }
+.rk-shortcut-table kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--rk-surface-2);
+    border: 1px solid var(--rk-border);
+    border-radius: 3px;
+    padding: 1px 6px;
+    color: var(--rk-text);
 }
 
-.rk-btn-primary:hover {
-    background: #555;
-}
-
-/* ---- Track Changes Styles ---- */
-.rk-track-insert {
-    color: #1a73e8;
-    background-color: rgba(26, 115, 232, 0.1);
+/* ---- Track changes ---- */
+.rk-track-insert, [data-track-insert] {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
     text-decoration: underline;
-    text-decoration-color: #1a73e8;
+    text-decoration-color: #047857;
+    border-radius: 2px;
 }
-
-.rk-track-delete {
-    color: #d32f2f;
-    background-color: rgba(211, 47, 47, 0.1);
+.rk-track-delete, [data-track-delete] {
+    background: rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
     text-decoration: line-through;
-    text-decoration-color: #d32f2f;
+    text-decoration-color: #b91c1c;
 }
 
-/* ==================================================
-   UNIFIED PRINT STYLES
-   ================================================== */
+.rk-readonly .ProseMirror { background: var(--rk-surface-2); cursor: default; }
+
+/* ---- Citations ---- */
+.rk-citation {
+    color: var(--rk-primary);
+    cursor: pointer;
+    font-size: 0.85em;
+    vertical-align: super;
+    font-weight: 600;
+}
+.rk-bibliography p {
+    font-size: 0.9em;
+    color: var(--rk-text-muted);
+    padding-left: 1.5em;
+    text-indent: -1.5em;
+}
+
+/* ---- Table of Contents (elegant, hierarchical, refreshable) ---- */
+.ProseMirror .rk-toc {
+    margin: 1.5em 0;
+    padding: 1em 1.4em;
+    border: 1px solid var(--rk-border, #e2e8f0);
+    border-radius: var(--rk-radius, 6px);
+    background: rgba(255, 255, 255, 0.6);
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.ProseMirror .rk-toc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6em;
+    padding-bottom: 0.4em;
+    border-bottom: 1px solid var(--rk-border, #e2e8f0);
+}
+
+.ProseMirror .rk-toc-title {
+    margin: 0;
+    font-size: 14pt;
+    font-weight: 700;
+    color: var(--rk-text, #0f172a);
+    font-family: var(--rk-font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.ProseMirror .rk-toc-refresh {
+    background: transparent;
+    border: 1px solid var(--rk-border, #e2e8f0);
+    color: var(--rk-text-muted, #64748b);
+    border-radius: var(--rk-radius-sm, 4px);
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: var(--rk-font-ui);
+    transition: all 0.12s;
+}
+.ProseMirror .rk-toc-refresh:hover {
+    background: var(--rk-primary-soft, #dbeafe);
+    color: var(--rk-primary, #2563eb);
+    border-color: var(--rk-primary, #2563eb);
+}
+
+.ProseMirror .rk-toc-empty {
+    color: var(--rk-text-muted, #64748b);
+    font-style: italic;
+    font-size: 0.9em;
+    margin: 0.5em 0;
+}
+
+.ProseMirror .rk-toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: rk-toc-counter;
+}
+
+.ProseMirror .rk-toc-item {
+    margin: 0.25em 0;
+}
+
+.ProseMirror .rk-toc-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6em;
+    text-decoration: none;
+    color: var(--rk-text, #0f172a);
+    padding: 2px 0;
+    cursor: pointer;
+    transition: color 0.12s;
+}
+.ProseMirror .rk-toc-link:hover { color: var(--rk-primary, #2563eb); }
+.ProseMirror .rk-toc-link:hover .rk-toc-text { text-decoration: underline; text-decoration-color: var(--rk-primary, #2563eb); }
+
+.ProseMirror .rk-toc-text {
+    flex-shrink: 0;
+    font-family: var(--rk-font-doc);
+}
+.ProseMirror .rk-toc-leader {
+    flex: 1;
+    border-bottom: 1px dotted #999;
+    height: 0.6em;
+    margin: 0 4px;
+    min-width: 16px;
+}
+.ProseMirror .rk-toc-page {
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    color: var(--rk-text-muted, #64748b);
+    font-size: 0.9em;
+    min-width: 1.5em;
+    text-align: right;
+}
+
+/* Hierarchical styling — H1 stands out, H2 normal, H3+ smaller and indented. */
+.ProseMirror .rk-toc-l1 .rk-toc-link {
+    font-weight: 700;
+    font-size: 1.08em;
+    margin-top: 0.4em;
+}
+.ProseMirror .rk-toc-l2 .rk-toc-link {
+    font-weight: 500;
+    padding-left: 1.2em;
+}
+.ProseMirror .rk-toc-l3 .rk-toc-link {
+    font-weight: 400;
+    padding-left: 2.4em;
+    font-size: 0.95em;
+    color: var(--rk-text-muted, #64748b);
+}
+.ProseMirror .rk-toc-l4 .rk-toc-link { padding-left: 3.6em; font-size: 0.9em; color: var(--rk-text-muted); }
+.ProseMirror .rk-toc-l5 .rk-toc-link { padding-left: 4.8em; font-size: 0.85em; color: var(--rk-text-muted); }
+.ProseMirror .rk-toc-l6 .rk-toc-link { padding-left: 6em;   font-size: 0.85em; color: var(--rk-text-muted); }
+
+/* ---- TextBox (floating, draggable, resizable) ---- */
+.ProseMirror .rk-textbox {
+    position: relative;
+    display: inline-block;
+    min-width: 80px;
+    min-height: 60px;
+    padding: 12px 14px;
+    margin: 0.5em 0;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-shadow-sm);
+    transition: box-shadow 0.12s, outline 0.12s;
+}
+
+.ProseMirror .rk-textbox:hover { box-shadow: var(--rk-shadow-md); }
+
+.ProseMirror .rk-textbox.is-dragging,
+.ProseMirror .rk-textbox.is-resizing {
+    outline: 2px solid var(--rk-primary);
+    box-shadow: var(--rk-shadow-lg);
+    user-select: none;
+}
+
+.ProseMirror .rk-textbox-content > p:first-child { margin-top: 0; }
+.ProseMirror .rk-textbox-content > *:last-child { margin-bottom: 0; }
+
+.ProseMirror .rk-textbox-drag {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 20px;
+    height: 20px;
+    background: var(--rk-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    font-size: 11px;
+    line-height: 1;
+    user-select: none;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transition: opacity 0.12s;
+}
+.ProseMirror .rk-textbox:hover .rk-textbox-drag,
+.ProseMirror .rk-textbox.is-dragging .rk-textbox-drag,
+.ProseMirror .rk-textbox.ProseMirror-selectednode .rk-textbox-drag { opacity: 1; }
+.ProseMirror .rk-textbox-drag:active { cursor: grabbing; }
+
+.ProseMirror .rk-textbox-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--rk-primary);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.12s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.ProseMirror .rk-textbox:hover .rk-textbox-handle,
+.ProseMirror .rk-textbox.is-resizing .rk-textbox-handle,
+.ProseMirror .rk-textbox.ProseMirror-selectednode .rk-textbox-handle { opacity: 1; }
+.ProseMirror .rk-textbox-handle-nw { top: -5px;  left: -5px;  cursor: nw-resize; }
+.ProseMirror .rk-textbox-handle-n  { top: -5px;  left: calc(50% - 5px); cursor: n-resize; }
+.ProseMirror .rk-textbox-handle-ne { top: -5px;  right: -5px; cursor: ne-resize; }
+.ProseMirror .rk-textbox-handle-e  { top: calc(50% - 5px); right: -5px; cursor: e-resize; }
+.ProseMirror .rk-textbox-handle-se { bottom: -5px; right: -5px; cursor: se-resize; }
+.ProseMirror .rk-textbox-handle-s  { bottom: -5px; left: calc(50% - 5px); cursor: s-resize; }
+.ProseMirror .rk-textbox-handle-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+.ProseMirror .rk-textbox-handle-w  { top: calc(50% - 5px); left: -5px; cursor: w-resize; }
+
+/* ---- Math ---- */
+.rk-math-inline {
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 3px;
+    padding: 1px 4px;
+}
+.rk-math-block {
+    display: block;
+    text-align: center;
+    background: rgba(37, 99, 235, 0.06);
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+}
+
+/* ==================================================================
+   Print — kept minimal because PrintEngine renders content in an
+   isolated iframe with its own CSS. These rules only matter when the
+   user prints from the host page directly.
+   ================================================================== */
 @media print {
-    @page {
-        margin: 1.5cm;
-        size: auto;
-    }
-
-    html,
-    body,
-    .rk-word-editor {
-        background: #fff !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
-
-    body {
-        counter-reset: page;
-    }
-
-    /* Hide UI elements */
-    .rk-editor-shell,
-    .rk-toolbar,
     .rk-menubar,
-    .rk-menubar-spacer,
-    .rk-wordcount-display,
-    .rk-cmd-palette,
-    .rk-drag-handle,
-    .rk-modal-overlay,
+    .rk-toolbar,
     .rk-statusbar,
-    .rk-toolbar-container {
-        display: none !important;
-    }
+    .rk-outline,
+    .rk-properties,
+    .rk-find-bar,
+    .rk-modal-overlay,
+    .rk-drag-handle,
+    .rk-page-bg { display: none !important; }
 
-    ::-webkit-scrollbar {
-        display: none !important;
-    }
-
-    .rk-editor,
-    .rk-editor-container,
-    .rk-editor-content {
-        overflow: visible !important;
+    .rk-word-editor,
+    .rk-editor-shell,
+    .rk-editor-main,
+    .rk-editor-surface-area {
+        background: #fff !important;
         padding: 0 !important;
         margin: 0 !important;
-        background: white !important;
-        border: none !important;
-        box-shadow: none !important;
         height: auto !important;
+        box-shadow: none !important;
     }
 
-    /* ProseMirror editor paper */
     .ProseMirror {
         box-shadow: none !important;
         margin: 0 !important;
-        padding: 0 !important;
+        padding: var(--rk-page-margin-top) var(--rk-page-margin-right) var(--rk-page-margin-bottom) var(--rk-page-margin-left) !important;
         width: 100% !important;
         min-height: auto !important;
-        background: white !important;
-    }
-
-    /* Ensure page breaks work */
-    .rk-page-break {
-        display: block !important;
-        border: none !important;
-        break-after: page !important;
-        page-break-after: always !important;
-        visibility: hidden;
-    }
-
-    .rk-footer {
-        position: fixed;
-        bottom: 0;
-        right: 0;
-        font-size: 10pt;
-        color: #666;
-    }
-
-    .rk-footer::after {
-        counter-increment: page;
-        content: "Page " counter(page);
     }
 }

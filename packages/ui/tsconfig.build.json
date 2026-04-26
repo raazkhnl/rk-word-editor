@@ -1,12 +1,13 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "./tsconfig.json",
     "compilerOptions": {
-        "rootDir": "./src",
-        "outDir": "./dist",
-        "noEmit": true,
+        "noEmit": false,
+        "declaration": true,
+        "declarationDir": "./dist",
+        "emitDeclarationOnly": true,
         "paths": {
             "@raazkhnl/rk-editor-core": [
-                "../core/src/index.ts"
+                "../core/dist/index.d.ts"
             ]
         }
     },

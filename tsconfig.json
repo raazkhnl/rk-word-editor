@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
-        "target": "ESNext",
+        "target": "ES2022",
         "module": "ESNext",
         "lib": [
-            "ESNext",
+            "ES2022",
             "DOM",
             "DOM.Iterable"
         ],
@@ -14,16 +14,24 @@
         "noUnusedParameters": false,
         "noFallthroughCasesInSwitch": true,
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
         "declaration": true,
-        "baseUrl": ".",
+        "useDefineForClassFields": true,
+        "forceConsistentCasingInFileNames": true,
         "paths": {
             "@rk-editor/core": [
-                "packages/core/src/index.ts"
+                "./packages/core/src/index.ts"
             ],
             "@rk-editor/ui": [
-                "packages/ui/src/index.ts"
+                "./packages/ui/src/index.ts"
+            ],
+            "@raazkhnl/rk-editor-core": [
+                "./packages/core/src/index.ts"
+            ],
+            "@raazkhnl/rk-editor-ui": [
+                "./packages/ui/src/index.ts"
             ]
         }
     }
