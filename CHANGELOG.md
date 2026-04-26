@@ -2,7 +2,7 @@
 
 All notable changes to **RK Word Editor** will be documented here. This project follows [Semantic Versioning](https://semver.org/).
 
-## [4.1.3] — 2026-04-26
+## [4.5.0] — 2026-04-26
 
 ### Fixed
 - **Table of Contents missing in PDF / Print export.** The TOC node renders its populated content via a NodeView, which `editor.getHTML()` cannot serialize, so prints were emitting an empty fallback. `printPdf()` now uses a new `getPrintableHTML()` that clones the live `.ProseMirror` DOM (so the populated TOC, image-resize wrappers, and text boxes all carry over), then strips editor-only chrome (drag handles, resize handles, pagination spacers, refresh buttons, gap cursors, `contenteditable` attrs, selected-node markers) before sending to the print iframe.

@@ -1,6 +1,6 @@
 {
     "name": "@raazkhnl/rk-editor-core",
-    "version": "4.1.3",
+    "version": "4.5.0",
     "type": "module",
     "description": "Free open-source headless rich-text Word editor for the web. Built on Tiptap & ProseMirror with first-class DOCX export, true PDF/print, page layout, find & replace, track changes, draggable text boxes, image resize, and Markdown/HTML import-export. Framework-agnostic — works with Vanilla JS, React, Vue, Svelte, Angular, Next.js.",
     "author": {

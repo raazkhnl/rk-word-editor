@@ -1,6 +1,6 @@
 {
     "name": "@raazkhnl/rk-editor-cli",
-    "version": "4.1.3",
+    "version": "4.5.0",
     "description": "CLI scaffolder for RK Word Editor — `npx @raazkhnl/rk-editor-cli init` to bootstrap a new free, open-source Word/Google-Docs-style rich-text editor project (Vanilla JS, React, Vue, Svelte, Next.js).",
     "author": {
         "name": "RaaZ Khanal",
