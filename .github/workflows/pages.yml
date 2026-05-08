@@ -9,7 +9,7 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-# A single concurrent deployment per branch.
+# A single concurrent deployment per branch
 concurrency:
   group: pages
   cancel-in-progress: true
