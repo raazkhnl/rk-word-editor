@@ -477,6 +477,9 @@
     page-break-inside: avoid;
 }
 
+/* Inline `<code>` styling — but NOT for `<code>` inside a code block, where the
+   parent `<pre>` already defines bg/colour. Without this reset the inline-code
+   rule below would force dark text onto the dark navy code-block background. */
 .ProseMirror code {
     background: var(--rk-code-inline-bg);
     color: var(--rk-code-inline-text);
@@ -485,6 +488,15 @@
     padding: 1px 4px;
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
     font-size: 0.92em;
+}
+.ProseMirror pre code,
+.ProseMirror .rk-code-block code {
+    background: transparent;
+    color: inherit;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: inherit;
 }
 
 /* ---- Tables ----
@@ -1773,23 +1785,34 @@
 .ProseMirror .rk-textbox-handle-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
 .ProseMirror .rk-textbox-handle-w  { top: calc(50% - 5px); left: -5px; cursor: w-resize; }
 
-/* ---- Math ---- */
+/* ---- Math ----
+   Explicit foreground/background so the equation is always readable, even
+   when the parent `<pre>` (rare) or some external context overrides colour. */
 .rk-math-inline {
     font-family: 'Cambria Math', 'Times New Roman', serif;
-    background: rgba(37, 99, 235, 0.08);
-    border: 1px solid rgba(37, 99, 235, 0.18);
+    background: rgba(37, 99, 235, 0.10);
+    color: var(--rk-doc-text, var(--rk-text, #0f172a));
+    border: 1px solid rgba(37, 99, 235, 0.25);
     border-radius: 3px;
     padding: 1px 4px;
 }
 .rk-math-block {
     display: block;
     text-align: center;
-    background: rgba(37, 99, 235, 0.06);
-    border: 1px solid rgba(37, 99, 235, 0.18);
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--rk-doc-text, var(--rk-text, #0f172a));
+    border: 1px solid rgba(37, 99, 235, 0.25);
     border-radius: 6px;
     padding: 12px 16px;
     margin: 16px 0;
     font-family: 'Cambria Math', 'Times New Roman', serif;
+}
+
+.rk-word-editor[data-rk-theme='dark'] .rk-math-inline,
+.rk-word-editor[data-rk-theme='dark'] .rk-math-block {
+    /* Lift the blue tint a touch so it's visible on the dark page. */
+    background: rgba(96, 165, 250, 0.16);
+    border-color: rgba(96, 165, 250, 0.35);
 }
 
 /* ==================================================================
