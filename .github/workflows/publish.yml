@@ -1,6 +1,14 @@
 # RK Word Editor — CI / npm publish
 # - Builds and tests on every push & PR.
 # - Publishes core / ui / cli to npm when a tag matching v*.*.* is pushed.
+#
+# This workflow deliberately does NOT request `id-token: write`. That
+# permission requires the repo's Settings → Actions → General → "Workflow
+# permissions" to be at least "Read and write permissions"; if it's set to
+# the default "Read repository contents and packages permissions", any
+# workflow that asks for id-token: write fails to schedule (startup_failure)
+# before any job runs. Skipping it costs only npm-provenance signing, which
+# is a nice-to-have, not a requirement.
 
 name: CI / Publish
 
@@ -40,9 +48,6 @@ jobs:
     needs: build-test
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -59,17 +64,20 @@ jobs:
       - name: Build Packages
         run: npm run build:packages
 
+      - name: Build CLI
+        run: npm run build --workspace=@raazkhnl/rk-editor-cli
+
       - name: Publish @raazkhnl/rk-editor-core
-        run: npm publish --workspace=@raazkhnl/rk-editor-core --access public --provenance
+        run: npm publish --workspace=@raazkhnl/rk-editor-core --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @raazkhnl/rk-editor-ui
-        run: npm publish --workspace=@raazkhnl/rk-editor-ui --access public --provenance
+        run: npm publish --workspace=@raazkhnl/rk-editor-ui --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @raazkhnl/rk-editor-cli
-        run: npm publish --workspace=@raazkhnl/rk-editor-cli --access public --provenance
+        run: npm publish --workspace=@raazkhnl/rk-editor-cli --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
