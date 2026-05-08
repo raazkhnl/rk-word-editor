@@ -47,23 +47,29 @@ RK Word Editor is the rich-text editor we wished existed when we needed somethin
 
 ## Highlights
 
-> **v4.0.2** — adds **draggable text boxes**, fixes outline scroll, table column resize, sub/sup icons, placeholder showing on every line, deprecated `baseUrl` + missing CSS module declaration. See [CHANGELOG](CHANGELOG.md).
+> **v4.6.0** — adds a **command palette** (`Ctrl/⌘+/`), **auto-save status pill**, **image alt-text editor**, fully **responsive layout** (mobile/tablet drawers, touch-friendly handles), **PWA-installable demo**, and a hosted demo on **GitHub Pages**. Dark-mode contrast, hard-coded colours and CLI version mismatch all cleaned up. See [CHANGELOG](CHANGELOG.md).
 
 - **DOCX export** with embedded images, hyperlinks, tables, lists (incl. Nepali numbering), task lists, headings, blockquotes, code blocks, citations and footnotes.
 - **True PDF / print** rendered in an isolated iframe — only the document prints, with proper A4 / Letter / Legal page sizes, margins and pagination.
 - **Page layout dialog** — A3, A4, A5, Letter, Legal, Tabloid; portrait/landscape; per-side margins.
 - **DOCX / Markdown / HTML / JSON / TXT import**.
 - **Find &amp; replace** with regex, whole-word and case-sensitive options.
-- **Document outline** sidebar; **read-only mode**; **dark mode**; **status bar** with zoom, page count and reading time.
+- **Document outline** sidebar; **read-only mode**; **dark mode**; **status bar** with zoom, page count, reading time, and an **auto-save indicator**.
 - **Draggable, resizable text boxes** for callouts, sidebars, pull quotes — Word-style floating frames with content inside.
-- **Slash commands** (`/heading`, `/table`, `/image`, …), **format painter**, **track changes**, **drag-and-drop image upload**, **interactive image resize handles**.
+- **Slash commands** (`/heading`, `/table`, `/image`, …), **command palette** (`Ctrl/⌘+/`), **format painter**, **track changes**, **drag-and-drop image upload**, **interactive image resize handles**, **image alt-text editor**.
+- **Responsive** — collapses outline & properties panels into overlay drawers on mobile, fits the page surface to small viewports, enlarges resize handles on touch devices, honours `prefers-reduced-motion`.
+- **PWA-installable demo** with a stale-while-revalidate service worker.
 - **Headless core** for building your own UI, plus a polished default UI shell with a unified SVG icon set.
 - **Vanilla, React, Vue, Web Component** — works anywhere; no React requirement.
 - ESM + CJS dual build. Tiny CSS, zero global pollution. Fully typed.
 
 ## Live demo
 
-Run the included demo locally:
+**🚀 Try it now → [raazkhnl.github.io/rk-word-editor](https://raazkhnl.github.io/rk-word-editor/)**
+
+The demo loads a sample document with every major feature wired up. It auto-saves to `localStorage`, supports installable PWA mode, and works offline once cached.
+
+Run it locally:
 
 ```bash
 git clone https://github.com/raazkhnl/rk-word-editor.git
@@ -73,8 +79,6 @@ npm run dev
 ```
 
 Then open `http://localhost:3000`.
-
-A hosted demo is available at https://rk-word-editor.vercel.app *(WIP)*.
 
 ## Packages
 
@@ -468,16 +472,20 @@ The **core** package is intentionally framework-free. The **UI** package consume
 
 ## Roadmap
 
-- [ ] Real-time collaboration via Y.js
-- [ ] Comments / annotations sidebar with author colours
-- [ ] Image cropping and alt-text editor
-- [ ] Spelling/grammar check (browser native + plugin)
-- [ ] Equation editor with rendering (KaTeX/MathJax)
-- [ ] Headers &amp; footers (running titles, page numbers per section)
-- [ ] Multi-section page layouts (different orientations within one document)
-- [ ] Templates gallery (letter, resume, article, invoice)
-- [ ] PWA installable demo
-- [ ] i18n bundle and a11y audit
+- [x] **Image alt-text editor** — shipped in v4.6 (right-side properties panel + image dialog).
+- [x] **PWA installable demo** — shipped in v4.6 (manifest + stale-while-revalidate service worker).
+- [x] **Responsive / mobile layout** — shipped in v4.6 (drawer panels, touch-sized handles, 4 breakpoints).
+- [x] **Command palette** — shipped in v4.6 (`Ctrl/⌘+/`).
+- [x] **Auto-save status indicator** — shipped in v4.6 (`shell.setSaveState(...)`).
+- [ ] Real-time collaboration via Y.js.
+- [ ] Comments / annotations sidebar with author colours.
+- [ ] Image cropping.
+- [ ] Spelling/grammar check (browser native + plugin).
+- [ ] Equation editor with rendering (KaTeX/MathJax).
+- [ ] Headers &amp; footers (running titles, page numbers per section).
+- [ ] Multi-section page layouts (different orientations within one document).
+- [ ] Templates gallery (letter, resume, article, invoice).
+- [ ] Full i18n bundle and external a11y audit.
 
 Want any of these sooner? Open an issue and tell us — or send a PR.
 

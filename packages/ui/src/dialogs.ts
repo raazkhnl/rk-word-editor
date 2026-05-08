@@ -42,15 +42,19 @@ function sanitizeUrl(input: string | undefined | null): string | null {
 export function showImageDialog(editor: WordEditor): void {
     new Modal({
         title: 'Insert image',
+        width: 460,
         fields: [
-            { id: 'src', label: 'Image URL', type: 'text', placeholder: 'https://...' },
-            { id: 'alt', label: 'Alt text', type: 'text', placeholder: 'Description' },
+            { id: 'src', label: 'Image URL', type: 'text', placeholder: 'https://example.com/photo.png' },
+            { id: 'alt', label: 'Alt text (for screen readers)', type: 'text', placeholder: 'Describe the image' },
+            { id: 'title', label: 'Title (tooltip on hover, optional)', type: 'text', placeholder: 'Tooltip' },
             { id: 'width', label: 'Width (e.g. 480, 60%)', type: 'text' },
         ],
         confirmLabel: 'Insert',
         onConfirm: (data) => {
-            if (!data.src) return;
-            const attrs: any = { src: data.src, alt: data.alt || '' };
+            const src = sanitizeUrl(data.src);
+            if (!src) return;
+            const attrs: any = { src, alt: data.alt || '' };
+            if (data.title) attrs.title = data.title;
             if (data.width) attrs.width = data.width;
             (editor.instance.chain().focus() as any).setImage(attrs).run();
         },
@@ -225,12 +229,14 @@ export function showShortcutsDialog(): void {
     }).show();
 }
 
+export const RK_EDITOR_VERSION = '4.6.0';
+
 export function showAboutDialog(): void {
     new Modal({
         title: 'About RK Word Editor',
         width: 480,
         bodyHtml: `<p>A free, open-source, fully customizable Word-style editor built with Tiptap and ProseMirror.</p>
-            <p><strong>Version:</strong> 4.0.0<br/>
+            <p><strong>Version:</strong> ${RK_EDITOR_VERSION}<br/>
             <strong>Author:</strong> RaaZ Khanal (@raazkhnl)<br/>
             <strong>License:</strong> MIT</p>
             <p><a href="https://github.com/raazkhnl/rk-word-editor" target="_blank" rel="noopener">View on GitHub</a></p>`,

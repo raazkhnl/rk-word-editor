@@ -130,6 +130,8 @@ export class PropertyPanel {
             });
             onInput('#prop-img-float', v => ed.format.setImageFloat(v as any));
             onInput('#prop-img-align', v => ed.format.align(v as any));
+            onInput('#prop-img-alt', v => updateImageAttr(ed, info, { alt: v }));
+            onInput('#prop-img-title', v => updateImageAttr(ed, info, { title: v }));
         }
 
         if (info.kind === 'table') {
@@ -262,15 +264,29 @@ function renderImageBody(node: any): string {
     const w = node?.attrs?.width || '';
     const h = node?.attrs?.height || '';
     const float = node?.attrs?.float || 'none';
+    const alt = node?.attrs?.alt || '';
+    const title = node?.attrs?.title || '';
     return `
-        ${field('Width', `<input id="prop-img-width" type="text" value="${escAttr(w)}" placeholder="e.g. 480 or 60%" />`)}
-        ${field('Height', `<input id="prop-img-height" type="text" value="${escAttr(h)}" placeholder="auto" />`)}
-        ${field('Wrap', selectMarkup('prop-img-float', String(float), [
-            { v: 'none', l: 'No wrap' }, { v: 'left', l: 'Wrap left' }, { v: 'right', l: 'Wrap right' },
-        ]))}
-        ${field('Align', selectMarkup('prop-img-align', '', [
-            { v: 'left', l: 'Left' }, { v: 'center', l: 'Center' }, { v: 'right', l: 'Right' },
-        ]))}
+        <div class="rk-properties-section">
+            <h4>Accessibility</h4>
+            ${field('Alt text', `<input id="prop-img-alt" type="text" value="${escAttr(alt)}" placeholder="Describe the image" />`)}
+            ${field('Title', `<input id="prop-img-title" type="text" value="${escAttr(title)}" placeholder="Optional tooltip" />`)}
+            <p class="rk-properties-help">Alt text is read by screen readers and shown if the image fails to load.</p>
+        </div>
+        <div class="rk-properties-section">
+            <h4>Size</h4>
+            ${field('Width', `<input id="prop-img-width" type="text" value="${escAttr(w)}" placeholder="e.g. 480 or 60%" />`)}
+            ${field('Height', `<input id="prop-img-height" type="text" value="${escAttr(h)}" placeholder="auto" />`)}
+        </div>
+        <div class="rk-properties-section">
+            <h4>Layout</h4>
+            ${field('Wrap', selectMarkup('prop-img-float', String(float), [
+                { v: 'none', l: 'No wrap' }, { v: 'left', l: 'Wrap left' }, { v: 'right', l: 'Wrap right' },
+            ]))}
+            ${field('Align', selectMarkup('prop-img-align', '', [
+                { v: 'left', l: 'Left' }, { v: 'center', l: 'Center' }, { v: 'right', l: 'Right' },
+            ]))}
+        </div>
         <p class="rk-properties-hint">Tip: drag the corner handles on the image to resize visually.</p>
     `;
 }
@@ -473,6 +489,12 @@ function updateTextBoxAttr(editor: WordEditor, info: SelectionInfo, attrs: Recor
 }
 
 function updateTocAttr(editor: WordEditor, info: SelectionInfo, attrs: Record<string, any>) {
+    const view = editor.instance.view;
+    const tr = editor.instance.state.tr.setNodeMarkup(info.pos, undefined, { ...info.node.attrs, ...attrs });
+    view.dispatch(tr);
+}
+
+function updateImageAttr(editor: WordEditor, info: SelectionInfo, attrs: Record<string, any>) {
     const view = editor.instance.view;
     const tr = editor.instance.state.tr.setNodeMarkup(info.pos, undefined, { ...info.node.attrs, ...attrs });
     view.dispatch(tr);

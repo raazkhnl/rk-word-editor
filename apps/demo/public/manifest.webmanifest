@@ -1,0 +1,18 @@
+{
+  "name": "RK Word Editor",
+  "short_name": "RK Editor",
+  "description": "Free, open-source rich-text Word editor for the web — DOCX, PDF, Markdown, page layout, find & replace, dark mode.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%232563eb'/%3E%3Ctext x='50%25' y='50%25' font-size='96' font-weight='700' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Inter,sans-serif'%3ERK%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -2,19 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RK Word Editor — Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>RK Word Editor — Free open-source Word/Docs alternative for the web</title>
+    <meta name="description" content="A modern, MIT-licensed, drop-in rich-text Word editor for the web. DOCX export, true PDF/print, page layout, find &amp; replace, draggable text boxes, image resize, dark mode. Built on Tiptap and ProseMirror." />
+    <meta name="theme-color" content="#2563eb" />
+    <meta property="og:title" content="RK Word Editor — Free, open-source Word editor for the web" />
+    <meta property="og:description" content="DOCX, PDF, Markdown export · page layout · track changes · dark mode · MIT license." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://raazkhnl.github.io/rk-word-editor/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Ctext x='50%25' y='50%25' font-size='18' font-weight='700' fill='white' text-anchor='middle' dominant-baseline='central' font-family='Inter,sans-serif'%3ERK%3C/text%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Calibri:wght@400;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Calibri:wght@400;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
     <style>
         html, body, #app { height: 100%; margin: 0; }
         body { font-family: 'Inter', -apple-system, sans-serif; background: #f3f4f6; }
         #app { display: flex; flex-direction: column; }
+
+        .rk-demo-resetbar {
+            position: fixed;
+            bottom: 14px;
+            left: 14px;
+            z-index: 40;
+            pointer-events: none;
+        }
+        .rk-demo-reset {
+            pointer-events: auto;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--rk-border, #e2e8f0);
+            background: var(--rk-surface, #fff);
+            color: var(--rk-text-muted, #64748b);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+            transition: background 0.12s, color 0.12s;
+        }
+        .rk-demo-reset:hover {
+            background: var(--rk-primary-soft, #dbeafe);
+            color: var(--rk-primary, #2563eb);
+        }
+
+        @media (max-width: 640px) {
+            .rk-demo-resetbar { bottom: 8px; left: 8px; }
+        }
+
+        /* Pre-mount loading splash so visitors see something immediately. */
+        .rk-demo-splash {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            background: #f3f4f6;
+            color: #2563eb;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 50;
+            transition: opacity 0.25s;
+        }
+        .rk-demo-splash.is-hidden { opacity: 0; pointer-events: none; }
+        .rk-demo-splash .spinner {
+            width: 26px; height: 26px;
+            border: 2px solid #cbd5e1;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: rk-spin 0.8s linear infinite;
+        }
+        @keyframes rk-spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+    <div id="splash" class="rk-demo-splash" aria-hidden="true">
+        <div class="spinner"></div>
+        <div>Loading RK Word Editor…</div>
+    </div>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+    <script>
+        // Hide splash once main.ts has done its initial paint.
+        const obs = new MutationObserver(() => {
+            const surface = document.querySelector('.ProseMirror');
+            if (surface) {
+                const splash = document.getElementById('splash');
+                if (splash) splash.classList.add('is-hidden');
+                obs.disconnect();
+                setTimeout(() => splash?.remove(), 350);
+            }
+        });
+        obs.observe(document.getElementById('app'), { childList: true, subtree: true });
+    </script>
 </body>
 </html>

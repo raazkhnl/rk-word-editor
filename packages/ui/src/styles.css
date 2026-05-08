@@ -28,6 +28,34 @@
     --rk-shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.18);
     --rk-radius: 6px;
     --rk-radius-sm: 4px;
+    /* Spacing scale — keep all paddings/gaps on this token set so the UI
+       reads consistently across toolbar, panels, modals, and find bar. */
+    --rk-space-1: 2px;
+    --rk-space-2: 4px;
+    --rk-space-3: 6px;
+    --rk-space-4: 8px;
+    --rk-space-5: 12px;
+    --rk-space-6: 16px;
+    --rk-space-7: 24px;
+    /* Control sizing — toolbar buttons, selects, inputs all read 28px so
+       rows align without ad-hoc heights. */
+    --rk-control-h: 28px;
+    --rk-control-h-sm: 24px;
+    /* Document surface */
+    --rk-doc-bg: #ffffff;
+    --rk-doc-text: #111111;
+    /* Tables */
+    --rk-table-border: #c7c7c7;
+    --rk-table-header-bg: #f3f4f6;
+    --rk-table-header-text: inherit;
+    /* Inline code */
+    --rk-code-inline-bg: rgba(15, 23, 42, 0.06);
+    --rk-code-inline-text: var(--rk-text);
+    --rk-code-block-bg: #0f172a;
+    --rk-code-block-text: #e2e8f0;
+    /* Blockquote */
+    --rk-blockquote-text: #475569;
+    --rk-blockquote-border: var(--rk-border-strong);
     --rk-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     --rk-font-doc: 'Calibri', 'Segoe UI', sans-serif;
     --rk-page-width: 210mm;
@@ -55,16 +83,31 @@
     --rk-border: #334155;
     --rk-border-strong: #475569;
     --rk-text: #e2e8f0;
-    --rk-text-muted: #94a3b8;
-    --rk-primary: #3b82f6;
-    --rk-primary-fg: #ffffff;
-    --rk-primary-hover: #2563eb;
+    --rk-text-muted: #cbd5e1; /* lifted from #94a3b8 for WCAG AA on dark surface */
+    --rk-primary: #60a5fa;
+    --rk-primary-fg: #0b1220;
+    --rk-primary-hover: #3b82f6;
     --rk-primary-soft: #1e3a8a;
     --rk-active-bg: #1e3a8a;
     --rk-hover-bg: #28354a;
     --rk-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --rk-shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
     --rk-shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55);
+    /* Document surface — looks like an off-white page on dark slate. */
+    --rk-doc-bg: #1f2937;
+    --rk-doc-text: #e5e7eb;
+    /* Tables */
+    --rk-table-border: #475569;
+    --rk-table-header-bg: #283549;
+    --rk-table-header-text: #f1f5f9;
+    /* Inline code: light tint against dark surface (was unreadable). */
+    --rk-code-inline-bg: rgba(148, 163, 184, 0.18);
+    --rk-code-inline-text: #f8fafc;
+    --rk-code-block-bg: #020617;
+    --rk-code-block-text: #e2e8f0;
+    /* Blockquote: meet AA contrast against #1f2937. */
+    --rk-blockquote-text: #cbd5e1;
+    --rk-blockquote-border: #64748b;
 }
 
 /* ---------------- Shell layout ---------------- */
@@ -324,7 +367,7 @@
 .ProseMirror {
     position: relative;
     z-index: 1;
-    color: #111;
+    color: var(--rk-doc-text);
     width: var(--rk-page-width);
     min-height: var(--rk-page-height);
     padding: var(--rk-page-margin-top) var(--rk-page-margin-right) var(--rk-page-margin-bottom) var(--rk-page-margin-left);
@@ -335,7 +378,7 @@
     outline: none;
     box-sizing: border-box;
     transition: transform 0.2s ease;
-    background-color: #ffffff;
+    background-color: var(--rk-doc-bg);
     /* Page boundary lines — subtle dashed rule every page-content height,
        drawn with `background-attachment: local` so they scroll with content
        and align to the editor's own coordinate system. */
@@ -351,8 +394,6 @@
 }
 
 .rk-word-editor[data-rk-theme='dark'] .ProseMirror {
-    color: #e5e7eb;
-    background-color: #1f2937;
     background-image: repeating-linear-gradient(
         to bottom,
         transparent 0,
@@ -418,16 +459,16 @@
 .ProseMirror a, .ProseMirror .rk-link { color: var(--rk-primary); text-decoration: underline; cursor: pointer; }
 
 .ProseMirror blockquote {
-    border-left: 3px solid var(--rk-border-strong);
+    border-left: 3px solid var(--rk-blockquote-border);
     padding-left: 1em;
     margin: 1em 0;
-    color: var(--rk-text-muted);
+    color: var(--rk-blockquote-text);
     font-style: italic;
 }
 
 .ProseMirror pre, .ProseMirror .rk-code-block {
-    background: #0f172a;
-    color: #e2e8f0;
+    background: var(--rk-code-block-bg);
+    color: var(--rk-code-block-text);
     border-radius: var(--rk-radius);
     padding: 0.8em 1em;
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
@@ -437,7 +478,8 @@
 }
 
 .ProseMirror code {
-    background: rgba(15, 23, 42, 0.06);
+    background: var(--rk-code-inline-bg);
+    color: var(--rk-code-inline-text);
     border: 1px solid var(--rk-border);
     border-radius: 3px;
     padding: 1px 4px;
@@ -459,7 +501,7 @@
 
 .ProseMirror table td,
 .ProseMirror table th {
-    border: 1px solid #c7c7c7;
+    border: 1px solid var(--rk-table-border);
     padding: 6px 10px;
     min-width: 60px;
     vertical-align: top;
@@ -481,14 +523,7 @@
     text-align: left;
 }
 
-.rk-word-editor[data-rk-theme='dark'] .ProseMirror table th {
-    background: #283549;
-    color: #f1f5f9;
-}
-.rk-word-editor[data-rk-theme='dark'] .ProseMirror table td,
-.rk-word-editor[data-rk-theme='dark'] .ProseMirror table th {
-    border-color: #475569;
-}
+/* Dark-mode table colours flow from --rk-table-* tokens defined on the host. */
 
 /* Cell selection overlay */
 .ProseMirror .selectedCell:after {
@@ -1790,5 +1825,297 @@
         padding: var(--rk-page-margin-top) var(--rk-page-margin-right) var(--rk-page-margin-bottom) var(--rk-page-margin-left) !important;
         width: 100% !important;
         min-height: auto !important;
+    }
+}
+
+/* ==================================================================
+   Auto-save status pill (status bar)
+   ================================================================== */
+.rk-status-autosave {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 1px 8px 1px 6px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--rk-text-muted);
+    background: var(--rk-surface-2);
+    border: 1px solid var(--rk-border);
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+.rk-status-autosave::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--rk-text-muted);
+    flex-shrink: 0;
+}
+.rk-status-autosave.is-saving { color: var(--rk-primary); border-color: var(--rk-primary); }
+.rk-status-autosave.is-saving::before {
+    background: var(--rk-primary);
+    animation: rk-pulse 1.1s ease-in-out infinite;
+}
+.rk-status-autosave.is-saved { color: var(--rk-success); border-color: rgba(22, 163, 74, 0.4); }
+.rk-status-autosave.is-saved::before { background: var(--rk-success); }
+.rk-status-autosave.is-error { color: var(--rk-danger); border-color: rgba(220, 38, 38, 0.4); }
+.rk-status-autosave.is-error::before { background: var(--rk-danger); }
+
+@keyframes rk-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* ==================================================================
+   Toast notifications (non-blocking feedback)
+   ================================================================== */
+.rk-toast-host {
+    position: fixed;
+    z-index: 9998;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+.rk-toast {
+    pointer-events: auto;
+    min-width: 220px;
+    max-width: 360px;
+    padding: 10px 12px;
+    background: var(--rk-surface);
+    color: var(--rk-text);
+    border: 1px solid var(--rk-border);
+    border-left: 3px solid var(--rk-primary);
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-shadow-md);
+    font-size: 12px;
+    line-height: 1.4;
+    transform: translateX(8px);
+    opacity: 0;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.rk-toast.is-visible { transform: translateX(0); opacity: 1; }
+.rk-toast-success { border-left-color: var(--rk-success); }
+.rk-toast-error { border-left-color: var(--rk-danger); }
+.rk-toast-warn { border-left-color: #d97706; }
+
+/* ==================================================================
+   Command palette (Ctrl/⌘+/)
+   ================================================================== */
+.rk-cmd-palette {
+    position: fixed;
+    inset: 0;
+    z-index: 9997;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 12vh;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s, visibility 0.15s;
+}
+.rk-cmd-palette.is-open { opacity: 1; visibility: visible; }
+.rk-cmd-palette-content {
+    width: 100%;
+    max-width: 520px;
+    background: var(--rk-surface);
+    border: 1px solid var(--rk-border);
+    border-radius: var(--rk-radius);
+    box-shadow: var(--rk-shadow-lg);
+    overflow: hidden;
+    transform: translateY(-8px);
+    transition: transform 0.15s;
+}
+.rk-cmd-palette.is-open .rk-cmd-palette-content { transform: translateY(0); }
+.rk-cmd-palette-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-bottom: 1px solid var(--rk-border);
+    background: transparent;
+    color: var(--rk-text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+.rk-cmd-palette-list {
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+.rk-cmd-palette-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--rk-radius-sm);
+    cursor: pointer;
+    color: var(--rk-text);
+    font-size: 13px;
+    transition: background 0.1s;
+}
+.rk-cmd-palette-item:hover,
+.rk-cmd-palette-item.is-active {
+    background: var(--rk-hover-bg);
+    color: var(--rk-primary);
+}
+.rk-cmd-palette-item-shortcut {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--rk-text-muted);
+    font-family: 'JetBrains Mono', monospace;
+}
+.rk-cmd-palette-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--rk-text-muted);
+    font-size: 12px;
+}
+
+/* ==================================================================
+   Mobile / tablet responsive tweaks
+   ------------------------------------------------------------------
+   Strategy:
+   • ≤1024px → collapse outline/property panels to overlay drawers.
+   • ≤768px → toolbar wraps; selects shrink; modals fill width.
+   • ≤640px → page surface fits viewport, smaller margins; hide some
+     low-priority toolbar groups behind an overflow menu.
+   ================================================================== */
+@media (max-width: 1024px) {
+    .rk-outline { width: 220px; }
+    .rk-properties { width: 260px; }
+    .rk-editor-surface-area { padding: 24px 16px 48px; }
+}
+
+@media (max-width: 860px) {
+    /* Sidebars become overlay drawers above the editor surface. */
+    .rk-editor-main { position: relative; }
+    .rk-outline,
+    .rk-properties {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        z-index: 30;
+        background: var(--rk-surface);
+        box-shadow: var(--rk-shadow-lg);
+    }
+    .rk-outline { left: 0; }
+    .rk-properties { right: 0; }
+    .rk-outline-collapsed,
+    .rk-properties-collapsed {
+        box-shadow: none;
+    }
+    .rk-editor-surface-area { padding: 20px 12px 40px; }
+    .rk-toolbar-row { padding: 4px 6px; gap: 2px; }
+    .rk-select-wide { min-width: 120px; }
+    .rk-select-medium { min-width: 90px; }
+}
+
+@media (max-width: 640px) {
+    .rk-word-editor { font-size: 12px; }
+
+    .rk-menubar {
+        height: auto;
+        flex-wrap: wrap;
+        padding: 4px;
+        gap: 0;
+    }
+    .rk-brand { padding: 0 6px; font-size: 12px; }
+    .rk-menu-trigger { padding: 6px 8px; font-size: 12px; }
+    .rk-menubar-spacer { display: none; }
+    .rk-menubar-actions { margin-left: auto; }
+
+    .rk-toolbar-row {
+        flex-wrap: wrap;
+        gap: 2px;
+        min-height: 0;
+    }
+    .rk-toolbar-group {
+        padding-right: 4px;
+    }
+
+    /* Page surface: fit the viewport instead of a fixed mm width. */
+    .rk-editor-surface-area {
+        padding: 12px 6px 24px;
+        align-items: stretch;
+    }
+    .ProseMirror {
+        width: 100% !important;
+        max-width: 100%;
+        min-height: 70vh;
+        padding: 18px 14px !important;
+        font-size: 12pt;
+    }
+    .ProseMirror table { font-size: 0.9em; }
+
+    /* Modals fit the viewport. */
+    .rk-word-editor.rk-modal-overlay { padding: 8px; }
+    .rk-modal-content { max-width: 100%; }
+
+    /* Find/replace bar full-width-ish */
+    .rk-find-bar {
+        width: calc(100% - 16px);
+        right: 8px;
+        left: 8px;
+        top: 8px;
+    }
+
+    /* Property panel & outline: fit viewport when expanded. */
+    .rk-outline { width: min(80vw, 280px); }
+    .rk-properties { width: min(85vw, 300px); }
+
+    /* Status bar wraps so word/page/zoom don't overflow. */
+    .rk-statusbar {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 6px 10px;
+    }
+    .rk-statusbar-left { flex-wrap: wrap; gap: 8px; }
+
+    /* Larger touch targets for primary controls. */
+    .rk-icon-btn {
+        width: 32px;
+        height: 32px;
+    }
+    .rk-menu-dropdown {
+        min-width: min(86vw, 280px);
+    }
+}
+
+@media (max-width: 420px) {
+    .rk-statusbar-left .rk-status-read { display: none; }
+    /* Hide the secondary (less-used) toolbar row to save space — users
+       can still reach those actions via the menubar. */
+    .rk-toolbar-row + .rk-toolbar-row { display: none; }
+    .rk-toolbar.is-show-secondary .rk-toolbar-row + .rk-toolbar-row { display: flex; }
+}
+
+/* Coarse-pointer device hint: bigger handles for touch. */
+@media (pointer: coarse) {
+    .rk-resize-handle,
+    .ProseMirror .rk-textbox-handle {
+        width: 14px;
+        height: 14px;
+    }
+    .ProseMirror .rk-textbox-drag {
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+    }
+}
+
+/* Honour user's reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
     }
 }

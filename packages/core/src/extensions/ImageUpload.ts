@@ -61,7 +61,6 @@ export const ImageUpload = Extension.create({
                 props: {
                     handleDOMEvents: {
                         drop(_view: any, event: DragEvent) {
-                            console.log('[ImageUpload] Drop event detected');
                             const files = event.dataTransfer?.files;
                             if (!files || files.length === 0) return false;
 
@@ -72,14 +71,16 @@ export const ImageUpload = Extension.create({
 
                             event.preventDefault();
                             imageFiles.forEach(file => {
-                                console.log('[ImageUpload] Uploading dropped image:', file.name);
+                                if (options.maxFileSizeMB && file.size > options.maxFileSizeMB * 1024 * 1024) {
+                                    console.warn(`[rk-editor] Image too large (max ${options.maxFileSizeMB}MB): ${file.name}`);
+                                    return;
+                                }
                                 (editor.commands as any).uploadImage(file);
                             });
                             return true;
                         },
                     },
                     handlePaste: (_view: any, event: ClipboardEvent) => {
-                        console.log('[ImageUpload] Paste event detected');
                         const items = event.clipboardData?.items;
                         if (!items) return false;
 
@@ -88,17 +89,15 @@ export const ImageUpload = Extension.create({
                             if (item.type.startsWith('image/')) {
                                 const file = item.getAsFile();
                                 if (file) {
-                                    // Validate file size and type
                                     if (options.maxFileSizeMB && file.size > options.maxFileSizeMB * 1024 * 1024) {
-                                        console.warn(`[ImageUpload] File too large: ${file.name}`);
+                                        console.warn(`[rk-editor] Pasted image too large (max ${options.maxFileSizeMB}MB).`);
                                         return;
                                     }
                                     if (options.acceptedTypes && !options.acceptedTypes.includes(file.type)) {
-                                        console.warn(`[ImageUpload] Invalid file type: ${file.type}`);
+                                        console.warn(`[rk-editor] Unsupported pasted image type: ${file.type}`);
                                         return;
                                     }
 
-                                    console.log('[ImageUpload] Uploading pasted image:', file.name);
                                     event.preventDefault();
                                     (editor.commands as any).uploadImage(file);
                                     handled = true;

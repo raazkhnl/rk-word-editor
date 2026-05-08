@@ -4,15 +4,20 @@ import { icon, Icons, type IconName } from './icons';
 import {
     showLinkDialog, showImageDialog, showTableDialog, showMathDialog, showFootnoteDialog,
     showCitationDialog, showPageLayoutDialog, showShortcutsDialog, showAboutDialog, showTocDialog,
+    RK_EDITOR_VERSION,
 } from './dialogs';
 import { FindReplaceBar } from './FindReplaceBar';
-import { StatusBar } from './StatusBar';
+import { StatusBar, type AutoSaveState } from './StatusBar';
 import { Outline } from './Outline';
 import { PropertyPanel } from './PropertyPanel';
+import { CommandPalette } from './CommandPalette';
+import { toast } from './toast';
 import './styles.css';
 
 export { Modal, icon, Icons, type IconName };
-export { FindReplaceBar, StatusBar, Outline, PropertyPanel };
+export { FindReplaceBar, StatusBar, Outline, PropertyPanel, CommandPalette, toast };
+export type { AutoSaveState };
+export { RK_EDITOR_VERSION };
 export {
     showLinkDialog, showImageDialog, showTableDialog, showMathDialog, showFootnoteDialog,
     showCitationDialog, showPageLayoutDialog, showShortcutsDialog, showAboutDialog, showTocDialog,
@@ -85,10 +90,14 @@ export class WordToolbar {
     private opts: WordToolbarOptions;
     private root!: HTMLDivElement;
     private findBar?: FindReplaceBar;
-    private statusBar?: StatusBar;
+    private _statusBar?: StatusBar;
     private outline?: Outline;
     private propertyPanel?: PropertyPanel;
     private surfaceWrap!: HTMLDivElement;
+    private palette?: CommandPalette;
+
+    /** The status bar instance (if one was rendered). */
+    public get statusBar(): StatusBar | undefined { return this._statusBar; }
 
     constructor(editor: WordEditor, container: HTMLElement, opts: WordToolbarOptions = {}) {
         this.editor = editor;
@@ -142,7 +151,7 @@ export class WordToolbar {
 
         this.findBar = new FindReplaceBar(this.editor, surfaceArea);
 
-        if (this.opts.statusBar) this.statusBar = new StatusBar(this.editor, this.root);
+        if (this.opts.statusBar) this._statusBar = new StatusBar(this.editor, this.root);
 
         const importInput = document.createElement('input');
         importInput.type = 'file';
@@ -238,8 +247,10 @@ export class WordToolbar {
                     { label: 'Math (LaTeX)…', action: 'insertMath', icon: 'math' },
                     { label: 'Citation…', action: 'insertCitation', icon: 'citation' },
                     { label: 'Footnote…', action: 'insertFootnote', icon: 'footnote' },
+                    { label: 'Bibliography', action: 'insertBibliography', icon: 'citation' },
                     { label: 'Table of contents', action: 'insertToc', icon: 'toc' },
                     { sep: true },
+                    { label: 'Page number', action: 'insertPageNumber', icon: 'pageBreak' },
                     { label: 'Page break', action: 'pageBreak', icon: 'pageBreak', shortcut: 'Ctrl+Enter' },
                     { label: 'Horizontal rule', action: 'hr', icon: 'horizontalRule' },
                     { label: 'Blockquote', action: 'blockquote', icon: 'blockquote' },
@@ -274,9 +285,12 @@ export class WordToolbar {
                     { label: 'Toggle outline', action: 'toggleOutline', icon: 'panelLeft' },
                     { label: 'Toggle properties panel', action: 'toggleProperties', icon: 'panelRight' },
                     { label: 'Read-only mode', action: 'toggleReadOnly', icon: 'eye' },
+                    { label: 'Show secondary toolbar', action: 'toggleSecondaryToolbar', icon: 'panelLeft' },
                     { sep: true },
                     { label: 'Light theme', action: 'themeLight', icon: 'sun' },
                     { label: 'Dark theme', action: 'themeDark', icon: 'moon' },
+                    { sep: true },
+                    { label: 'Command palette', action: 'commandPalette', icon: 'search', shortcut: 'Ctrl+/' },
                     { sep: true },
                     { label: 'Zoom in', action: 'zoomIn', icon: 'zoomIn', shortcut: 'Ctrl++' },
                     { label: 'Zoom out', action: 'zoomOut', icon: 'zoomOut', shortcut: 'Ctrl+-' },
@@ -286,6 +300,7 @@ export class WordToolbar {
             {
                 label: 'Help',
                 items: [
+                    { label: 'Command palette', action: 'commandPalette', icon: 'search', shortcut: 'Ctrl+/' },
                     { label: 'Keyboard shortcuts', action: 'showShortcuts', icon: 'keyboard' },
                     { label: 'About', action: 'showAbout', icon: 'info' },
                     { label: 'GitHub repository', action: 'openGithub', icon: 'github' },
@@ -560,7 +575,9 @@ export class WordToolbar {
             case 'insertMath': showMathDialog(ed); break;
             case 'insertFootnote': showFootnoteDialog(ed); break;
             case 'insertCitation': showCitationDialog(ed); break;
+            case 'insertBibliography': ed.format.insertBibliography(); break;
             case 'insertToc': showTocDialog(ed); break;
+            case 'insertPageNumber': ed.format.insertPageNumber(); break;
             case 'refreshToc': ed.format.refreshTableOfContents(); break;
             case 'pageBreak': ed.format.pageBreak(); break;
             case 'hr': ed.format.horizontalRule(); break;
@@ -608,11 +625,17 @@ export class WordToolbar {
                 ed.setEditable(!ed.isEditable());
                 this.root.classList.toggle('rk-readonly', !ed.isEditable());
                 break;
+            case 'toggleSecondaryToolbar': {
+                const tb = this.root.querySelector('.rk-toolbar') as HTMLElement | null;
+                tb?.classList.toggle('is-show-secondary');
+                break;
+            }
+            case 'commandPalette': this.openCommandPalette(); break;
             case 'themeLight': this.applyTheme('light'); break;
             case 'themeDark': this.applyTheme('dark'); break;
-            case 'zoomIn': ed.setZoom(ed.getZoom() + 0.1); this.statusBar?.update(); break;
-            case 'zoomOut': ed.setZoom(ed.getZoom() - 0.1); this.statusBar?.update(); break;
-            case 'zoomReset': ed.setZoom(1); this.statusBar?.update(); break;
+            case 'zoomIn': ed.setZoom(ed.getZoom() + 0.1); this._statusBar?.update(); break;
+            case 'zoomOut': ed.setZoom(ed.getZoom() - 0.1); this._statusBar?.update(); break;
+            case 'zoomReset': ed.setZoom(1); this._statusBar?.update(); break;
 
             // Help
             case 'showShortcuts': showShortcutsDialog(); break;
@@ -633,8 +656,49 @@ export class WordToolbar {
             else if (k === '=' || k === '+') { e.preventDefault(); this.handleAction('zoomIn'); }
             else if (k === '-') { e.preventDefault(); this.handleAction('zoomOut'); }
             else if (k === '0') { e.preventDefault(); this.handleAction('zoomReset'); }
-            else if (k === '/') { e.preventDefault(); /* future command palette */ }
+            else if (k === '/') { e.preventDefault(); this.openCommandPalette(); }
         });
+    }
+
+    /** Lazily build & open the command palette (Ctrl/⌘+/). */
+    private openCommandPalette() {
+        if (!this.palette) {
+            const run = (action: string) => () => this.handleAction(action);
+            this.palette = new CommandPalette([
+                { id: 'newDoc', title: 'New document', description: 'Clear the editor and start fresh', action: run('newDoc') },
+                { id: 'openImport', title: 'Open / Import file…', description: '.docx, .md, .html, .json, .txt', action: run('openImport') },
+                { id: 'exportDocx', title: 'Save as DOCX', shortcut: 'Ctrl+S', action: run('exportDocx') },
+                { id: 'exportMd', title: 'Export as Markdown', action: run('exportMd') },
+                { id: 'exportHtml', title: 'Export as HTML', action: run('exportHtml') },
+                { id: 'exportJson', title: 'Export as JSON', action: run('exportJson') },
+                { id: 'printDoc', title: 'Print / Save as PDF', shortcut: 'Ctrl+P', action: run('printDoc') },
+                { id: 'pageLayout', title: 'Page layout…', description: 'Page size, orientation, margins', action: run('pageLayout') },
+                { id: 'find', title: 'Find', shortcut: 'Ctrl+F', action: run('find') },
+                { id: 'findReplace', title: 'Find and replace', shortcut: 'Ctrl+H', action: run('findReplace') },
+                { id: 'insertImage', title: 'Insert image (upload)', action: run('insertImage') },
+                { id: 'insertImageUrl', title: 'Insert image from URL', action: run('insertImageUrl') },
+                { id: 'insertTable', title: 'Insert table', action: run('insertTable') },
+                { id: 'insertTextBox', title: 'Insert text box', action: run('insertTextBox') },
+                { id: 'insertLink', title: 'Insert link', shortcut: 'Ctrl+K', action: run('insertLink') },
+                { id: 'insertMath', title: 'Insert math (LaTeX)', action: run('insertMath') },
+                { id: 'insertCitation', title: 'Insert citation', action: run('insertCitation') },
+                { id: 'insertFootnote', title: 'Insert footnote', action: run('insertFootnote') },
+                { id: 'insertToc', title: 'Insert table of contents', action: run('insertToc') },
+                { id: 'insertPageNumber', title: 'Insert page number', action: run('insertPageNumber') },
+                { id: 'pageBreak', title: 'Insert page break', shortcut: 'Ctrl+Enter', action: run('pageBreak') },
+                { id: 'trackChanges', title: 'Toggle track changes', action: run('trackChanges') },
+                { id: 'formatPainter', title: 'Format painter', action: run('formatPainter') },
+                { id: 'clearFormatting', title: 'Clear formatting', action: run('clearFormatting') },
+                { id: 'toggleOutline', title: 'Toggle outline panel', action: run('toggleOutline') },
+                { id: 'toggleProperties', title: 'Toggle properties panel', action: run('toggleProperties') },
+                { id: 'toggleReadOnly', title: 'Toggle read-only mode', action: run('toggleReadOnly') },
+                { id: 'themeDark', title: 'Switch to dark theme', action: run('themeDark') },
+                { id: 'themeLight', title: 'Switch to light theme', action: run('themeLight') },
+                { id: 'showShortcuts', title: 'Keyboard shortcuts', action: run('showShortcuts') },
+                { id: 'showAbout', title: 'About RK Word Editor', action: run('showAbout') },
+            ]);
+        }
+        this.palette.open();
     }
 
     // ----- Theme -----
@@ -688,12 +752,18 @@ export class WordToolbar {
         }
     }
 
+    /** Reflect auto-save progress in the status bar pill. */
+    public setSaveState(state: AutoSaveState, message?: string) {
+        this._statusBar?.setSaveState(state, message);
+    }
+
     public destroy() {
         document.removeEventListener('click', this.handleDocClick);
         this.findBar?.destroy();
-        this.statusBar?.destroy();
+        this._statusBar?.destroy();
         this.outline?.destroy();
         this.propertyPanel?.destroy();
+        this.palette?.destroy();
         this.root.remove();
     }
 }
@@ -733,6 +803,11 @@ export class EditorShell {
             element: surface,
         });
         this.toolbar = new WordToolbar(this.editor, target, opts);
+    }
+
+    /** Reflect auto-save progress in the status bar pill. */
+    public setSaveState(state: AutoSaveState, message?: string) {
+        this.toolbar.setSaveState(state, message);
     }
 
     public destroy(): void {

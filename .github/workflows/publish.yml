@@ -1,5 +1,9 @@
-# filepath: c:\Users\raazk\Desktop\Apps\Antigravity\rk-word-editor\.github\workflows\publish.yml
-name: CI/CD - Build and Publish
+# RK Word Editor — CI/CD
+# - Builds and tests on every push & PR.
+# - Publishes core / ui / cli to npm when a tag matching v*.*.* is pushed.
+# - Deploys the demo to GitHub Pages on every push to the default branch.
+
+name: CI/CD - Build, Test, Publish, Deploy
 
 on:
   push:
@@ -9,6 +13,11 @@ on:
   pull_request:
     branches: [main, master]
   workflow_dispatch:
+
+# A single concurrency lane per ref keeps Pages from racing with itself.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-test:
@@ -26,11 +35,19 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Lint and Type Check
+      - name: Build all packages and demo
         run: npm run build
 
       - name: Run Tests
         run: npm test --workspaces --if-present
+
+      - name: Upload demo bundle
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-dist
+          path: apps/demo/dist
+          retention-days: 7
 
   publish:
     name: Publish to NPM
@@ -48,43 +65,31 @@ jobs:
         with:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
+          cache: "npm"
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Build Packages
-        run: npm run build
+        run: npm run build:packages
 
       - name: Publish @raazkhnl/rk-editor-core
-        run: npm publish ./packages/core --access public --provenance
+        run: npm publish --workspace=@raazkhnl/rk-editor-core --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @raazkhnl/rk-editor-ui
-        run: npm publish ./packages/ui --access public --provenance
+        run: npm publish --workspace=@raazkhnl/rk-editor-ui --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  deploy-dev:
-    name: Deploy Dev Preview
-    needs: build-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install and Build Demo
-        run: |
-          npm ci
-          npm run build:all
-      # Tip: Add your deployment provider here (Vercel, GH Pages, etc.)
-      # Example: npx vercel --token ${{ secrets.VERCEL_TOKEN }} --prod
+      - name: Publish @raazkhnl/rk-editor-cli
+        run: npm publish --workspace=@raazkhnl/rk-editor-cli --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   deploy-ghpages:
-    name: Deploy to GitHub Pages
+    name: Deploy demo to GitHub Pages
     needs: build-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -92,6 +97,9 @@ jobs:
       contents: read
       pages: write
       id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -104,12 +112,25 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build Static Site
-        run: npm run build:all
+      - name: Build demo with Pages base path
+        # Vite's `base` resolves automatically from $GITHUB_REPOSITORY thanks to
+        # the demo's vite.config.ts (see RK_DEMO_BASE / GITHUB_REPOSITORY logic).
+        run: npm run build
+
+      - name: Add SPA 404 fallback
+        run: cp apps/demo/dist/index.html apps/demo/dist/404.html
+
+      - name: Disable Jekyll on Pages
+        run: touch apps/demo/dist/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/demo/dist
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          # Optional: add custom domain if needed
+        id: deployment
+        uses: actions/deploy-pages@v4

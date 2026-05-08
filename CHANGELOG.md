@@ -2,7 +2,55 @@
 
 All notable changes to **RK Word Editor** will be documented here. This project follows [Semantic Versioning](https://semver.org/).
 
-## [4.5.0] — 2026-04-26
+## [4.6.0] — 2026-05-08
+
+Major polish, responsiveness, and accessibility release. Adds a command palette, auto-save status indicator, image alt-text editor, and a hosted demo on GitHub Pages.
+
+### Added
+- **Command palette** ([Ctrl/⌘ + /]) — fuzzy-search every editor command (insert image, export DOCX, toggle outline, switch theme, …) without hunting through menus.
+- **Auto-save status pill** in the status bar — shows `Saving…`, `Saved`, or `Save failed`, plus a relative timestamp (`Saved 12s ago`). The host app drives it via `shell.setSaveState('saving' | 'saved' | 'error')`.
+- **Image alt-text + title editor** in the right-side properties panel. Both are read by screen readers and round-trip through DOCX/HTML export.
+- **Image dialog** now collects alt text and tooltip title up front, and rejects `javascript:` / `data:` URLs.
+- **Insert menu** now exposes Page number, Bibliography, and direct Math (LaTeX) insertion — previously these existed in core but were not reachable from the UI.
+- **Toast notifications** (`toast(message, { variant })`) — tiny, theme-aware, dismissible; used by the demo to surface storage-quota errors.
+- **PWA-installable demo** with a web manifest, theme-color, SVG favicon, and a stale-while-revalidate service worker (production builds only).
+- **Hosted demo on GitHub Pages** — `.github/workflows/publish.yml` now ships every push to `main` to `https://raazkhnl.github.io/rk-word-editor/` via the official `actions/deploy-pages` flow. SPA fallback (`404.html`) and `.nojekyll` are written automatically.
+- **Web component events** — `<rk-word-editor>` now dispatches `rk-ready`, `rk-change`, and `rk-selection` CustomEvents and exposes `getValue(format)` / `setValue(content)` methods. New `properties` attribute toggles the right-side panel; `theme` and `readonly` react to attribute changes.
+- **CLI scaffolder** rewritten — `npx @raazkhnl/rk-editor-cli init` now generates a working Vite project (Vanilla, React, Vue, or Svelte template) with `index.html`, `vite.config.ts`, `tsconfig.json`, and a starter `main.{ts,tsx}` that imports `EditorShell` and the styles.
+
+### Fixed
+- **Hard-coded colours** scoped through new CSS tokens (`--rk-doc-bg`, `--rk-doc-text`, `--rk-table-border`, `--rk-table-header-bg`, `--rk-table-header-text`, `--rk-code-inline-bg`, `--rk-code-inline-text`, `--rk-code-block-bg`, `--rk-blockquote-text`, `--rk-blockquote-border`). Dark-mode tables, inline code, and blockquotes now meet WCAG AA contrast against the dark surface.
+- **Inline `<code>` was unreadable in dark mode** — light tint applied, foreground colour follows the theme.
+- **Blockquote text** in dark mode bumped from `--rk-text-muted` (≈3.5:1) to a dedicated lighter shade (≈4.7:1).
+- **`--rk-text-muted` lifted** in dark mode so all secondary labels (status bar, outline, footnotes) hit AA contrast.
+- **`console.log` debug noise removed** from the `ImageUpload` extension; oversized drops/pastes still warn once.
+- **CLI version mismatch** — was reporting `3.5.0` and pinning legacy deps. Now reports `4.6.0` and points at `^4.6.0`.
+
+### Improved — UI uniformity
+- New spacing tokens (`--rk-space-1`…`--rk-space-7`) and control-height tokens (`--rk-control-h`, `--rk-control-h-sm`) keep toolbar buttons, inputs, selects, and modal fields visually aligned across components.
+- Modal fields now consistently match the toolbar control sizing.
+- Image properties panel split into `Accessibility / Size / Layout` sections for better scanning.
+- A11y: more `aria-label` and `title` on icon buttons, `aria-live` on status indicators, focus-visible outline on keyboard interaction.
+
+### Improved — Mobile & responsiveness
+- **First-class responsive layout** with `@media` breakpoints at 1024 / 860 / 640 / 420 px:
+  - Outline & properties panels become overlay drawers below 860 px instead of squeezing the editor.
+  - Toolbar wraps and shrinks; on very narrow viewports the secondary toolbar row is hidden by default with a *View → Show secondary toolbar* toggle to bring it back.
+  - The editor surface fits the viewport on phones (instead of a fixed 210 mm A4 box that overflowed).
+  - Modals fill the screen on phones; the find bar auto-fills the available width.
+  - Status bar wraps; least-important pieces (reading time) are hidden under 420 px.
+- **Coarse-pointer media query** — image-resize and text-box handles enlarge to 14 px so they're tappable on touch devices.
+- **`prefers-reduced-motion`** honoured everywhere (animations and transitions reduced to ~0).
+
+### Demo
+- First-time visitors are seeded with a guided sample document showing every major feature (TOC, headings, table, code block, task list, math, blockquote).
+- "Reset demo" pill (bottom-left) restores the sample at any time.
+- Loading splash so the page paints something immediately.
+- `localStorage` quota errors now surface a toast instead of silently swallowing.
+- SEO meta + Open Graph tags; PWA manifest; SVG favicon.
+- `vite.config.ts` now resolves the right `base` automatically when built under `GITHUB_ACTIONS` (so GH Pages deploys to `/rk-word-editor/` without manual config).
+
+
 
 ### Fixed
 - **Table of Contents missing in PDF / Print export.** The TOC node renders its populated content via a NodeView, which `editor.getHTML()` cannot serialize, so prints were emitting an empty fallback. `printPdf()` now uses a new `getPrintableHTML()` that clones the live `.ProseMirror` DOM (so the populated TOC, image-resize wrappers, and text boxes all carry over), then strips editor-only chrome (drag handles, resize handles, pagination spacers, refresh buttons, gap cursors, `contenteditable` attrs, selected-node markers) before sending to the print iframe.
