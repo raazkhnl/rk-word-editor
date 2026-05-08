@@ -1,6 +1,15 @@
 # Deploys the demo to GitHub Pages on every push to the default branch.
-# Requires the repo to have Pages enabled with "GitHub Actions" as the source
-# (Settings → Pages → Build and deployment → Source: GitHub Actions).
+#
+# One-time setup the repo owner must do *before* this workflow can succeed:
+#   1. Settings → Pages → Build and deployment → Source: GitHub Actions
+#   2. Settings → Actions → General → Workflow permissions:
+#        Read and write permissions  +  Allow GitHub Actions to create/approve PRs
+#
+# This file deliberately splits the work into two jobs:
+#   · build    → always runs; produces apps/demo/dist as an artifact.
+#   · deploy   → only runs when the runtime detects Pages is enabled.
+#                Skips itself with a friendly message otherwise so the workflow
+#                stays green (instead of failing every push until setup is done).
 
 name: Deploy demo to GitHub Pages
 
@@ -9,22 +18,16 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-# A single concurrent deployment per branch
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: Build and deploy
+  build:
+    name: Build demo
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      pages-enabled: ${{ steps.check.outputs.enabled }}
     steps:
       - uses: actions/checkout@v4
 
@@ -34,11 +37,11 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
       - name: Build demo
-        # The demo's vite.config.ts auto-resolves the right base path from
+        # The demo's vite.config.ts auto-resolves the base path from
         # $GITHUB_REPOSITORY so deeply-linked assets resolve under /<repo>/.
         run: npm run build
 
@@ -48,14 +51,56 @@ jobs:
       - name: Disable Jekyll on Pages
         run: touch apps/demo/dist/.nojekyll
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Detect whether GitHub Pages is enabled
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: token ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages")
+          if [ "$status" = "200" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "Pages is enabled — deploy job will run."
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Pages is NOT enabled on this repo (HTTP $status)."
+            echo "::warning::Enable it: Settings → Pages → Source: 'GitHub Actions'. Then re-run."
+          fi
 
       - name: Upload Pages artifact
+        if: steps.check.outputs.enabled == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: apps/demo/dist
 
-      - name: Deploy to GitHub Pages
+      - name: Upload demo as a regular artifact (always)
+        # So you can still download the built demo from the run summary even
+        # before Pages is enabled.
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-dist
+          path: apps/demo/dist
+          retention-days: 14
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: needs.build.outputs.pages-enabled == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

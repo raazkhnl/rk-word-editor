@@ -1,0 +1,21 @@
+# Diagnostic-only workflow.
+# If this run also fails at "startup_failure" with zero jobs scheduled, the
+# problem is *not* in any workflow file — it's at the repo level. Open
+# Settings → Actions → General and confirm:
+#   · "Actions permissions" is set to "Allow all actions and reusable workflows".
+#   · "Workflow permissions" is set to "Read and write permissions".
+#   · The repository is not blocked by an organisation policy or billing issue.
+# Delete this file once Actions starts running again.
+
+name: Smoke test (delete after first green run)
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "actions are running on this repo"
