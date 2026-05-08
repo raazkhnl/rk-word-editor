@@ -1,0 +1,61 @@
+# Deploys the demo to GitHub Pages on every push to the default branch.
+# Requires the repo to have Pages enabled with "GitHub Actions" as the source
+# (Settings → Pages → Build and deployment → Source: GitHub Actions).
+
+name: Deploy demo to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+# A single concurrent deployment per branch.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build demo
+        # The demo's vite.config.ts auto-resolves the right base path from
+        # $GITHUB_REPOSITORY so deeply-linked assets resolve under /<repo>/.
+        run: npm run build
+
+      - name: Add SPA 404 fallback
+        run: cp apps/demo/dist/index.html apps/demo/dist/404.html
+
+      - name: Disable Jekyll on Pages
+        run: touch apps/demo/dist/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/demo/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
