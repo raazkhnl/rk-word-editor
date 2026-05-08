@@ -63,6 +63,37 @@ RK Word Editor is the rich-text editor we wished existed when we needed somethin
 - **Vanilla, React, Vue, Web Component** — works anywhere; no React requirement.
 - ESM + CJS dual build. Tiny CSS, zero global pollution. Fully typed.
 
+## Free for any use — including commercial
+
+RK Word Editor is **MIT-licensed** and built on a stack of permissive
+dependencies (MIT, BSD, ISC, Apache 2.0). Every package in the dependency
+tree was audited — there is **zero GPL / AGPL / LGPL contamination** and
+**zero non-commercial restriction**. See [NOTICE.md](NOTICE.md) for the
+full breakdown.
+
+What this means in practice:
+
+- ✅ Use it on your **commercial / customer-facing** website or SaaS.
+- ✅ Embed it in **paid products** (per-seat, per-tenant, enterprise — all fine).
+- ✅ **Modify it** and keep the changes private.
+- ✅ **Fork** and ship your own branded version.
+- ❌ **No royalties.** No usage fees. No "free for non-commercial" trap.
+- ❌ **No permission needed** from anyone — just install the npm packages
+  and ship.
+
+The only legal requirement is to keep the MIT licence header in the source
+distribution of the package itself (modern bundlers — Vite, webpack, Rollup —
+preserve this automatically). An acknowledgement of the original developer
+**[RaaZ Khanal](https://github.com/raazkhnl)** in your product credits or
+"About" page is **appreciated but not required**.
+
+> Compared to **TinyMCE / CKEditor / Froala** — which require a paid
+> commercial licence (or force your application to be open-sourced under
+> GPL) for any commercial use — RK Word Editor is genuinely free.
+
+Reporting a security issue? See [SECURITY.md](SECURITY.md) for the
+private disclosure process.
+
 ## Live demo
 
 **🚀 Try it now → [raazkhnl.github.io/rk-word-editor](https://raazkhnl.github.io/rk-word-editor/)**
@@ -504,4 +535,15 @@ npm run test         # run vitest in core
 
 ## License
 
-MIT © [RaaZ Khanal](https://github.com/raazkhnl)
+**[MIT](LICENSE)** © **[RaaZ Khanal](https://github.com/raazkhnl)**
+
+Free for any use — personal, commercial, internal tooling, paid products,
+SaaS, enterprise. No royalties, no permission needed, no copyleft.
+See [NOTICE.md](NOTICE.md) for the third-party licence audit and
+[SECURITY.md](SECURITY.md) for the private vulnerability disclosure
+process.
+
+If RK Word Editor saves you a paid TinyMCE/CKEditor/Froala licence,
+consider [sponsoring the maintainer](https://github.com/sponsors/raazkhnl)
+or starring the repo. Every star helps the project reach more
+developers who'd otherwise be paying for the same thing.
