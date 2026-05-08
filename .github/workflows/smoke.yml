@@ -1,13 +1,9 @@
 # Diagnostic-only workflow.
-# If this run also fails at "startup_failure" with zero jobs scheduled, the
-# problem is *not* in any workflow file — it's at the repo level. Open
-# Settings → Actions → General and confirm:
-#   · "Actions permissions" is set to "Allow all actions and reusable workflows".
-#   · "Workflow permissions" is set to "Read and write permissions".
-#   · The repository is not blocked by an organisation policy or billing issue.
-# Delete this file once Actions starts running again.
+# Each job adds one piece of complexity vs the previous green smoke test
+# so we can pinpoint exactly which feature triggers the prior startup_failure.
+# Delete this file once the actual workflows are healthy.
 
-name: Smoke test (delete after first green run)
+name: Smoke test
 
 on:
   push:
@@ -15,7 +11,44 @@ on:
   workflow_dispatch:
 
 jobs:
-  hello:
+  a-just-echo:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "actions are running on this repo"
+      - run: echo "level 1 - bare echo (already green previously)"
+
+  b-checkout-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "level 2 - actions/checkout works"
+
+  c-checkout-and-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: node -v && echo "level 3 - setup-node without cache works"
+
+  d-checkout-node-and-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: echo "level 4 - setup-node WITH cache:npm works"
+
+  e-named-job-with-many-triggers:
+    name: Named job mirroring publish.yml structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: echo "level 5 - npm ci on monorepo works"
