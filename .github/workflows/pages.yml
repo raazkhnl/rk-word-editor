@@ -9,7 +9,7 @@
 #   · build    → always runs; produces apps/demo/dist as an artifact.
 #   · deploy   → only runs when the runtime detects Pages is enabled.
 #                Skips itself with a friendly message otherwise so the workflow
-#                stays green (instead of failing every push until setup is done).
+#                stays green (instead of failing every push until setup is done)
 
 name: Deploy demo to GitHub Pages
 
